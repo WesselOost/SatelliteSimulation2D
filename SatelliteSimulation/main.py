@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm 
+# @Author  : Tom Brandherm & Wessel Oostrum
 # @Link    : link
 # @Version : 0.0.1
 """
@@ -18,6 +18,7 @@ Short Introduction
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
+from SatelliteSimulation.controller import Controller
 
 
 class ClassName:
@@ -67,8 +68,4 @@ class ClassName:
 # =========================================================================== #
 
 if __name__ == '__main__':
-    pass
-
-
-
-
+    Controller()
