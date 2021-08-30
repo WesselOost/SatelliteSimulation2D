@@ -14,7 +14,7 @@ import pygame
 import os
 
 from model import Satellite
-from pycharm_button import Button
+from pygame_button import Button
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -113,10 +113,10 @@ class GUI:
         pygame.quit()
 
     def rotate_and_draw_earth(self):
-        self.__earth_img_angle += 0.2
+        self.__earth_img_angle -= 0.2
         earth_img_rotated = pygame.transform.rotozoom(EARTH_IMG, self.__earth_img_angle, EARTH_SCALE)
-        image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) / 2, \
-                         self.__surface.get_height() - earth_img_rotated.get_height() / 2
+        image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) // 2, \
+                         self.__surface.get_height() - earth_img_rotated.get_height() // 2
         self.__surface.blit(earth_img_rotated, image_position)
 
     def __draw_satellite(self, satellite: Satellite):
