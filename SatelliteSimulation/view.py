@@ -13,17 +13,17 @@ Short Introduction
 import pygame
 import os
 
-from SatelliteSimulation.model import Satellite
-from SatelliteSimulation.pycharm_button import Button
+from model import Satellite
+from pycharm_button import Button
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-
+ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
 BACKGROUND_COLOR = (0, 0, 0)
 FONT_SIZE = 14
 FRAMERATE = 60
-EARTH_IMG = pygame.image.load(os.path.join("Assets", "earth.png"))
+EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH,"Assets", "earth.png"))
 EARTH_SCALE = 0.4
 
 
@@ -135,5 +135,4 @@ class GUI:
 # =========================================================================== #
 
 if __name__ == '__main__':
-    # GUI(1400, 800, None)
     pass

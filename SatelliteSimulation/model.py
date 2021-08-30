@@ -10,15 +10,15 @@ Short Introduction
 # =========================================================================== #
 #  SECTION: Imports                                                           
 # =========================================================================== #
-
+import os
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-
+ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-import os
+
 
 
 class Satellite:
@@ -65,7 +65,7 @@ class SatelliteA(Satellite):
                          weigth=100,
                          width=50,
                          height=50,
-                         imgUrl=os.path.join("Assets", "satellite1.png"))
+                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
 
 
 class SatelliteB(Satellite):
@@ -75,7 +75,7 @@ class SatelliteB(Satellite):
                          weigth=80,
                          width=40,
                          height=40,
-                         imgUrl=os.path.join("Assets", "satellite2.png"))
+                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite2.png"))
 
 
 class SatelliteC(Satellite):
@@ -85,7 +85,7 @@ class SatelliteC(Satellite):
                          weigth=120,
                          width=60,
                          height=60,
-                         imgUrl=os.path.join("Assets", "satellite3.png"))
+                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
 
 
 class Space:

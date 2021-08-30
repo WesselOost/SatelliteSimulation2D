@@ -18,7 +18,7 @@ Short Introduction
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from SatelliteSimulation.controller import Controller
+from controller import Controller
 
 
 class ClassName:
