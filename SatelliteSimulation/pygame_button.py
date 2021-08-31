@@ -63,7 +63,6 @@ class Button:
         self.__height = self.__body_height + self.__bottom_border_height
 
 
-
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
@@ -140,7 +139,6 @@ class Button:
 
     def __draw_text(self, surface):
         surface.blit(self.__text_surface, (self.x + self.__text_offset_x, self.__body.y + self.__text_offset_y))
-
 
 
     def __pressed_and_state_is_hovered(self, mouse_position) -> bool:
