@@ -4,7 +4,7 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Short Introduction
+Controller of the satelluite simulation. All the logic is implemented here. 
 """
 
 # =========================================================================== #

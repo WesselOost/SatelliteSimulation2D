@@ -107,6 +107,7 @@ class Space:
     def create_disturbance(self, disturbanceType: str):
         pass
 
+
     def detect_possible_collision(self):
         pass
 
