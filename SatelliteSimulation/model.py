@@ -32,15 +32,15 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: int, y: int, weigth: int, width: int, height: int, imgUrl: str):
+    def __init__(self, x: int, y: int, weight: int, width: int, height: int, imgUrl: str):
         ## public
         self.isCrashed: bool = False
         self.observanceRadius: int = None
         self.dangerZoneShift: int = 20
         self.x = x
         self.y = y
-        self.weigth = weigth
-        self.suface = width * height
+        self.weight = weight
+        self.surface = width * height
         self.size = max(width, height)
         self.dangerZoneRadius = self.size//2 + self.dangerZoneShift
         self.imgUrl = imgUrl
@@ -123,7 +123,7 @@ class Space:
         if disturbanceType == "MALFUNCTION":
             disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
             
-        disturbance.start()
+            disturbance.start()
 
 
     def detect_possible_collision(self):
@@ -162,10 +162,12 @@ class Space:
     def __no_overlapp(self, new_satellite:Satellite, satellites:list) -> bool:
         if not satellites:
             return True
+            
         #center coordinates for new satellite
         x1 = new_satellite.x + new_satellite.size//2
         y1 = new_satellite.y + new_satellite.size//2
         for satellite in satellites:
+    
             #center coordinates of existing satellite
             x2 = satellite.x + satellite.size//2
             y2 = satellite.y + satellite.size//2
@@ -178,9 +180,11 @@ class Space:
 
 
     def __inside_border(self, satellite:Satellite, offset:int = 10)->bool:
-        valid_x = self.border_corner_x + offset < (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - offset)
-        valid_y = self.border_corner_x + offset <(satellite.y + satellite.size) < (self.border_corner_y + self.border_height - offset)
-        if valid_x and valid_y:
+        right_valid_x = (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - offset)
+        left_valid_x = self.border_corner_x + offset < satellite.x
+        top_valid_y = self.border_corner_y + offset < satellite.y
+        bottom_valid_y = (satellite.y + satellite.size) < (self.border_corner_y + self.border_height - offset)
+        if right_valid_x and left_valid_x and top_valid_y and bottom_valid_y:
             return True
         return False
 

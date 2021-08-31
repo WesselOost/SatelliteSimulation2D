@@ -79,7 +79,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def get_satellite_border(self) -> (int, int, int, int):
+    def get_satellite_border(self) -> tuple:
         return self.__satellite_border.x, \
                self.__satellite_border.y, \
                self.__satellite_border.width, \
