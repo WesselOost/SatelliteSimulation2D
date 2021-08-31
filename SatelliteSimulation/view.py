@@ -94,16 +94,15 @@ class GUI:
                 new_y += previous_button.y
             button.set_position(new_x, new_y)
 
+
     def __start_simulation_loop(self):
         clock = pygame.time.Clock()
         run = True
         while run:
             clock.tick(FRAMERATE)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-
             for button in self.__buttons:
                 button.calculate_state()
                 if button.new_click_event():
@@ -112,12 +111,14 @@ class GUI:
             self.__controller.next_frame()
         pygame.quit()
 
+
     def rotate_and_draw_earth(self):
-        self.__earth_img_angle += 0.2
+        self.__earth_img_angle -= 0.2
         earth_img_rotated = pygame.transform.rotozoom(EARTH_IMG, self.__earth_img_angle, EARTH_SCALE)
         image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) / 2, \
                          self.__surface.get_height() - earth_img_rotated.get_height() / 2
         self.__surface.blit(earth_img_rotated, image_position)
+
 
     def __draw_satellite(self, satellite: Satellite):
         satellite_img = pygame.image.load(satellite.imgUrl)
