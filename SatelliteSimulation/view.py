@@ -4,7 +4,8 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Short Introduction
+View of the satellite simulation. Everything that is part of the visible GUI
+is implemented here. The GUI is based on the python libary "pygame".
 """
 
 # =========================================================================== #
@@ -26,30 +27,23 @@ FRAMERATE = 60
 EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH,"Assets", "earth.png"))
 EARTH_SCALE = 0.4
 
-
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-
-
 class GUI:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-
     def __init__(self, controller, width: int, height: int):
         pygame.init()
         pygame.display.set_caption("Satellite simulation")
-
         ## __private
         self.__surface = pygame.display.set_mode((width, height))
         self.__controller = controller
         self.__earth_img_angle = 0
         self.__simulation_started = False
-
-        offset = height // 10
-        self.__init_buttons(offset, width)
+        self.__init_buttons(offset=height // 10, width=width)
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -58,18 +52,15 @@ class GUI:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-
     def update(self, satellites: list):
         self.__surface.fill(BACKGROUND_COLOR)
         self.rotate_and_draw_earth()
-
         for satellite in satellites:
             self.__draw_satellite(satellite)
-
         for button in self.__buttons:
             button.draw(self.__surface)
-
         pygame.display.update()
+
 
     def start_simulation_loop(self):
         if not self.__simulation_started:
@@ -84,6 +75,7 @@ class GUI:
                           Button(button_text="MALFUNCTION", font_size=FONT_SIZE),
                           Button(button_text="SOLAR RADIATION DISTURBANCE", font_size=FONT_SIZE),
                           Button(button_text="GRAVITY GRADIENT DISTURBANCE", font_size=FONT_SIZE)]
+
 
         # todo make buttons same width
         for i, button in enumerate(self.__buttons):
@@ -107,7 +99,6 @@ class GUI:
                 button.calculate_state()
                 if button.new_click_event():
                     self.__controller.create_disturbance(button.get_text())
-
             self.__controller.next_frame()
         pygame.quit()
 
@@ -122,7 +113,7 @@ class GUI:
 
     def __draw_satellite(self, satellite: Satellite):
         satellite_img = pygame.image.load(satellite.imgUrl)
-        satellite_img = pygame.transform.scale(satellite_img, (satellite.radius, satellite.radius))
+        satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 
 
@@ -130,10 +121,8 @@ class GUI:
 #  SECTION: Function definitions
 # =========================================================================== #
 
-
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
 if __name__ == '__main__':
     pass

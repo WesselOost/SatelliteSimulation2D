@@ -4,39 +4,43 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Short Introduction
+The model of the satellite simulation. All the data is stored in that class.
 """
 
 # =========================================================================== #
 #  SECTION: Imports                                                           
 # =========================================================================== #
 import os
+import random
+import math
+
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
+SATELLITE_TYPE_AMOUNT = 3
+
+
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-
-
-
 class Satellite:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-
     def __init__(self, x: int, y: int, weigth: int, width: int, height: int, imgUrl: str):
         ## public
         self.isCrashed: bool = False
         self.observanceRadius: int = None
-        self.dangerZoneRadius: int = None
+        self.dangerZoneShift: int = 20
         self.x = x
         self.y = y
         self.weigth = weigth
         self.suface = width * height
-        self.radius = max(width, height)
+        self.size = max(width, height)
+        self.dangerZoneRadius = self.size//2 + self.dangerZoneShift
         self.imgUrl = imgUrl
         ## __private
 
@@ -47,16 +51,17 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-
     def moveTo(self, new_x: int, new_y: int):
         pass
 
+
     def initiate_crash(self):
         pass
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-
 
 class SatelliteA(Satellite):
     def __init__(self, x: int, y: int):
@@ -92,8 +97,16 @@ class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, satelliteAmount: int):
+    def __init__(self, satelliteAmount: int,
+                 border_corner_x: int = 0,
+                 border_corner_y: int = 0,
+                 border_width: int = 800,
+                 border_heigth: int = 400):
         ## public
+        self.border_corner_x = border_corner_x
+        self.border_corner_y = border_corner_y
+        self.border_width = border_width
+        self.border_height = border_heigth
         self.satellites: list = self.__create_satellites(satelliteAmount)
         ## __private
 
@@ -114,18 +127,64 @@ class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-    def __create_satellites(self, satelliteAmount: int):
-        pass
+    def __create_satellites(self, satelliteAmount: int)->list:
+        satellites = list()
+        for satellite in range(satelliteAmount):
+            while True:
+                satellite = self.__create_random_satellite()
+                if self.__is_satellite_position_valid(satellite, satellites):
+                    satellites.append(satellite)
+                    break
+        print(len(satellites))
+        return satellites
+                
+
+    def __create_random_satellite(self) -> Satellite:
+        satellite_type = random.randint(1,SATELLITE_TYPE_AMOUNT)
+        position_x = random.randrange(self.border_corner_x + 10,
+                                      self.border_corner_x + self.border_width -10,
+                                      10)
+        position_y = random.randrange(self.border_corner_y + 10 ,
+                                      self.border_corner_y + self.border_height -10,
+                                      10)
+        if satellite_type == 1:
+            return SatelliteA(position_x, position_y)
+        if satellite_type == 2:
+            return SatelliteB(position_x, position_y)
+        if satellite_type == 3:
+            return SatelliteC(position_x, position_y)
+
+    
+    def __is_satellite_position_valid(self, new_satellite:Satellite, satellites:list) -> bool:
+        if not satellites:
+            return True
+        #center coordinates for new satellite
+        x1 = new_satellite.x + new_satellite.size//2
+        y1 = new_satellite.y + new_satellite.size//2
+        for satellite in satellites:
+            #center coordinates of existing satellite
+            x2 = satellite.x + satellite.size//2
+            y2 = satellite.y + satellite.size//2
+
+            distance = calculate_distance((x1,y1),(x2,y2))
+            ref_distance = satellite.dangerZoneRadius + new_satellite.dangerZoneRadius
+            if distance < ref_distance:
+                return False
+        return True
+
 
 
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
-
+def calculate_distance(coord_A:tuple, coords_B:tuple)->float:
+    return math.sqrt((coords_B[0]-coord_A[0])**2 + (coords_B[1]-coord_A[1])**2)
 
 # =========================================================================== #
 #  SECTION: Main Body                                                         
 # =========================================================================== #
 
 if __name__ == '__main__':
-    pass
+    test = list()
+    if not test:
+        print('empty')

@@ -4,7 +4,7 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Controller of the satelluite simulation. All the logic is implemented here. 
+Controller of the satellite simulation.
 """
 
 # =========================================================================== #
@@ -30,8 +30,8 @@ class Controller:
     # ----------------------------------------------------------------------- #
 
     def __init__(self):
-        self.space = Space(satelliteAmount=2)
         self.gui = GUI(controller=self, width=1400, height=800)
+        self.space = Space(satelliteAmount=20)
         self.gui.start_simulation_loop()
 
     # ----------------------------------------------------------------------- #
@@ -41,19 +41,12 @@ class Controller:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-
     def create_disturbance(self, disturbanceType: str):
         print(disturbanceType)
         self.space.create_disturbance(disturbanceType)
 
     def next_frame(self):
-        # todo remove placeholder satellites
-        satelliteA = SatelliteA(400, 100)
-        satelliteB = SatelliteB(200, 200)
-        satelliteC = SatelliteC(800, 250)
-        satellites = [satelliteA, satelliteB, satelliteC]
-
-        self.gui.update(satellites)
+        self.gui.update(self.space.satellites)
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
