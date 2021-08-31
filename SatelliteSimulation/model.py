@@ -13,6 +13,8 @@ The model of the satellite simulation. All the data is stored in that class.
 import os
 import random
 import math
+import threading
+import time
 
 
 # =========================================================================== #
@@ -118,7 +120,10 @@ class Space:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def create_disturbance(self, disturbanceType: str):
-        pass
+        if disturbanceType == "MALFUNCTION":
+            disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
+            
+        disturbance.start()
 
 
     def detect_possible_collision(self):
@@ -132,7 +137,7 @@ class Space:
         for satellite in range(satelliteAmount):
             while True:
                 satellite = self.__create_random_satellite()
-                if self.__no_overlapp(satellite, satellites) and self.__inside_boarder(satellite):
+                if self.__no_overlapp(satellite, satellites) and self.__inside_border(satellite):
                     satellites.append(satellite)
                     break
         return satellites
@@ -172,24 +177,53 @@ class Space:
         return True
 
 
-    def __inside_boarder(self, satellite:Satellite)->bool:
-        valid_x = (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - 10)
-        valid_y = (satellite.y + satellite.size) < (self.border_corner_y + self.border_height - 10)
+    def __inside_border(self, satellite:Satellite, offset:int = 10)->bool:
+        valid_x = self.border_corner_x + offset < (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - offset)
+        valid_y = self.border_corner_x + offset <(satellite.y + satellite.size) < (self.border_corner_y + self.border_height - offset)
         if valid_x and valid_y:
             return True
         return False
 
+
+    def __create_malfunction(self, satellites:list):
+        satellite = satellites[random.randint(0,len(satellites)-1)]
+        x = satellite.x
+        y = satellite.y
+        duration = random.randrange(100,3000,10) #ms
+        #disturbance direction in radians
+        disturbance_direction = math.radians(random.randint(1,360))
+        x_shift = math.sin(disturbance_direction)
+        y_shift = math.cos(disturbance_direction)
+        #velocity in Pixel per ms
+        velocity = random.randint(10,100)/1000
+        begin = current_milli_time()
+        t = 0
+        while duration >= t:
+            old_x = satellite.x
+            old_y = satellite.y
+            satellite.x = x + x_shift * velocity * t
+            satellite.y = y + y_shift * velocity * t
+            if not self.__inside_border(satellite):
+                satellite.x = old_x
+                satellite.y = old_y
+                break
+            t = current_milli_time() - begin
+            
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
 def calculate_distance(coord_A:tuple, coords_B:tuple)->float:
     return math.sqrt((coords_B[0]-coord_A[0])**2 + (coords_B[1]-coord_A[1])**2)
 
+
+def current_milli_time():
+    return round(time.time() * 1000)
+
+
+
 # =========================================================================== #
 #  SECTION: Main Body                                                         
 # =========================================================================== #
 
 if __name__ == '__main__':
-    test = list()
-    if not test:
-        print('empty')
+    pass
