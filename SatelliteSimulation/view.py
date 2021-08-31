@@ -51,6 +51,7 @@ class GUI:
         offset = height // 10
         self.__init_buttons(offset, width, height)
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
@@ -75,10 +76,12 @@ class GUI:
 
         pygame.display.update()
 
+
     def start_simulation_loop(self):
         if not self.__simulation_started:
             self.__simulation_started = True
             self.__start_simulation_loop()
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods

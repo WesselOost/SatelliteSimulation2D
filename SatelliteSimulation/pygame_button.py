@@ -65,6 +65,7 @@ class Button:
 
         self.__height = self.__body_height + self.__bottom_border_height
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
@@ -76,20 +77,25 @@ class Button:
         self.__bottom_border.x = new_x
         self.__bottom_border.y = new_y + self.__body_height
 
+
     def set_width(self, new_width):
         self.__width = new_width
         self.__body.width = new_width
         self.__bottom_border.width = new_width
         self.__text_offset_x = (self.__width - self.__text_surface.get_width()) // 2
 
+
     def get_width(self) -> int:
         return self.__width
+
 
     def get_height(self) -> int:
         return self.__height
 
+
     def get_text(self) -> str:
         return self.__text
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -99,6 +105,7 @@ class Button:
         self.__draw_bottom_border(surface)
         self.__draw_body(surface)
         self.__draw_text(surface)
+
 
     def calculate_state(self):
         mouse_position = pygame.mouse.get_pos()
@@ -112,8 +119,10 @@ class Button:
         elif self.__released_and_state_changed(mouse_position):
             self.__set_state(RELEASED, self.y, LIGHT_BLUE)
 
+
     def new_click_event(self) -> bool:
         return self.__new_click_event
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
@@ -124,33 +133,41 @@ class Button:
         self.__body.y = body_y
         self.__bottom_border_color = border_color
 
+
     def __draw_bottom_border(self, surface):
         pygame.draw.rect(surface, self.__bottom_border_color, self.__bottom_border)
+
 
     def __draw_body(self, surface):
         corner_arch = self.__body_height // 4
         pygame.draw.rect(surface, BLUE, self.__body, 0, 0, corner_arch, corner_arch)
 
+
     def __draw_text(self, surface):
         surface.blit(self.__text_surface, (self.x + self.__text_offset_x, self.__body.y + self.__text_offset_y))
+
 
     def __pressed_and_state_is_hovered(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
                self.__mouse_pressed() and \
                self.__state == HOVERED
 
+
     def __hovered_and_state_changed(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
                not self.__mouse_pressed() and \
                self.__state != HOVERED
+
 
     def __released_and_state_changed(self, mouse_position) -> bool:
         return not self.__mouse_collide_with_button(mouse_position) and \
                not self.__mouse_pressed() \
                and self.__state != RELEASED
 
+
     def __mouse_collide_with_button(self, mouse_position) -> int:
         return self.__body.collidepoint(mouse_position) or self.__bottom_border.collidepoint(mouse_position)
+
 
     def __mouse_pressed(self) -> bool:
         return pygame.mouse.get_pressed()[0] == 1
