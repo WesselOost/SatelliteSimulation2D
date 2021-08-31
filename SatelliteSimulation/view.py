@@ -5,7 +5,7 @@
 # @Version : 0.0.1
 """
 View of the satellite simulation. Everything that is part of the visible GUI
-is implemented here. The GUI is based on the python libary "pygame".
+is implemented here. The GUI is based on the python library "pygame".
 """
 
 # =========================================================================== #
@@ -21,12 +21,15 @@ from pygame_button import Button
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
-BACKGROUND_COLOR = (0, 0, 0)
+BLACK = (0, 0, 0)
 LIGHT_GREY = (243, 243, 243)
 FONT_SIZE = 14
 FRAMERATE = 60
+BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
 EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "earth.png"))
+DOTTED_CIRCLE = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "dashed_circle.png"))
 EARTH_SCALE = 0.4
+
 
 # =========================================================================== #
 #  SECTION: Class definitions
@@ -39,7 +42,7 @@ class GUI:
     def __init__(self, controller, width: int, height: int):
         pygame.init()
         pygame.display.set_caption("Satellite simulation")
-        ## __private
+
         self.__surface = pygame.display.set_mode((width, height))
         self.__controller = controller
         self.__earth_img_angle = 0
@@ -50,16 +53,33 @@ class GUI:
         top_button = self.__buttons[-1]
         self.__earth_offset_x = (width - top_button.x) // 2
 
+        size = int(EARTH_IMG.get_width() * EARTH_SCALE) + offset
+        self.__dotted_circle = pygame.transform.scale(DOTTED_CIRCLE, (size, size))
+        self.__dotted_circle_x = width - top_button.x
+        self.__dotted_circle_y = height - (size // 2)
+
+        border_width = (top_button.x - offset * 2)
+        border_height = (top_button.y - offset)
         self.__satellite_border = pygame.Rect(offset,  # x
                                               offset,  # y
-                                              (top_button.x - offset * 2),  # width
-                                              (top_button.y - offset))  # height
+                                              border_width,
+                                              border_height)
+
+        mini_border_scale = 0.04
+        mini_border_width = border_width * mini_border_scale
+        mini_border_height = border_height * mini_border_scale
+        mini_border_x = self.__dotted_circle_x + self.__dotted_circle.get_width() // 2 - mini_border_width // 2
+        mini_border_y = self.__dotted_circle_y - mini_border_height // 2
+        self.__satellite_mini_border = pygame.Rect(mini_border_x,
+                                                   mini_border_y,
+                                                   mini_border_width,
+                                                   mini_border_height)
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def get_satellite_border(self):
+    def get_satellite_border(self) -> (int, int, int, int):
         return self.__satellite_border.x, \
                self.__satellite_border.y, \
                self.__satellite_border.width, \
@@ -70,10 +90,24 @@ class GUI:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def update(self, satellites: list):
-        self.__surface.fill(BACKGROUND_COLOR)
+        surface = self.__surface
+
+        surface.blit(BACKGROUND_IMG, (0, 0))
         self.rotate_and_draw_earth()
 
-        pygame.draw.rect(self.__surface, LIGHT_GREY, self.__satellite_border, 3)
+        satellite_border = self.__satellite_border
+        satellite_mini_border = self.__satellite_mini_border
+        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
+        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
+        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
+        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.topright, satellite_mini_border.topright, 3)
+
+        surface.blit(self.__dotted_circle, (self.__dotted_circle_x, self.__dotted_circle_y))
+
+        pygame.draw.rect(surface, LIGHT_GREY, satellite_border, 3)
+        pygame.draw.rect(surface, BLACK, satellite_border)
+        pygame.draw.rect(surface, BLACK, satellite_mini_border)
+        pygame.draw.rect(surface, LIGHT_GREY, satellite_mini_border, 1)
 
         if satellites:
             for satellite in satellites:
@@ -83,7 +117,7 @@ class GUI:
             print()
 
         for button in self.__buttons:
-            button.draw(self.__surface)
+            button.draw(surface)
         pygame.display.update()
 
 
@@ -116,13 +150,16 @@ class GUI:
         run = True
         while run:
             clock.tick(FRAMERATE)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+
             for button in self.__buttons:
                 button.calculate_state()
                 if button.new_click_event():
                     self.__controller.create_disturbance(button.get_text())
+
             self.__controller.next_frame()
         pygame.quit()
 

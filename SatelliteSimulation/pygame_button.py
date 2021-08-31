@@ -4,7 +4,7 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Button modul for the satellite simulation written in pygame.
+Button module for the satellite simulation written in pygame.
 """
 
 # =========================================================================== #
