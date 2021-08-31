@@ -24,7 +24,7 @@ ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
 BACKGROUND_COLOR = (0, 0, 0)
 FONT_SIZE = 14
 FRAMERATE = 60
-EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH,"Assets", "earth.png"))
+EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "earth.png"))
 EARTH_SCALE = 0.4
 
 # =========================================================================== #
@@ -43,7 +43,9 @@ class GUI:
         self.__controller = controller
         self.__earth_img_angle = 0
         self.__simulation_started = False
-        self.__init_buttons(offset=height // 10, width=width)
+
+        self.__init_buttons(height // 10, width, height)
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -55,8 +57,14 @@ class GUI:
     def update(self, satellites: list):
         self.__surface.fill(BACKGROUND_COLOR)
         self.rotate_and_draw_earth()
-        for satellite in satellites:
-            self.__draw_satellite(satellite)
+
+        if satellites:
+            for satellite in satellites:
+                self.__draw_satellite(satellite)
+        else:
+            # TODO raise Exception
+            print()
+
         for button in self.__buttons:
             button.draw(self.__surface)
         pygame.display.update()
@@ -67,24 +75,23 @@ class GUI:
             self.__simulation_started = True
             self.__start_simulation_loop()
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-    def __init_buttons(self, offset, width):
-        self.__buttons = [Button(button_text="MAGNETIC DISTURBANCE", font_size=FONT_SIZE),
-                          Button(button_text="MALFUNCTION", font_size=FONT_SIZE),
+    def __init_buttons(self, offset, width, height):
+        self.__buttons = [Button(button_text="GRAVITY GRADIENT DISTURBANCE", font_size=FONT_SIZE),
                           Button(button_text="SOLAR RADIATION DISTURBANCE", font_size=FONT_SIZE),
-                          Button(button_text="GRAVITY GRADIENT DISTURBANCE", font_size=FONT_SIZE)]
+                          Button(button_text="MAGNETIC DISTURBANCE", font_size=FONT_SIZE),
+                          Button(button_text="MALFUNCTION", font_size=FONT_SIZE)]
 
+        max_button_width = max(button.get_width() for button in self.__buttons)
+        new_button_x = width - max_button_width - offset // 2
 
-        # todo make buttons same width
         for i, button in enumerate(self.__buttons):
-            new_x = width - button.width - offset
-            new_y = offset
-            if i != 0:
-                previous_button = self.__buttons[i - 1]
-                new_y += previous_button.y
-            button.set_position(new_x, new_y)
+            button.set_width(max_button_width)
+            new_button_y = (height - offset) if i == 0 else (self.__buttons[i - 1].y - offset)
+            button.set_position(new_button_x, new_button_y)
 
 
     def __start_simulation_loop(self):
