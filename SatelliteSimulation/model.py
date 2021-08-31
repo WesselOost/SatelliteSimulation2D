@@ -132,10 +132,9 @@ class Space:
         for satellite in range(satelliteAmount):
             while True:
                 satellite = self.__create_random_satellite()
-                if self.__is_satellite_position_valid(satellite, satellites):
+                if self.__no_overlapp(satellite, satellites) and self.__inside_boarder(satellite):
                     satellites.append(satellite)
                     break
-        print(len(satellites))
         return satellites
                 
 
@@ -155,7 +154,7 @@ class Space:
             return SatelliteC(position_x, position_y)
 
     
-    def __is_satellite_position_valid(self, new_satellite:Satellite, satellites:list) -> bool:
+    def __no_overlapp(self, new_satellite:Satellite, satellites:list) -> bool:
         if not satellites:
             return True
         #center coordinates for new satellite
@@ -173,6 +172,12 @@ class Space:
         return True
 
 
+    def __inside_boarder(self, satellite:Satellite)->bool:
+        valid_x = (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - 10)
+        valid_y = (satellite.y + satellite.size) < (self.border_corner_y + self.border_height - 10)
+        if valid_x and valid_y:
+            return True
+        return False
 
 # =========================================================================== #
 #  SECTION: Function definitions
