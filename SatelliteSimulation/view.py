@@ -22,6 +22,7 @@ from pygame_button import Button
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
 BACKGROUND_COLOR = (0, 0, 0)
+LIGHT_GREY = (243, 243, 243)
 FONT_SIZE = 14
 FRAMERATE = 60
 EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "earth.png"))
@@ -44,12 +45,26 @@ class GUI:
         self.__earth_img_angle = 0
         self.__simulation_started = False
 
-        self.__init_buttons(height // 10, width, height)
+        offset = height // 10
+        self.__init_buttons(offset, width, height)
+        top_button = self.__buttons[-1]
+        self.__earth_offset_x = (width - top_button.x) // 2
+
+        self.__satellite_border = pygame.Rect(offset,  # x
+                                              offset,  # y
+                                              (top_button.x - offset * 2),  # width
+                                              (top_button.y - offset))  # height
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    def get_satellite_border(self):
+        return self.__satellite_border.x, \
+               self.__satellite_border.y, \
+               self.__satellite_border.width, \
+               self.__satellite_border.height
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -57,6 +72,8 @@ class GUI:
     def update(self, satellites: list):
         self.__surface.fill(BACKGROUND_COLOR)
         self.rotate_and_draw_earth()
+
+        pygame.draw.rect(self.__surface, LIGHT_GREY, self.__satellite_border, 3)
 
         if satellites:
             for satellite in satellites:
@@ -113,7 +130,7 @@ class GUI:
     def rotate_and_draw_earth(self):
         self.__earth_img_angle -= 0.2
         earth_img_rotated = pygame.transform.rotozoom(EARTH_IMG, self.__earth_img_angle, EARTH_SCALE)
-        image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) // 2, \
+        image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) // 2 - self.__earth_offset_x, \
                          self.__surface.get_height() - earth_img_rotated.get_height() // 2
         self.__surface.blit(earth_img_rotated, image_position)
 
