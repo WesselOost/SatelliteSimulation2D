@@ -38,6 +38,9 @@ class Satellite:
         self.dangerZoneShift: int = 20
         self.x = x
         self.y = y
+        self.malfunction_duration = 0
+        self.velocity_x = 0
+        self.velocity_y = 0
         self.weight = weight
         self.surface = width * height
         self.size = max(width, height)
@@ -118,13 +121,24 @@ class Space:
     # ----------------------------------------------------------------------- #
     def create_disturbance(self, disturbanceType: str):
         if disturbanceType == "MALFUNCTION":
-            disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
-
-            disturbance.start()
+            # disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
+            # disturbance.start()
+            self.__create_malfunction2()
 
 
     def detect_possible_collision(self):
         pass
+
+    def move_malfunctioning_satellites(self):
+        for satellite in self.satellites:
+            if satellite.malfunction_duration > 0:
+                satellite.x += satellite.velocity_x
+                satellite.y += satellite.velocity_y
+                satellite.malfunction_duration -= 1
+                if not self.__inside_border(satellite):
+                    satellite.x -= satellite.velocity_x
+                    satellite.y -= satellite.velocity_y
+                    satellite.malfunction_duration = 0
 
 
     # ----------------------------------------------------------------------- #
@@ -201,6 +215,12 @@ class Space:
             print(f"MALFUNCTION: {duration=} ms; direction={360-math.degrees(direction):.2f}; velocity={velocity*1000} Pixel/s")
         self.__move_satellite(start_x, start_y, duration, velocity, direction, satellite)
 
+    def __create_malfunction2(self):
+        satellite = self.satellites[random.randint(0, len(self.satellites) - 1)]
+        satellite.malfunction_duration = Disturbance().duration2
+        satellite.velocity_x = Disturbance().velocity_x
+        satellite.velocity_y = Disturbance().velocity_y
+
 
     def __move_satellite(self, start_x:int, start_y:int, duration:int, velocity:int, direction:int, satellite:Satellite):
         x_shift = math.sin(direction)
@@ -218,17 +238,21 @@ class Space:
                 break
             t = current_milli_time() - begin
 
+
 class Disturbance:
 
     def __init__(self):
         #duration in ms
         self.duration = random.randrange(100, 3000, 10)
+        self.duration2 = random.randrange(60, 120, 1)
 
         # disturbance direction in radians
         self.direction = math.radians(random.randint(1, 360))
 
         # velocity in Pixel per ms
         self.velocity = random.randint(10, 100) / 1000
+        self.velocity_x = random.uniform(-1, 1) * random.randint(1, 5)
+        self.velocity_y = random.uniform(-1, 1) * random.randint(1, 5)
 
         
 # =========================================================================== #

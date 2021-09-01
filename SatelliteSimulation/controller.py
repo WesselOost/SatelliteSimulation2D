@@ -55,6 +55,7 @@ class Controller:
 
 
     def next_frame(self):
+        self.space.move_malfunctioning_satellites()
         self.gui.update(self.space.satellites)
 
     # ----------------------------------------------------------------------- #
