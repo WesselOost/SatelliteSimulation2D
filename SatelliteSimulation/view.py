@@ -188,9 +188,9 @@ class GUI:
         satellite_img = None
         if type(satellite) is SatelliteA:
             satellite_img = SATELLITE_1
-        if type(satellite) is SatelliteB:
+        elif type(satellite) is SatelliteB:
             satellite_img = SATELLITE_2
-        if type(satellite) is SatelliteC:
+        elif type(satellite) is SatelliteC:
             satellite_img = SATELLITE_3
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
