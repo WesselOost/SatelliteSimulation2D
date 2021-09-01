@@ -31,7 +31,7 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: int, y: int, weight: int, width: int, height: int, imgUrl: str):
+    def __init__(self, x: int, y: int, weight: int, width: int, height: int):
         ## public
         self.isCrashed: bool = False
         self.observanceRadius: int = None
@@ -42,7 +42,6 @@ class Satellite:
         self.surface = width * height
         self.size = max(width, height)
         self.dangerZoneRadius = self.size // 2 + self.dangerZoneShift
-        self.imgUrl = imgUrl
         ## __private
 
 
@@ -71,8 +70,7 @@ class SatelliteA(Satellite):
                          y,
                          weight=100,
                          width=50,
-                         height=50,
-                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
+                         height=50)
 
 
 class SatelliteB(Satellite):
@@ -81,8 +79,7 @@ class SatelliteB(Satellite):
                          y,
                          weight=80,
                          width=40,
-                         height=40,
-                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite2.png"))
+                         height=40)
 
 
 class SatelliteC(Satellite):
@@ -91,8 +88,7 @@ class SatelliteC(Satellite):
                          y,
                          weight=120,
                          width=60,
-                         height=60,
-                         imgUrl=os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
+                         height=60)
 
 
 class Space:

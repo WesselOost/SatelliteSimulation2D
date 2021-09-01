@@ -14,7 +14,7 @@ is implemented here. The GUI is based on the python library "pygame".
 import pygame
 import os
 
-from model import Satellite
+from model import Satellite, SatelliteA, SatelliteB, SatelliteC
 from pygame_button import Button
 
 # =========================================================================== #
@@ -28,6 +28,10 @@ FRAMERATE = 60
 BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
 EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "earth.png"))
 DOTTED_CIRCLE = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "dashed_circle.png"))
+
+SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
+SATELLITE_2 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite2.png"))
+SATELLITE_3 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
 EARTH_SCALE = 0.4
 
 
@@ -44,6 +48,14 @@ class GUI:
         pygame.display.set_caption("Satellite simulation")
 
         self.__surface = pygame.display.set_mode((width, height))
+        # performance boost
+        BACKGROUND_IMG.convert()
+        EARTH_IMG.convert()
+        DOTTED_CIRCLE.convert()
+        SATELLITE_1.convert()
+        SATELLITE_2.convert()
+        SATELLITE_3.convert()
+
         self.__controller = controller
         self.__earth_img_angle = 0
         self.__simulation_started = False
@@ -173,7 +185,13 @@ class GUI:
 
 
     def __draw_satellite(self, satellite: Satellite):
-        satellite_img = pygame.image.load(satellite.imgUrl)
+        satellite_img = None
+        if type(satellite) is SatelliteA:
+            satellite_img = SATELLITE_1
+        if type(satellite) is SatelliteB:
+            satellite_img = SATELLITE_2
+        if type(satellite) is SatelliteC:
+            satellite_img = SATELLITE_3
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 

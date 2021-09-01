@@ -51,7 +51,6 @@ class Controller:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def create_disturbance(self, disturbanceType: str):
-        print(disturbanceType)
         self.space.create_disturbance(disturbanceType)
 
 
