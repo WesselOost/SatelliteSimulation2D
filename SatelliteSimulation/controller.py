@@ -34,13 +34,14 @@ class Controller:
     def __init__(self):
         self.gui = GUI(controller=self, width=1400, height=800)
         border_parameter = self.gui.get_satellite_border()
-        
-        self.space = Space(satelliteAmount=random.randint(1,30),
+
+        self.space = Space(satelliteAmount=random.randint(1, 30),
                            border_corner_x=border_parameter[0],
                            border_corner_y=border_parameter[1],
                            border_width=border_parameter[2],
                            border_heigth=border_parameter[3])
         self.gui.start_simulation_loop()
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -52,6 +53,7 @@ class Controller:
     def create_disturbance(self, disturbanceType: str):
         print(disturbanceType)
         self.space.create_disturbance(disturbanceType)
+
 
     def next_frame(self):
         self.gui.update(self.space.satellites)

@@ -16,7 +16,6 @@ import math
 import threading
 import time
 
-
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -42,9 +41,10 @@ class Satellite:
         self.weight = weight
         self.surface = width * height
         self.size = max(width, height)
-        self.dangerZoneRadius = self.size//2 + self.dangerZoneShift
+        self.dangerZoneRadius = self.size // 2 + self.dangerZoneShift
         self.imgUrl = imgUrl
         ## __private
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -60,10 +60,10 @@ class Satellite:
     def initiate_crash(self):
         pass
 
-
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
+
 
 class SatelliteA(Satellite):
     def __init__(self, x: int, y: int):
@@ -112,6 +112,7 @@ class Space:
         self.satellites: list = self.__create_satellites(satelliteAmount)
         ## __private
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
@@ -122,17 +123,18 @@ class Space:
     def create_disturbance(self, disturbanceType: str):
         if disturbanceType == "MALFUNCTION":
             disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
-            
+
             disturbance.start()
 
 
     def detect_possible_collision(self):
         pass
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-    def __create_satellites(self, satelliteAmount: int)->list:
+    def __create_satellites(self, satelliteAmount: int) -> list:
         satellites = list()
         for satellite in range(satelliteAmount):
             while True:
@@ -141,15 +143,15 @@ class Space:
                     satellites.append(satellite)
                     break
         return satellites
-                
+
 
     def __create_random_satellite(self) -> Satellite:
-        satellite_type = random.randint(1,SATELLITE_TYPE_AMOUNT)
+        satellite_type = random.randint(1, SATELLITE_TYPE_AMOUNT)
         position_x = random.randrange(self.border_corner_x + 10,
-                                      self.border_corner_x + self.border_width -10,
+                                      self.border_corner_x + self.border_width - 10,
                                       10)
-        position_y = random.randrange(self.border_corner_y + 10 ,
-                                      self.border_corner_y + self.border_height -10,
+        position_y = random.randrange(self.border_corner_y + 10,
+                                      self.border_corner_y + self.border_height - 10,
                                       10)
         if satellite_type == 1:
             return SatelliteA(position_x, position_y)
@@ -158,28 +160,28 @@ class Space:
         if satellite_type == 3:
             return SatelliteC(position_x, position_y)
 
-    
-    def __no_overlapp(self, new_satellite:Satellite, satellites:list) -> bool:
+
+    def __no_overlapp(self, new_satellite: Satellite, satellites: list) -> bool:
         if not satellites:
             return True
 
-        #center coordinates for new satellite
-        x1 = new_satellite.x + new_satellite.size//2
-        y1 = new_satellite.y + new_satellite.size//2
+        # center coordinates for new satellite
+        x1 = new_satellite.x + new_satellite.size // 2
+        y1 = new_satellite.y + new_satellite.size // 2
         for satellite in satellites:
-    
-            #center coordinates of existing satellite
-            x2 = satellite.x + satellite.size//2
-            y2 = satellite.y + satellite.size//2
 
-            distance = calculate_distance((x1,y1),(x2,y2))
+            # center coordinates of existing satellite
+            x2 = satellite.x + satellite.size // 2
+            y2 = satellite.y + satellite.size // 2
+
+            distance = calculate_distance((x1, y1), (x2, y2))
             ref_distance = satellite.dangerZoneRadius + new_satellite.dangerZoneRadius
             if distance < ref_distance:
                 return False
         return True
 
 
-    def __inside_border(self, satellite:Satellite, offset:int = 10)->bool:
+    def __inside_border(self, satellite: Satellite, offset: int = 10) -> bool:
         right_valid_x = (satellite.x + satellite.size) < (self.border_corner_x + self.border_width - offset)
         left_valid_x = (self.border_corner_x + offset) < satellite.x
         top_valid_y = (self.border_corner_y + offset) < satellite.y
@@ -189,17 +191,17 @@ class Space:
         return False
 
 
-    def __create_malfunction(self, satellites:list):
-        satellite = satellites[random.randint(0,len(satellites)-1)]
+    def __create_malfunction(self, satellites: list):
+        satellite = satellites[random.randint(0, len(satellites) - 1)]
         x = satellite.x
         y = satellite.y
-        duration = random.randrange(100,3000,10) #ms
-        #disturbance direction in radians
-        disturbance_direction = math.radians(random.randint(1,360))
+        duration = random.randrange(100, 3000, 10)  # ms
+        # disturbance direction in radians
+        disturbance_direction = math.radians(random.randint(1, 360))
         x_shift = math.sin(disturbance_direction)
         y_shift = math.cos(disturbance_direction)
-        #velocity in Pixel per ms
-        velocity = random.randint(10,100)/1000
+        # velocity in Pixel per ms
+        velocity = random.randint(10, 100) / 1000
         begin = current_milli_time()
         t = 0
         while duration >= t:
@@ -212,17 +214,17 @@ class Space:
                 satellite.y = old_y
                 break
             t = current_milli_time() - begin
-            
+
+
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
-def calculate_distance(coord_A:tuple, coords_B:tuple)->float:
-    return math.sqrt((coords_B[0]-coord_A[0])**2 + (coords_B[1]-coord_A[1])**2)
+def calculate_distance(coord_A: tuple, coords_B: tuple) -> float:
+    return math.sqrt((coords_B[0] - coord_A[0]) ** 2 + (coords_B[1] - coord_A[1]) ** 2)
 
 
 def current_milli_time():
     return round(time.time() * 1000)
-
 
 
 # =========================================================================== #
