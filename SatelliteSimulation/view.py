@@ -173,7 +173,7 @@ class GUI:
 
 
     def __draw_satellite(self, satellite: Satellite):
-        satellite_img = pygame.image.load(satellite.imgUrl)
+        satellite_img = pygame.image.load(satellite.imgUrl).convert_alpha()
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 
