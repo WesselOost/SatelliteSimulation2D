@@ -4,16 +4,12 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Controller of the satellite simulation.
+Disturbance Buttons for the UI
 """
 
 # =========================================================================== #
-#  SECTION: Imports                                                           
+#  SECTION: Imports
 # =========================================================================== #
-import random
-
-from model import *
-from view import *
 
 
 # =========================================================================== #
@@ -23,44 +19,72 @@ from view import *
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
+import pygame
+
+from SatelliteSimulation.view.pygame_button import Button
 
 
-class Controller:
+class DisturbanceButtons:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self):
-        self.gui = GUI(controller=self, width=1400, height=800)
-        border_parameter = self.gui.get_satellite_border()
+    def __init__(self, offset: int, width: int, height: int, font_size: int):
+        self.__buttons = [
+            Button(button_text="GRAVITY GRADIENT DISTURBANCE", font_size=font_size),
+            Button(button_text="SOLAR RADIATION DISTURBANCE", font_size=font_size),
+            Button(button_text="MAGNETIC DISTURBANCE", font_size=font_size),
+            Button(button_text="MALFUNCTION", font_size=font_size)]
+        self.__font_size = font_size
 
-        self.space = Space(satelliteAmount=random.randint(1, 30),
-                           border_corner_x=border_parameter[0],
-                           border_corner_y=border_parameter[1],
-                           border_width=border_parameter[2],
-                           border_heigth=border_parameter[3])
-        self.gui.start_simulation_loop()
+        self.__init_button_size_and_position(width, height, offset)
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    def get_top_button(self) -> Button:
+        return self.__buttons[-1]
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def create_disturbance(self, disturbanceType: str):
-        self.space.create_disturbance(disturbanceType)
+
+    def draw(self, surface: pygame.Surface):
+        for button in self.__buttons:
+            button.draw(surface)
 
 
-    def next_frame(self):
-        self.space.move_malfunctioning_satellites()
-        self.gui.update(self.space.satellites)
+    def on_size_changed(self, scale_factor):
+        for button in self.__buttons:
+            button.on_size_changed(scale_factor)
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
+    def __init_button_size_and_position(self, width: int, height: int, offset: int):
+        max_button_width = max(button.get_width() for button in self.__buttons)
+        new_button_x = width - max_button_width - offset // 2
+        for i, button in enumerate(self.__buttons):
+            button.set_width(max_button_width)
+            new_button_y = (height - offset) if i == 0 else (self.__buttons[i - 1].y - offset)
+            button.set_position(new_button_x, new_button_y)
+
+
+    def calculate_state(self):
+        for button in self.__buttons:
+            button.calculate_state()
+
+
+    def get_new_click_events(self) -> [str]:
+        click_events = []
+        for button in self.__buttons:
+            if button.new_click_event():
+                click_events.append(button.get_text())
+        return click_events
 
 
 # =========================================================================== #
@@ -69,7 +93,7 @@ class Controller:
 
 
 # =========================================================================== #
-#  SECTION: Main Body                                                         
+#  SECTION: Main Body
 # =========================================================================== #
 
 if __name__ == '__main__':

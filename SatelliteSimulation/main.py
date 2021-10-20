@@ -10,7 +10,8 @@ Main module for the satellite simulation. Execute this to start the program.
 # =========================================================================== #
 #  SECTION: Imports                                                           
 # =========================================================================== #
-from controller import Controller
+from SatelliteSimulation.controller.controller import Controller
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -25,6 +26,7 @@ from controller import Controller
 # =========================================================================== #
 def main():
     Controller()
+
 
 # =========================================================================== #
 #  SECTION: Main Body                                                         
