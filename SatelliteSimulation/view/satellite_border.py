@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author  : Tom Brandherm & Wessel Oostrum
+# @Python  : 3.6.8
 # @Link    : link
 # @Version : 0.0.1
 """

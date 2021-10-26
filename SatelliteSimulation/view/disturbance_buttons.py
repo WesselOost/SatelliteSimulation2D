@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author  : Tom Brandherm & Wessel Oostrum
+# @Python  : 3.6.8
 # @Link    : link
 # @Version : 0.0.1
 """
@@ -79,7 +80,7 @@ class DisturbanceButtons:
             button.calculate_state()
 
 
-    def get_new_click_events(self) -> [str]:
+    def get_new_click_events(self) -> list:
         click_events = []
         for button in self.__buttons:
             if button.new_click_event():

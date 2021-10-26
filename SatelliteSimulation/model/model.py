@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author  : Tom Brandherm & Wessel Oostrum
+# @Python  : 3.6.8
 # @Link    : link
 # @Version : 0.0.1
 """
@@ -69,25 +70,25 @@ class Satellite:
 class SatelliteA(Satellite):
     def __init__(self, x: int, y: int, size: int):
         super().__init__(x,
-                         y,
-                         weight=100,
-                         size=size)
+                        y,
+                        weight=100,
+                        size=size)
 
 
 class SatelliteB(Satellite):
     def __init__(self, x: int, y: int, size: int):
         super().__init__(x,
-                         y,
-                         weight=80,
-                         size=size)
+                        y,
+                        weight=80,
+                        size=size)
 
 
 class SatelliteC(Satellite):
     def __init__(self, x: int, y: int, size: int):
         super().__init__(x,
-                         y,
-                         weight=120,
-                         size=size)
+                        y,
+                        weight=120,
+                        size=size)
 
 
 class Space:
@@ -95,11 +96,11 @@ class Space:
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     def __init__(self, satelliteAmount: int,
-                 border_corner_x: int,
-                 border_corner_y: int,
-                 border_width: int,
-                 border_height: int,
-                 border_offset: int):
+                border_corner_x: int,
+                border_corner_y: int,
+                border_width: int,
+                border_height: int,
+                border_offset: int):
         ## public
         self.scale_factor: float = 1.0
         self.border_corner_x = border_corner_x
@@ -160,11 +161,11 @@ class Space:
         satellite_type = random.randint(1, SATELLITE_TYPE_AMOUNT)
         border_offset = self.border_padding
         position_x = random.randrange(self.border_corner_x + border_offset,
-                                      self.border_corner_x + self.border_width - border_offset,
-                                      border_offset)
+                                    self.border_corner_x + self.border_width - border_offset,
+                                    border_offset)
         position_y = random.randrange(self.border_corner_y + border_offset,
-                                      self.border_corner_y + self.border_height - border_offset,
-                                      border_offset)
+                                    self.border_corner_y + self.border_height - border_offset,
+                                    border_offset)
         if satellite_type == 1:
             return SatelliteA(position_x, position_y, math.ceil(default_size))
         if satellite_type == 2:
@@ -227,7 +228,7 @@ class Space:
 
 
     def __move_satellite(self, start_x: int, start_y: int, duration: int, velocity: int, direction: int,
-                         satellite: Satellite):
+                        satellite: Satellite):
         x_shift = math.sin(direction)
         y_shift = math.cos(direction)
         begin = current_milli_time()
@@ -245,12 +246,12 @@ class Space:
 
 
     def update_border_and_satellite_data(self,
-                                         scale_factor,
-                                         border_corner_x,
-                                         border_corner_y,
-                                         border_width,
-                                         border_height,
-                                         border_padding):
+                                        scale_factor,
+                                        border_corner_x,
+                                        border_corner_y,
+                                        border_width,
+                                        border_height,
+                                        border_padding):
         self.scale_factor = scale_factor
         self.update_satellite_size_and_position(scale_factor)
 
