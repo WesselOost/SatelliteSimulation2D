@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 # @Author  : Tom Brandherm & Wessel Oostrum
 # @Python  : 3.6.8
-# @Link    : link
+# @Link    : https://de.wikipedia.org/wiki/Bahnst%C3%B6rung#Schwerefeldvariationen
 # @Version : 0.0.1
 """
 The model of the satellite simulation. All the data is stored in that class.
+The used velocities are assumed to be constant during the movement. 
 """
 
 # =========================================================================== #
@@ -135,7 +136,17 @@ class Space:
                 
     def create_disturbance(self, disturbanceType: str):
         if disturbanceType == "MALFUNCTION":
-            self.__create_malfunction2()
+            self.__create_malfunction()
+        elif disturbanceType == "GRAVITY GRADIENT DISTURBANCE":
+            self.__create_gavity_disturbance()
+            print('damn gravity')
+            pass
+        elif disturbanceType == "SOLAR RADIATION DISTURBANCE":
+            print('sun burn')
+            pass
+        elif disturbanceType == "MAGNETIC DISTURBANCE":
+            print('pls help Iron Man')
+            pass
 
 
     def move_influenced_satellites(self)->bool:
@@ -288,66 +299,46 @@ class Space:
         return False
 
 
-    def __create_malfunction(self, satellites: list, degub: bool = True):
-        satellite = satellites[random.randint(0, len(satellites) - 1)]
-        start_x = satellite.x
-        start_y = satellite.y
-
-        malfunction = Disturbance()
-        duration = malfunction.duration
-        direction = malfunction.direction
-        velocity = malfunction.velocity
-
-        if degub:
-            print(
-                f"MALFUNCTION: {duration} ms; direction={360 - math.degrees(direction):.2f}; velocity={velocity * 1000} Pixel/s")
-        self.__move_satellite(start_x, start_y, duration, velocity, direction, satellite)
-
-
-    def __create_malfunction2(self):
+    def __create_malfunction(self):
         try:
+            malfunction = Disturbance()
             satellite = random.choice([satellite for satellite in self.satellites if not satellite.isCrashed])
-            satellite.malfunction_duration = Disturbance().duration2
-            satellite.velocity_x = Disturbance().velocity_x * self.scale_factor
-            satellite.velocity_y = Disturbance().velocity_y * self.scale_factor
+            satellite.malfunction_duration = malfunction.duration
+            satellite.velocity_x = malfunction.velocity_x * self.scale_factor
+            satellite.velocity_y = malfunction.velocity_y * self.scale_factor
         except IndexError:
             #TODO everything is crashed, game over (maybe game over screen :p)
             pass
-        
-
-
-    def __move_satellite(self, start_x: int, start_y: int, duration: int, velocity: int, direction: int,
-                        satellite: Satellite):
-        x_shift = math.sin(direction)
-        y_shift = math.cos(direction)
-        begin = current_milli_time()
-        t = 0
-        while duration >= t:
-            old_x = satellite.x
-            old_y = satellite.y
-            satellite.x = start_x + x_shift * velocity * t
-            satellite.y = start_y + y_shift * velocity * t
-            if not self.__inside_border(satellite, self.border_padding):
-                satellite.x = old_x
-                satellite.y = old_y
-                break
-            t = current_milli_time() - begin
-
+    
+    def __create_gavity_disturbance(self):
+        gravityDisturbance = Disturbance()
+        for satellite in self.satellites:
+            satellite.malfunction_duration = gravityDisturbance.duration
+            print(satellite.malfunction_duration)
+            satellite.velocity_x = 0
+            satellite.velocity_y = gravityDisturbance.change_gravity(satellite.weight)
 
 class Disturbance:
 
     def __init__(self):
-        # duration in ms
-        self.duration = random.randrange(100, 3000, 10)
-        self.duration2 = random.randrange(60, 120, 1)
+        # duration in frames
+        self.duration = random.randrange(60, 120, 1)
 
-        # disturbance direction in radians
-        self.direction = math.radians(random.randint(1, 360))
-
-        # velocity in Pixel per ms
-        self.velocity = random.randint(10, 100) / 1000
+        # velocity vector in Pixel 
         self.velocity_x = random.uniform(-1, 1) * random.randint(1, 5)
         self.velocity_y = random.uniform(-1, 1) * random.randint(1, 5)
+        
+        
+    def change_gravity(self, mass:int)->float:
+        # LAW: F_G = G * (M*m)/r^2, M>m
+        # with G, m = const and r~const (because shift is to little)
+        # => F_G = const * M
+        #TODO check if r is making a big difference
+        ref_mass = 120
+        return self.velocity_y*(ref_mass/mass)
+        
+
+    
 
 
 # =========================================================================== #

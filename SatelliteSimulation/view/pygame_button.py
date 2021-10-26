@@ -147,9 +147,9 @@ class Button:
         self.__bottom_border_height = self.__body_height / 8
         self.__bottom_border_color = LIGHT_BLUE
         self.__bottom_border = pygame.Rect(self.x,
-                                           self.__body_height + self.y,
-                                           self.__width,
-                                           self.__bottom_border_height)
+                                        self.__body_height + self.y,
+                                        self.__width,
+                                        self.__bottom_border_height)
 
 
     def __draw_bottom_border(self, surface):
@@ -173,20 +173,20 @@ class Button:
 
     def __pressed_and_state_is_hovered(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
-               self.__mouse_pressed() and \
-               self.__state == HOVERED
+            self.__mouse_pressed() and \
+            self.__state == HOVERED
 
 
     def __hovered_and_state_changed(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
-               not self.__mouse_pressed() and \
-               self.__state != HOVERED
+                not self.__mouse_pressed() and \
+                self.__state != HOVERED
 
 
     def __released_and_state_changed(self, mouse_position) -> bool:
         return not self.__mouse_collide_with_button(mouse_position) and \
-               not self.__mouse_pressed() \
-               and self.__state != RELEASED
+                not self.__mouse_pressed() \
+                and self.__state != RELEASED
 
 
     def __mouse_collide_with_button(self, mouse_position) -> int:
