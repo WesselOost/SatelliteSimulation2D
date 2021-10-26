@@ -36,6 +36,13 @@ SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite
 SATELLITE_2 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite2.png"))
 SATELLITE_3 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
 
+SATELLITE_1_CRASHED = pygame.image.load(os.path.join(
+    ABSOLUTE_PATH, "Assets", "satellite1_crashed.png"))
+SATELLITE_2_CRASHED = pygame.image.load(os.path.join(
+    ABSOLUTE_PATH, "Assets", "satellite2_crashed.png"))
+SATELLITE_3_CRASHED = pygame.image.load(os.path.join(
+    ABSOLUTE_PATH, "Assets", "satellite3_crashed.png"))
+
 
 # =========================================================================== #
 #  SECTION: Class definitions
@@ -63,6 +70,9 @@ class GUI:
         SATELLITE_1.convert()
         SATELLITE_2.convert()
         SATELLITE_3.convert()
+        SATELLITE_1_CRASHED.convert()
+        SATELLITE_2_CRASHED.convert()
+        SATELLITE_3_CRASHED.convert()
 
         self.__controller = controller
 
@@ -80,7 +90,7 @@ class GUI:
                              earth_offset_x=(self.__surface.get_width() - top_button.x) // 2)
 
         self.__satellite_border = Border(x=0, y=0, width=top_button.x,
-                                         height=top_button.y, margin=DEFAULT_BORDER_OFFSET, padding=DEFAULT_BORDER_OFFSET / 3)
+                                        height=top_button.y, margin=DEFAULT_BORDER_OFFSET, padding=DEFAULT_BORDER_OFFSET / 3)
         self.__satellite_border.show_offset()
         self.__satellite_mini_border = self.__create_mini_border(
             self.__satellite_border.get_border(),
@@ -95,10 +105,10 @@ class GUI:
     def get_satellite_border(self) -> tuple:
         border = self.__satellite_border.get_border()
         return border.x, \
-               border.y, \
-               border.width, \
-               border.height, \
-               self.__satellite_border.get_padding()
+                border.y, \
+                border.width, \
+                border.height, \
+                self.__satellite_border.get_padding()
 
 
     def get_scale_factor(self) -> float:
@@ -148,7 +158,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
 
     def __create_mini_border(self, satellite_border: pygame.Rect, dotted_circle_position: tuple,
-                             dotted_circle_width: int) -> Border:
+                            dotted_circle_width: int) -> Border:
         mini_border_scale = 0.04
         mini_border_width = satellite_border.width * mini_border_scale
         mini_border_height = satellite_border.height * mini_border_scale
@@ -156,11 +166,11 @@ class GUI:
         mini_border_y = dotted_circle_position[1] - mini_border_height // 2
 
         return Border(x=mini_border_x,
-                      y=mini_border_y,
-                      width=mini_border_width,
-                      height=mini_border_height,
-                      margin=0,
-                      padding=0)
+                    y=mini_border_y,
+                    width=mini_border_width,
+                    height=mini_border_height,
+                    margin=0,
+                    padding=0)
 
 
     def __start_simulation_loop(self):
@@ -210,11 +220,20 @@ class GUI:
     def __draw_satellite(self, satellite: Satellite):
         satellite_img = None
         if isinstance(satellite, SatelliteA):
-            satellite_img = SATELLITE_1
+            if satellite.isCrashed:
+                satellite_img = SATELLITE_1_CRASHED
+            else:
+                satellite_img = SATELLITE_1
         elif isinstance(satellite, SatelliteB):
-            satellite_img = SATELLITE_2
+            if satellite.isCrashed:
+                satellite_img = SATELLITE_2_CRASHED
+            else:
+                satellite_img = SATELLITE_2
         elif isinstance(satellite, SatelliteC):
-            satellite_img = SATELLITE_3
+            if satellite.isCrashed:
+                satellite_img = SATELLITE_3_CRASHED
+            else:
+                satellite_img = SATELLITE_3
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 

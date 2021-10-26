@@ -23,7 +23,7 @@ from SatelliteSimulation.controller.controller import Controller
 # =========================================================================== #
 
 # =========================================================================== #
-#  SECTION: Function definitions
+#  SECTION: Function definitions  
 # =========================================================================== #
 def main():
     Controller()

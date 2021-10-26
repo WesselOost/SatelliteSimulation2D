@@ -31,10 +31,9 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: int, y: int, weight: int, size: int):
-        ## public
-        self.isCrashed: bool = False
-        self.observanceRadius: int = None
+    def __init__(self, x: int, y: int, weight: int, size: int, visibleSatellites:list=[]):
+        self.isCrashed: bool = False                                    #is the 
+        self.observanceRadius: int = 75   
         self.dangerZoneShift: int = 20
         self.x = x
         self.y = y
@@ -45,13 +44,15 @@ class Satellite:
         self.surface = size * size
         self.size = size
         self.dangerZoneRadius = self.size // 2 + self.dangerZoneShift
-        ## __private
-
-
+        self.visible_satellites: list = visibleSatellites
+        
+    
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-
+    def get_center(self)->tuple:
+        return self.x+self.size/2, self.y+self.size/2
+    
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
@@ -59,9 +60,14 @@ class Satellite:
         pass
 
 
-    def initiate_crash(self):
-        pass
-
+    def check_satellite_status(self):
+        if not self.isCrashed:
+            for satellite in self.visible_satellites:
+                outer_boarder = self.size/2 + satellite.size/2
+                if calculate_distance(self.get_center(), satellite.get_center()) <= outer_boarder:
+                    self.isCrashed = True
+        
+    
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
@@ -109,37 +115,95 @@ class Space:
         self.border_height = border_height
         self.border_padding = border_offset
         self.satellites: list = self.__create_satellites(satelliteAmount)
+        self.update_satellite_observance()
         ## __private
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-
+    
+        
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
+    def update_satellite_observance(self):
+        for satellite in self.satellites:
+            satellite.visible_satellites = self.__get_visible_sattelites(satellite)
+            satellite.check_satellite_status()
+            
+                
     def create_disturbance(self, disturbanceType: str):
         if disturbanceType == "MALFUNCTION":
-            # disturbance = threading.Thread(target=self.__create_malfunction, args=(self.satellites,))
-            # disturbance.start()
             self.__create_malfunction2()
 
 
-    def detect_possible_collision(self):
-        pass
+    def move_influenced_satellites(self)->bool:
+        """
+        If a satellite is disturbed by an external force
+        or malfunctioning the duration of the forced movement
+        is greater 0 and its updating its position. At the
+        same time the duration is counted down. 
+        If the satellite crossed a outer border it has to move
+        one step backwards and to set the duration to zero.
 
-
-    def move_malfunctioning_satellites(self):
+        Returns
+        -------
+        bool
+            True, if at least one satellite moved
+        """
+        has_moved = False
+        temp_bool = False
         for satellite in self.satellites:
             if satellite.malfunction_duration > 0:
                 satellite.x += satellite.velocity_x
                 satellite.y += satellite.velocity_y
                 satellite.malfunction_duration -= 1
+                has_moved = True
+                crahed_satellites = self.__check_crash_occurence(satellite)
+                if crahed_satellites:
+                    #TODO add conservation of momentum: p_ges = const = p1 + ... + pn = m1*v1+...+mn*vn
+                    satellite.x -= satellite.velocity_x
+                    satellite.y -= satellite.velocity_y
+                    satellite.malfunction_duration = 0
                 if not self.__inside_border(satellite, self.border_padding):
                     satellite.x -= satellite.velocity_x
                     satellite.y -= satellite.velocity_y
                     satellite.malfunction_duration = 0
+                    if not temp_bool:
+                        has_moved = False
+            temp_bool = has_moved
+        return has_moved
+                
+                
+    def update_border_and_satellite_data(self,
+                                        scale_factor,
+                                        border_corner_x,
+                                        border_corner_y,
+                                        border_width,
+                                        border_height,
+                                        border_padding):
+        self.scale_factor = scale_factor
+        self.update_satellite_size_and_position(scale_factor)
+
+        self.border_corner_x = border_corner_x
+        self.border_corner_y = border_corner_y
+        self.border_width = border_width
+        self.border_height = border_height
+        self.border_padding = border_padding
+
+
+    def update_satellite_size_and_position(self, scale_factor: float):
+        for satellite in self.satellites:
+            satellite.observanceRadius *= scale_factor
+            satellite.dangerZoneShift *= scale_factor
+            satellite.dangerZoneRadius *= scale_factor
+            satellite.size *= scale_factor
+            satellite.x *= scale_factor
+            satellite.y *= scale_factor
+            if satellite.malfunction_duration > 0:
+                satellite.velocity_x *= scale_factor
+                satellite.velocity_y *= scale_factor
 
 
     # ----------------------------------------------------------------------- #
@@ -154,6 +218,27 @@ class Space:
                     satellites.append(satellite)
                     break
         return satellites
+    
+    
+    def __check_crash_occurence(self, satellite:Satellite)->list:
+        crashed_satellites = []
+        for other_satellite in satellite.visible_satellites:
+            outer_boarder = other_satellite.size/2 + satellite.size/2
+            if calculate_distance(other_satellite.get_center(), satellite.get_center()) < outer_boarder*0.90:
+                crashed_satellites.append(other_satellite)
+        return crashed_satellites
+    
+    
+    def __get_visible_sattelites(self, satellite: Satellite) -> list:
+        visible_satellites = []
+        for other_satellite in self.satellites:
+            if other_satellite is not satellite:
+                distance = calculate_distance(
+                    other_satellite.get_center(), satellite.get_center())
+
+                if distance <= satellite.observanceRadius:
+                    visible_satellites.append(other_satellite)
+        return visible_satellites
 
 
     def __create_random_satellite(self) -> Satellite:
@@ -177,7 +262,6 @@ class Space:
     def __no_overlapp(self, new_satellite: Satellite, satellites: list) -> bool:
         if not satellites:
             return True
-
         # center coordinates for new satellite
         x1 = new_satellite.x + new_satellite.size / 2
         y1 = new_satellite.y + new_satellite.size / 2
@@ -221,10 +305,15 @@ class Space:
 
 
     def __create_malfunction2(self):
-        satellite = self.satellites[random.randint(0, len(self.satellites) - 1)]
-        satellite.malfunction_duration = Disturbance().duration2
-        satellite.velocity_x = Disturbance().velocity_x * self.scale_factor
-        satellite.velocity_y = Disturbance().velocity_y * self.scale_factor
+        try:
+            satellite = random.choice([satellite for satellite in self.satellites if not satellite.isCrashed])
+            satellite.malfunction_duration = Disturbance().duration2
+            satellite.velocity_x = Disturbance().velocity_x * self.scale_factor
+            satellite.velocity_y = Disturbance().velocity_y * self.scale_factor
+        except IndexError:
+            #TODO everything is crashed, game over (maybe game over screen :p)
+            pass
+        
 
 
     def __move_satellite(self, start_x: int, start_y: int, duration: int, velocity: int, direction: int,
@@ -243,33 +332,6 @@ class Space:
                 satellite.y = old_y
                 break
             t = current_milli_time() - begin
-
-
-    def update_border_and_satellite_data(self,
-                                        scale_factor,
-                                        border_corner_x,
-                                        border_corner_y,
-                                        border_width,
-                                        border_height,
-                                        border_padding):
-        self.scale_factor = scale_factor
-        self.update_satellite_size_and_position(scale_factor)
-
-        self.border_corner_x = border_corner_x
-        self.border_corner_y = border_corner_y
-        self.border_width = border_width
-        self.border_height = border_height
-        self.border_padding = border_padding
-
-
-    def update_satellite_size_and_position(self, scale_factor: float):
-        for satellite in self.satellites:
-            satellite.size *= scale_factor
-            satellite.x *= scale_factor
-            satellite.y *= scale_factor
-            if satellite.malfunction_duration > 0:
-                satellite.velocity_x *= scale_factor
-                satellite.velocity_y *= scale_factor
 
 
 class Disturbance:
