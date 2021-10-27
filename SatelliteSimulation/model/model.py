@@ -154,6 +154,7 @@ class Space:
             print('sun burn')
             pass
         elif disturbanceType == "MAGNETIC DISTURBANCE":
+            self.__create_magnetic_disturbance()
             print('pls help Iron Man')
             pass
 
@@ -329,7 +330,6 @@ class Space:
         gravityDisturbance = Disturbance(120)
         for satellite in self.satellites:
             satellite.disturbance_duration = gravityDisturbance.duration
-            print(satellite.disturbance_duration)
             satellite.velocity_y = gravityDisturbance.change_gravity(satellite.weight)
             
             
@@ -342,6 +342,16 @@ class Space:
                 satellite.surface)
             satellite.velocity_y = radiation.velocity_y * radiation.add_radiation_pressure(
                 satellite.surface)
+            
+            
+    def __create_magnetic_disturbance(self):
+        magneticDisturbance = Disturbance(120)
+        for satellite in self.satellites:
+            satellite.disturbance_duration = magneticDisturbance.duration
+            satellite.velocity_x = magneticDisturbance.velocity_x * magneticDisturbance.add_magnetic_disturbance(
+                satellite.weight)
+            satellite.velocity_y = magneticDisturbance.velocity_y * magneticDisturbance.add_magnetic_disturbance(
+                satellite.weight)
 
 
 class Disturbance:
@@ -351,8 +361,8 @@ class Disturbance:
         self.duration = random.randrange(60, 120, 1)
 
         # velocity vector in Pixel 
-        self.velocity_x = random.uniform(-1, 1) * random.randint(1, 5)
-        self.velocity_y = random.uniform(-1, 1) * random.randint(1, 5)
+        self.velocity_x = random.uniform(-1, 1) * random.randint(0, 5)
+        self.velocity_y = random.uniform(-1, 1) * random.randint(0, 5)
         
         self.reference_value = reference_value
         
@@ -369,13 +379,19 @@ class Disturbance:
         
     def add_radiation_pressure(self, surface: int) -> float:
         # Radiation pressure from the sun
-        return (self.reference_value/surface)
+        if self.velocity_x != 0 and  self.velocity_y != -1:
+            return (self.reference_value/surface) * 0.5
+        self.velocity_x = random.uniform(-1, 1) * random.randint(0, 5)
+        self.velocity_y = random.uniform(-1, 1) * random.randint(0, 5)
+        return (self.reference_value/surface) * 0.5
     
     
-    def add_magnetic_disturbance(self, surface: int) -> float:
-        # change in the magnetic force 
-        #TODO add extra parameter that is responsible for strength of the magnetic force
-        return self.velocity_y*(self.reference_value/surface)
+    def add_magnetic_disturbance(self, mass: int) -> float:
+        # assumption a satellite with more mass contains more metall
+        # and more charge => is more attracted to the magnetic force 
+        # of the earth
+        #TODO compare the gravity/magnetic disturbance which is 
+        return mass/self.reference_value
 
 
 # =========================================================================== #
