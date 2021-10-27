@@ -380,10 +380,10 @@ class Disturbance:
     def add_radiation_pressure(self, surface: int) -> float:
         # Radiation pressure from the sun
         if self.velocity_x != 0 and  self.velocity_y != -1:
-            return (self.reference_value/surface) * 0.5
+            return (self.reference_value/surface) * 0.1
         self.velocity_x = random.uniform(-1, 1) * random.randint(0, 5)
         self.velocity_y = random.uniform(-1, 1) * random.randint(0, 5)
-        return (self.reference_value/surface) * 0.5
+        return (surface/self.reference_value) * 0.1
     
     
     def add_magnetic_disturbance(self, mass: int) -> float:
@@ -391,7 +391,7 @@ class Disturbance:
         # and more charge => is more attracted to the magnetic force 
         # of the earth
         #TODO compare the gravity/magnetic disturbance which is 
-        return mass/self.reference_value
+        return mass/self.reference_value * 0.3
 
 
 # =========================================================================== #
