@@ -17,7 +17,7 @@ import os
 
 from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
 from SatelliteSimulation.view.earth import Earth
-from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC
+from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -35,6 +35,7 @@ BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy
 SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
 SATELLITE_2 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite2.png"))
 SATELLITE_3 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
+SATELLITE_4 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite4.png"))
 
 SATELLITE_1_CRASHED = pygame.image.load(os.path.join(
     ABSOLUTE_PATH, "Assets", "satellite1_crashed.png"))
@@ -42,6 +43,8 @@ SATELLITE_2_CRASHED = pygame.image.load(os.path.join(
     ABSOLUTE_PATH, "Assets", "satellite2_crashed.png"))
 SATELLITE_3_CRASHED = pygame.image.load(os.path.join(
     ABSOLUTE_PATH, "Assets", "satellite3_crashed.png"))
+SATELLITE_4_CRASHED = pygame.image.load(os.path.join(
+    ABSOLUTE_PATH, "Assets", "satellite4_crashed.png"))
 
 
 # =========================================================================== #
@@ -70,9 +73,11 @@ class GUI:
         SATELLITE_1.convert()
         SATELLITE_2.convert()
         SATELLITE_3.convert()
+        SATELLITE_4.convert()
         SATELLITE_1_CRASHED.convert()
         SATELLITE_2_CRASHED.convert()
         SATELLITE_3_CRASHED.convert()
+        SATELLITE_4_CRASHED.convert()
 
         self.__controller = controller
 
@@ -234,6 +239,11 @@ class GUI:
                 satellite_img = SATELLITE_3_CRASHED
             else:
                 satellite_img = SATELLITE_3
+        elif isinstance(satellite, SatelliteD):
+            if satellite.isCrashed:
+                satellite_img = SATELLITE_4_CRASHED
+            else:
+                satellite_img = SATELLITE_4
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 

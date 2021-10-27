@@ -21,7 +21,7 @@ import time
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
-SATELLITE_TYPE_AMOUNT = 3
+SATELLITE_TYPE_AMOUNT = 4
 
 
 # =========================================================================== #
@@ -38,7 +38,7 @@ class Satellite:
         self.dangerZoneShift: int = 20
         self.x = x
         self.y = y
-        self.malfunction_duration = 0
+        self.disturbance_duration = 0
         self.velocity_x = 0
         self.velocity_y = 0
         self.weight = weight
@@ -98,6 +98,14 @@ class SatelliteC(Satellite):
                         size=size)
 
 
+class SatelliteD(Satellite):
+    def __init__(self, x: int, y: int, size: int):
+        super().__init__(x,
+                        y,
+                        weight=40,
+                        size=size)
+
+
 class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -153,9 +161,9 @@ class Space:
     def move_influenced_satellites(self)->bool:
         """
         If a satellite is disturbed by an external force
-        or malfunctioning the duration of the forced movement
-        is greater 0 and its updating its position. At the
-        same time the duration is counted down. 
+        or is malfunctioning and the duration of the forced 
+        movement is greater 0 and its updating its position. 
+        At the same time the duration is counted down. 
         If the satellite crossed a outer border it has to move
         one step backwards and to set the duration to zero.
 
@@ -167,23 +175,25 @@ class Space:
         has_moved = False
         temp_bool = False
         for satellite in self.satellites:
-            if satellite.malfunction_duration > 0:
+            if satellite.disturbance_duration > 0:
                 satellite.x += satellite.velocity_x
                 satellite.y += satellite.velocity_y
-                satellite.malfunction_duration -= 1
+                satellite.disturbance_duration -= 1
                 has_moved = True
                 crahed_satellites = self.__check_crash_occurence(satellite)
                 if crahed_satellites:
                     #TODO add conservation of momentum: p_ges = const = p1 + ... + pn = m1*v1+...+mn*vn
                     satellite.x -= satellite.velocity_x
                     satellite.y -= satellite.velocity_y
-                    satellite.malfunction_duration = 0
+                    satellite.disturbance_duration = 0
                 if not self.__inside_border(satellite, self.border_padding):
                     satellite.x -= satellite.velocity_x
                     satellite.y -= satellite.velocity_y
-                    satellite.malfunction_duration = 0
+                    satellite.disturbance_duration = 0
                     if not temp_bool:
                         has_moved = False
+            if satellite.disturbance_duration == 0:
+                satellite.velocity_x = satellite.velocity_y = 0
             temp_bool = has_moved
         return has_moved
                 
@@ -213,7 +223,7 @@ class Space:
             satellite.size *= scale_factor
             satellite.x *= scale_factor
             satellite.y *= scale_factor
-            if satellite.malfunction_duration > 0:
+            if satellite.disturbance_duration > 0:
                 satellite.velocity_x *= scale_factor
                 satellite.velocity_y *= scale_factor
 
@@ -269,6 +279,8 @@ class Space:
             return SatelliteB(position_x, position_y, math.ceil(default_size * 0.8))
         if satellite_type == 3:
             return SatelliteC(position_x, position_y, math.ceil(default_size * 1.2))
+        if satellite_type == 4:
+            return SatelliteD(position_x, position_y, math.ceil(default_size * 0.5))
 
 
     def __no_overlapp(self, new_satellite: Satellite, satellites: list) -> bool:
@@ -304,34 +316,37 @@ class Space:
         try:
             malfunction = Disturbance()
             satellite = random.choice([satellite for satellite in self.satellites if not satellite.isCrashed])
-            satellite.malfunction_duration = malfunction.duration
-            satellite.velocity_x = malfunction.velocity_x * self.scale_factor
-            satellite.velocity_y = malfunction.velocity_y * self.scale_factor
+            if satellite.disturbance_duration < malfunction.duration:
+                satellite.disturbance_duration = malfunction.duration 
+            satellite.velocity_x += malfunction.velocity_x * self.scale_factor
+            satellite.velocity_y += malfunction.velocity_y * self.scale_factor
         except IndexError:
             #TODO everything is crashed, game over (maybe game over screen :p)
             pass
     
+    
     def __create_gavity_disturbance(self):
         gravityDisturbance = Disturbance(120)
         for satellite in self.satellites:
-            satellite.malfunction_duration = gravityDisturbance.duration
-            print(satellite.malfunction_duration)
-            satellite.velocity_x = 0
+            satellite.disturbance_duration = gravityDisturbance.duration
+            print(satellite.disturbance_duration)
             satellite.velocity_y = gravityDisturbance.change_gravity(satellite.weight)
+            
             
     def __create_radiation_disturbance(self):
         ref = self.border_height // 10 * 1.2
         radiation = Disturbance(ref**2)
         for satellite in self.satellites:
-            satellite.malfunction_duration = radiation.duration
+            satellite.disturbance_duration = radiation.duration
             satellite.velocity_x = radiation.velocity_x * radiation.add_radiation_pressure(
                 satellite.surface)
             satellite.velocity_y = radiation.velocity_y * radiation.add_radiation_pressure(
                 satellite.surface)
 
+
 class Disturbance:
 
-    def __init__(self, reference_value):
+    def __init__(self, reference_value:float=0):
         # duration in frames
         self.duration = random.randrange(60, 120, 1)
 
@@ -341,16 +356,21 @@ class Disturbance:
         
         self.reference_value = reference_value
         
+        self.binary_direction = random.uniform(-1, 1)
+        
     def change_gravity(self, mass:int)->float:
         # LAW: F_G = G * (M*m)/r^2, M>m
         # with G, m = const and r~const (because shift is to little)
         # => F_G = const * M
+        # heavier objects should be more influenced by the force
         #TODO check if r is making a big difference
-        return self.velocity_y*(self.reference_value/mass)
+        return (mass/self.reference_value) * self.binary_direction
+        
         
     def add_radiation_pressure(self, surface: int) -> float:
         # Radiation pressure from the sun
         return (self.reference_value/surface)
+    
     
     def add_magnetic_disturbance(self, surface: int) -> float:
         # change in the magnetic force 
