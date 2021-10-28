@@ -82,7 +82,7 @@ class Earth:
     def __rotate_and_draw_earth(self):
         self.__earth_img_angle -= 0.2
         earth_img_rotated = pygame.transform.rotozoom(EARTH_IMG, self.__earth_img_angle,
-                                                      self.__earth_scale)
+                                                    self.__earth_scale)
         image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) // 2 - self.__earth_offset_x, \
                          self.__surface.get_height() - earth_img_rotated.get_height() // 2
         self.__surface.blit(earth_img_rotated, image_position)

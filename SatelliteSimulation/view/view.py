@@ -14,6 +14,7 @@ is implemented here. The GUI is based on the python library "pygame".
 # =========================================================================== #
 import pygame
 import os
+from SatelliteSimulation.model.satellite import SpaceJunk
 
 from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
 from SatelliteSimulation.view.earth import Earth
@@ -45,6 +46,9 @@ SATELLITE_3_CRASHED = pygame.image.load(os.path.join(
     ABSOLUTE_PATH, "Assets", "satellite3_crashed.png"))
 SATELLITE_4_CRASHED = pygame.image.load(os.path.join(
     ABSOLUTE_PATH, "Assets", "satellite4_crashed.png"))
+
+ASTEROID_1 = pygame.image.load(os.path.join(
+    ABSOLUTE_PATH, "Assets", "asteroid1.png"))
 
 
 # =========================================================================== #
@@ -78,6 +82,7 @@ class GUI:
         SATELLITE_2_CRASHED.convert()
         SATELLITE_3_CRASHED.convert()
         SATELLITE_4_CRASHED.convert()
+        ASTEROID_1.convert()
 
         self.__controller = controller
 
@@ -244,6 +249,8 @@ class GUI:
                 satellite_img = SATELLITE_4_CRASHED
             else:
                 satellite_img = SATELLITE_4
+        elif isinstance(satellite, SpaceJunk):
+            satellite_img = ASTEROID_1
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
         self.__surface.blit(satellite_img, (satellite.x, satellite.y))
 

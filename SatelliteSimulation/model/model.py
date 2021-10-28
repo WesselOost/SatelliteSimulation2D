@@ -17,12 +17,12 @@ import random
 import math
 import time
 
-from SatelliteSimulation.model.satellite import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
+from SatelliteSimulation.model.satellite import *
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
-SATELLITE_TYPE_AMOUNT = 4
+SATELLITE_TYPE_AMOUNT = 5
 
 
 # =========================================================================== #
@@ -180,9 +180,9 @@ class Space:
             if other_satellite is not satellite:
                 distance = calculate_distance(
                     other_satellite.get_center(), satellite.get_center())
-
                 if distance <= satellite.observanceRadius:
                     visible_satellites.append(other_satellite)
+        
         return visible_satellites
 
 
@@ -204,6 +204,8 @@ class Space:
             return SatelliteC(position_x, position_y, math.ceil(default_size * 1.2))
         if satellite_type == 4:
             return SatelliteD(position_x, position_y, math.ceil(default_size * 0.5))
+        if satellite_type == 5:
+            return SpaceJunk(position_x, position_y, math.ceil(default_size * 0.2))
 
 
     def __no_overlapp(self, new_satellite: Satellite, satellites: list) -> bool:
