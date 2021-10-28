@@ -14,6 +14,8 @@ a bunch of possbible satellites and their abilities
 # =========================================================================== #
 
 from SatelliteSimulation.model.model import *
+from mathBasics import *
+import numpy as np 
 
 
 # =========================================================================== #
@@ -70,17 +72,28 @@ class Satellite:
                 if calculate_distance(self.get_center(), satellite.get_center()) <= outer_boarder:
                     self.isCrashed = True
 
+    def collision_possible(self, point1:tuple, point2:tuple, size:float)->bool:
+        satellite_trajectory = self.__get_satellite_trajectory()
+        other_satellite_trajectories = [StraightLineEquation(point1, point2)]
+        other_satellite_trajectories.extend(self.__get_parallel_trajectory(size))
+        lgs = LinearSystemOfEquations()
+        for trajectory in other_satellite_trajectories:
+            intersection = lgs.get_intersection(satellite_trajectory, trajectory)
+        
+    
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
+    def __get_satellite_trajectory(self)->StraightLineEquation:
+        point1 = self.get_center()
+        point2 = self.velocity_x+point1[0], self.velocity_y+point1[1]
+        return StraightLineEquation(point1, point2)
 
-    def __track_satellites(self):
-        dangerZoneDict = dict()
-        for satellite in self.visible_satellites:
-            if calculate_distance(self.get_center(), satellite.get_center()) <= self.dangerZoneRadius:
-                dangerZoneDict[satellite] = satellite.get_center()
-
-
+    def __get_parallel_trajectory(self, shift: float) ->tuple:
+        #TODO return StraightLineEquations that are parallel to the given 
+        # in a +/- shift
+        pass
+        
 # =========================================================================== #
 #  SECTION: Satellite types A-D
 # =========================================================================== #
