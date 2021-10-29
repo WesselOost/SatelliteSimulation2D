@@ -25,6 +25,8 @@ from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, S
 # =========================================================================== #
 from SatelliteSimulation.view.satellite_border import Border
 
+MAX_SURFACE_HEIGHT = 242
+MIN_SURFACE_WIDTH = 430
 DEFAULT_BORDER_OFFSET = 30
 DEFAULT_BUTTON_OFFSET = 40
 ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -221,6 +223,10 @@ class GUI:
         else:
             resize_height = height
             resize_width = round(resize_height / self.__ratio)
+
+        if resize_width < MIN_SURFACE_WIDTH:
+            resize_width = MIN_SURFACE_WIDTH
+            resize_height = MAX_SURFACE_HEIGHT
         return resize_width, resize_height
 
 
