@@ -22,6 +22,8 @@ Disturbance Buttons for the UI
 # =========================================================================== #
 import pygame
 
+from SatelliteSimulation.model.DisturbanceType import DisturbanceType
+#TODO don't import anything from model
 from SatelliteSimulation.view.pygame_button import Button
 
 
@@ -33,10 +35,10 @@ class DisturbanceButtons:
 
     def __init__(self, offset: int, width: int, height: int, font_size: int):
         self.__buttons = [
-            Button(button_text="GRAVITY GRADIENT DISTURBANCE", font_size=font_size),
-            Button(button_text="SOLAR RADIATION DISTURBANCE", font_size=font_size),
-            Button(button_text="MAGNETIC DISTURBANCE", font_size=font_size),
-            Button(button_text="MALFUNCTION", font_size=font_size)]
+            Button(button_text=DisturbanceType.GRAVITATIONAL.value, font_size=font_size),
+            Button(button_text=DisturbanceType.SOLAR_RADIATION.value, font_size=font_size),
+            Button(button_text=DisturbanceType.MAGNETIC.value, font_size=font_size),
+            Button(button_text=DisturbanceType.MALFUNCTION.value, font_size=font_size)]
         self.__font_size = font_size
 
         self.__init_button_size_and_position(width, height, offset)
@@ -84,7 +86,7 @@ class DisturbanceButtons:
         click_events = []
         for button in self.__buttons:
             if button.new_click_event():
-                click_events.append(button.get_text())
+                click_events.append(DisturbanceType(button.get_text()))
         return click_events
 
 

@@ -17,6 +17,7 @@ import random
 import math
 import time
 
+from SatelliteSimulation.model.DisturbanceType import DisturbanceType
 from SatelliteSimulation.model.satellite import *
 
 # =========================================================================== #
@@ -70,18 +71,18 @@ class Space:
             satellite.check_satellite_status()
 
 
-    def create_disturbance(self, disturbanceType: str):
-        if disturbanceType == "MALFUNCTION":
+    def create_disturbance(self, disturbanceType: DisturbanceType):
+        if disturbanceType == DisturbanceType.MALFUNCTION:
             self.__create_malfunction()
-        elif disturbanceType == "GRAVITY GRADIENT DISTURBANCE":
+        elif disturbanceType == DisturbanceType.GRAVITATIONAL:
             self.__create_gravity_disturbance()
             print('damn gravity')
             pass
-        elif disturbanceType == "SOLAR RADIATION DISTURBANCE":
+        elif disturbanceType == DisturbanceType.SOLAR_RADIATION:
             self.__create_radiation_disturbance()
             print('sun burn')
             pass
-        elif disturbanceType == "MAGNETIC DISTURBANCE":
+        elif disturbanceType == DisturbanceType.MAGNETIC:
             self.__create_magnetic_disturbance()
             print('pls help Iron Man')
             pass

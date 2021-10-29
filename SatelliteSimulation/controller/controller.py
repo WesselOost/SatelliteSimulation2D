@@ -12,6 +12,8 @@ Controller of the satellite simulation.
 #  SECTION: Imports                                                           
 # =========================================================================== #
 import random
+
+from SatelliteSimulation.model.DisturbanceType import DisturbanceType
 from SatelliteSimulation.model.model import Space
 from SatelliteSimulation.view.view import GUI
 
@@ -52,7 +54,7 @@ class Controller:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def create_disturbance(self, disturbanceType: str):
+    def create_disturbance(self, disturbanceType: DisturbanceType):
         self.space.create_disturbance(disturbanceType)
 
 
