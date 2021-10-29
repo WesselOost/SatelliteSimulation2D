@@ -74,7 +74,7 @@ class Space:
         if disturbanceType == "MALFUNCTION":
             self.__create_malfunction()
         elif disturbanceType == "GRAVITY GRADIENT DISTURBANCE":
-            self.__create_gavity_disturbance()
+            self.__create_gravity_disturbance()
             print('damn gravity')
             pass
         elif disturbanceType == "SOLAR RADIATION DISTURBANCE":
@@ -259,7 +259,7 @@ class Space:
             pass
 
 
-    def __create_gavity_disturbance(self):
+    def __create_gravity_disturbance(self):
         gravity_disturbance = Disturbance(120)
         for satellite in self.satellites:
             satellite.disturbance_duration = gravity_disturbance.duration
