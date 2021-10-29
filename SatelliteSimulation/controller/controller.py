@@ -35,12 +35,13 @@ class Controller:
         self.gui = GUI(controller=self, width=1920, height=1080)
         border_parameters = self.gui.get_satellite_border()
 
-        self.space = Space(satelliteAmount=random.randint(5, 15),
-                        border_corner_x=border_parameters[0],
-                        border_corner_y=border_parameters[1],
-                        border_width=border_parameters[2],
-                        border_height=border_parameters[3],
-                        border_offset=border_parameters[4])
+        self.space = Space(
+            satellite_amount=random.randint(5, 15),
+            border_corner_x=border_parameters[0],
+            border_corner_y=border_parameters[1],
+            border_width=border_parameters[2],
+            border_height=border_parameters[3],
+            border_offset=border_parameters[4])
         self.gui.start_simulation_loop()
 
 
