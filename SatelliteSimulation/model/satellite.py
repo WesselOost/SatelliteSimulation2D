@@ -135,7 +135,7 @@ class SatelliteD(Satellite):
 class SpaceJunk(Satellite):
     def __init__(self, x: int, y: int, size: int):
         super().__init__(x, y, weight=10, size=size)
-        self.isCrashed = True
+        self.is_crashed = True
 
 
 # =========================================================================== #
