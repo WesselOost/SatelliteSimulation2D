@@ -147,9 +147,9 @@ class Space:
 
     def update_satellite_size_and_position(self, scale_factor: float):
         for satellite in self.satellites:
-            satellite.observanceRadius *= scale_factor
-            satellite.dangerZoneShift *= scale_factor
-            satellite.dangerZoneRadius *= scale_factor
+            satellite.observance_radius *= scale_factor
+            satellite.danger_zone_shift *= scale_factor
+            satellite.danger_zone_radius *= scale_factor
             satellite.size *= scale_factor
             satellite.x *= scale_factor
             satellite.y *= scale_factor
