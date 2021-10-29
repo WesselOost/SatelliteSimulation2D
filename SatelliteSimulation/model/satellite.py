@@ -26,7 +26,7 @@ import numpy as np
 # =========================================================================== #
 #  SECTION: Satellite in general
 # =========================================================================== #
-from model.mathBasics import StraightLineEquation, LinearSystemOfEquations
+from SatelliteSimulation.model.mathBasics import StraightLineEquation, LinearSystemOfEquations
 
 
 class Satellite:
