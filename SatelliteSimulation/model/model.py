@@ -67,7 +67,9 @@ class Space:
         for satellite in self.satellites:
             previous_observed_satellites: dict = satellite.observed_satellites
             satellite.observed_satellites = self.__get_observed_satellites(satellite)
-            satellite.detect_possible_collisions(previous_observed_satellites)
+            possible_collisions: dict = satellite.detect_possible_collisions(previous_observed_satellites)
+            satellite.avoid_possible_collisions(possible_collisions)
+
             satellite.check_satellite_status()
 
 
@@ -176,8 +178,9 @@ class Space:
     def __check_crash_occurence(self, satellite: Satellite) -> list:
         crashed_satellites = []
         for other_satellite in satellite.observed_satellites:
-            outer_boarder = other_satellite.size / 2 + satellite.size / 2
-            if calculate_distance(other_satellite.get_center(), satellite.get_center()) < outer_boarder * 0.90:
+            outer_border = other_satellite.size / 2 + satellite.size / 2
+            #TODO find out why out_border * 0.9 is necessary
+            if calculate_distance(other_satellite.get_center(), satellite.get_center()) < outer_border * 0.90:
                 crashed_satellites.append(other_satellite)
         return crashed_satellites
 
