@@ -43,7 +43,7 @@ class Satellite:
         self.disturbance_duration = 0
         self.velocity_x = 0
         self.velocity_y = 0
-        self.max_navigation_speed: float = 200 / weight
+        self.max_navigation_velocity: float = 75 / weight
         self.weight = weight
         self.surface = size * size
         self.size = size
@@ -90,27 +90,32 @@ class Satellite:
                 current_position: tuple = self.observed_satellites[observed_satellite]
                 observed_trajectories = [StraightLineEquation(previous_position, current_position)]
                 observed_trajectories.extend(self.__get_parallel_trajectory(observed_satellite.size))
-                #TODO 4 straightLineEquations
+                # TODO 4 straightLineEquations
                 for observed_trajectory in observed_trajectories:
                     intersection = lgs.get_intersection(observed_trajectory, satellite_trajectory)
-                    #TODO check collinear vectors
+                    # TODO check collinear vectors
                     if intersection != (float('inf'), float('inf')):
                         observed_t = observed_trajectory.calculate_t(intersection)
         return possible_collisions
 
-    def avoid_possible_collisions(self, possible_collisions: dict):
-        first_collision = next(iter(possible_collisions))
 
-    def navigateTo(self, position: tuple):
-        self.velocity_x += position[0] / self.max_navigation_speed
-        self.velocity_y += position[1] / self.max_navigation_speed
+    def avoid_possible_collisions(self, possible_collisions: dict):
+        pass
+        # first_collision = next(iter(possible_collisions))
+
+
+    def navigateTo(self, direction_in_degrees: int):
+        angle_in_radians = np.math.radians(direction_in_degrees)
+
+        self.x += (self.max_navigation_velocity * np.math.cos(angle_in_radians))
+        self.y += (self.max_navigation_velocity * np.math.sin(angle_in_radians))
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
     def __get_satellite_trajectory(self) -> StraightLineEquation:
-        #TODO shift center to outer edge
+        # TODO shift center to outer edge
         point1 = self.get_center()
         point2 = self.velocity_x + point1[0], self.velocity_y + point1[1]
         return StraightLineEquation(point1, point2)
@@ -121,17 +126,22 @@ class Satellite:
         # in a +/- shift
         return self.__get_satellite_trajectory(), self.__get_satellite_trajectory()
 
+
     def __avoid_collision_by_random_position(self):
         pass
+
 
     def __avoid_collision_by_90_degrees_angle(self):
         pass
 
+
     def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects(self):
         pass
 
+
     def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects_weighted(self):
         pass
+
 
     def __avoid_collision_by_inverting_direction(self):
         pass

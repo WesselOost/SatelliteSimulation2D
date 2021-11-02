@@ -12,14 +12,14 @@ is implemented here. The GUI is based on the python library "pygame".
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import pygame
 import os
-from SatelliteSimulation.model.satellite import SpaceJunk
+import pygame
 
+from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
+from SatelliteSimulation.model.satellite import SpaceJunk
+from SatelliteSimulation.view.NavigationHandler import NavigationHandler
 from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
 from SatelliteSimulation.view.earth import Earth
-from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
-
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -87,6 +87,7 @@ class GUI:
         ASTEROID_1.convert()
 
         self.__controller = controller
+        self.__navigation_handler = NavigationHandler()
 
         self.__simulation_started = False
 
@@ -198,6 +199,7 @@ class GUI:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                self.__navigation_handler.handle_key_events(event)
                 if event.type == pygame.VIDEORESIZE:
                     self.__surface = pygame.display.set_mode(
                         self.create_correct_aspect_ratio_width_height(event.w, event.h),
@@ -210,9 +212,19 @@ class GUI:
             self.__disturbance_buttons.calculate_state()
             for click_event_text in self.__disturbance_buttons.get_new_click_events():
                 self.__controller.create_disturbance(click_event_text)
+            if self.__navigation_handler.should_navigate():
+                navigation_state = self.__navigation_handler.get_button_states()
+                self.__controller.navigate_satellite(navigation_state[0],
+                                                     navigation_state[1],
+                                                     navigation_state[2],
+                                                     navigation_state[3])
 
             self.__controller.next_frame()
         pygame.quit()
+
+
+    def __navigate_selected_satellite(self):
+        pass
 
 
     def create_correct_aspect_ratio_width_height(self, width: int, height: int) -> tuple:

@@ -153,6 +153,7 @@ class Space:
             satellite.observance_radius *= scale_factor
             satellite.danger_zone_shift *= scale_factor
             satellite.danger_zone_radius *= scale_factor
+            satellite.max_navigation_speed *= scale_factor
             satellite.size *= scale_factor
             satellite.x *= scale_factor
             satellite.y *= scale_factor
@@ -289,6 +290,18 @@ class Space:
                 satellite.weight)
             satellite.velocity_y = magnetic_disturbance.velocity_y * magnetic_disturbance.add_magnetic_disturbance(
                 satellite.weight)
+
+
+    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
+        satellite = self.satellites[0]
+        if pressed_left:
+            satellite.x -= satellite.max_navigation_speed
+        if pressed_up:
+            satellite.y -= satellite.max_navigation_speed
+        if pressed_right:
+            satellite.x += satellite.max_navigation_speed
+        if pressed_down:
+            satellite.y += satellite.max_navigation_speed
 
 
 class Disturbance:

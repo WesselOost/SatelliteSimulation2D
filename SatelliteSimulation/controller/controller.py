@@ -38,7 +38,7 @@ class Controller:
         border_parameters = self.gui.get_satellite_border()
 
         self.space = Space(
-            satellite_amount=random.randint(5, 15),
+            satellite_amount=random.randint(2, 2),
             border_corner_x=border_parameters[0],
             border_corner_y=border_parameters[1],
             border_width=border_parameters[2],
@@ -56,6 +56,10 @@ class Controller:
     # ----------------------------------------------------------------------- #
     def create_disturbance(self, disturbanceType: DisturbanceType):
         self.space.create_disturbance(disturbanceType)
+
+
+    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
+        self.space.navigate_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
 
     def next_frame(self):

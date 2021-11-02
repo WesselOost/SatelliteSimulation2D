@@ -49,7 +49,8 @@ class StraightLineEquation:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def print_equation(self):
-        print(f"New equation: g{self.counter}: x(t)={self.direction_vector}t+{self.support_vector}")
+        pass
+        # print(f"New equation: g{self.counter}: x(t)={self.direction_vector}t+{self.support_vector}")
 
 
     def calculate_new_point(self, t: float) -> np.array:
