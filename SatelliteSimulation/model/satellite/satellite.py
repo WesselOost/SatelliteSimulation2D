@@ -13,7 +13,9 @@ a bunch of possible satellites and their abilities
 #  SECTION: Imports
 # =========================================================================== #
 
-import numpy as np
+from SatelliteSimulation.model.math.math_basic import *
+from SatelliteSimulation.model.math.vector import Vector
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -26,7 +28,6 @@ import numpy as np
 # =========================================================================== #
 #  SECTION: Satellite in general
 # =========================================================================== #
-from SatelliteSimulation.model.mathBasics import StraightLineEquation, LinearSystemOfEquations
 
 
 class Satellite:
@@ -34,41 +35,123 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: int, y: int, weight: int, size: int, observedSatellites: dict = {}):
-        self.is_crashed: bool = False  # is the
-        self.observance_radius: int = 75
-        self.danger_zone_shift: int = 20
-        self.x = x
-        self.y = y
-        self.disturbance_duration = 0
-        self.velocity_x = 0
-        self.velocity_y = 0
-        self.max_navigation_velocity: float = 75 / weight
-        self.weight = weight
-        self.surface = size * size
-        self.size = size
-        self.danger_zone_radius = self.size // 2 + self.danger_zone_shift
-        self.observed_satellites: dict = observedSatellites
+    def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
+        self.position: Vector = position
+        self.velocity: Vector = Vector(0, 0)
+
+        self.__is_crashed: bool = False
+        self.__observance_radius: int = 30
+        self.__max_navigation_velocity: float = 40 / mass
+        self.__disturbance_duration = 0
+        self.__mass = mass
+        self.__size = size
+        self.__observed_satellites: dict = observed_satellites
+        self.__previously_observed_satellites: dict = {}
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
 
-    def get_center(self) -> tuple:
-        return self.x + self.size / 2, self.y + self.size / 2
+    def mass(self) -> float:
+        return self.__mass
+
+
+    def size(self) -> float:
+        return self.__size
+
+
+    def surface(self) -> float:
+        return self.__size ** 2
+
+
+    def observed_satellites(self) -> dict:
+        return self.__observed_satellites
+
+
+    def previously_observed_satellites(self) -> dict:
+        return self.__previously_observed_satellites
+
+
+    def center(self) -> Vector:
+        return Vector(self.position.x() + self.radius(), self.position.y() + self.radius())
+
+
+    def radius(self) -> float:
+        return self.__size / 2
+
+
+    def disturbance_duration(self) -> int:
+        return self.__disturbance_duration
+
+
+    def set_disturbance_duration(self, duration: float):
+        self.__disturbance_duration = duration
+
+
+    def observance_radius(self) -> float:
+        return self.__observance_radius
+
+
+    def is_crashed(self) -> bool:
+        return self.__is_crashed
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
 
-    def check_satellite_status(self):
-        if not self.is_crashed:
-            for satellite in self.observed_satellites:
-                outer_border = self.size / 2 + satellite.size / 2
-                if calculate_distance(self.get_center(), satellite.get_center()) <= outer_border:
-                    self.is_crashed = True
+    def update_scale(self, scale_factor: float):
+        self.__observance_radius *= scale_factor
+        self.__max_navigation_velocity *= scale_factor
+        self.__size *= scale_factor
+        self.position.set_vector(multiply(self.position, scalar=scale_factor))
+
+        if self.__disturbance_duration > 0:
+            self.velocity.set_vector(multiply(self.velocity, scalar=scale_factor))
+
+
+    def update_crashed_status(self):
+        if not self.__is_crashed:
+            self.__is_crashed = True
+
+
+    def update_observed_satellites(self, satellites: dict):
+        self.__previously_observed_satellites = self.__observed_satellites
+        self.__observed_satellites = satellites
+
+
+    def clear_disturbance_duration(self):
+        self.__disturbance_duration = 0
+
+
+    def decrement_disturbance_duration(self):
+        self.__disturbance_duration -= 1
+
+
+    def move(self):
+        self.position.add_to_x(self.velocity.x())
+        self.position.add_to_y(self.velocity.y())
+
+
+    def moveTo(self, direction_in_degrees: int):
+        angle_in_radians = np.math.radians(direction_in_degrees)
+
+        max_nav_velocity = self.__max_navigation_velocity
+        self.velocity.set_x(max_nav_velocity * np.math.cos(angle_in_radians))
+        self.velocity.set_y(max_nav_velocity * np.math.sin(angle_in_radians))
+
+
+    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
+        max_velocity = self.__max_navigation_velocity
+        if pressed_left:
+            self.velocity.set_x(max_velocity * -1)
+        if pressed_up:
+            self.velocity.set_y(max_velocity * -1)
+        if pressed_right:
+            self.velocity.set_x(max_velocity)
+        if pressed_down:
+            self.velocity.set_y(max_velocity)
 
 
     def collision_possible(self, point1: tuple, point2: tuple, size: float) -> bool:
@@ -84,10 +167,10 @@ class Satellite:
         possible_collisions: dict = dict()
         lgs = LinearSystemOfEquations()
         satellite_trajectory = self.__get_satellite_trajectory()
-        for observed_satellite in self.observed_satellites:
+        for observed_satellite in self.__observed_satellites:
             if observed_satellite in previous_observed_satellites:
                 previous_position: tuple = previous_observed_satellites[observed_satellite]
-                current_position: tuple = self.observed_satellites[observed_satellite]
+                current_position: tuple = self.observed_satellites()[observed_satellite]
                 observed_trajectories = [StraightLineEquation(previous_position, current_position)]
                 observed_trajectories.extend(self.__get_parallel_trajectory(observed_satellite.size))
                 # TODO 4 straightLineEquations
@@ -104,21 +187,14 @@ class Satellite:
         # first_collision = next(iter(possible_collisions))
 
 
-    def navigateTo(self, direction_in_degrees: int):
-        angle_in_radians = np.math.radians(direction_in_degrees)
-
-        self.x += (self.max_navigation_velocity * np.math.cos(angle_in_radians))
-        self.y += (self.max_navigation_velocity * np.math.sin(angle_in_radians))
-
-
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
     def __get_satellite_trajectory(self) -> StraightLineEquation:
         # TODO shift center to outer edge
-        point1 = self.get_center()
-        point2 = self.velocity_x + point1[0], self.velocity_y + point1[1]
-        return StraightLineEquation(point1, point2)
+        point1: Vector = self.center()
+        point2: tuple = (self.velocity.x() + point1.x(), self.velocity.y() + point1.y())
+        return StraightLineEquation(point1.get_as_tuple(), point2)
 
 
     def __get_parallel_trajectory(self, shift: float) -> tuple:
@@ -128,6 +204,7 @@ class Satellite:
 
 
     def __avoid_collision_by_random_position(self):
+        #todo create own class for avoiding methods
         pass
 
 
@@ -153,38 +230,34 @@ class Satellite:
 
 
 class SatelliteA(Satellite):
-    def __init__(self, x: int, y: int, size: int):
-        super().__init__(x, y, weight=100, size=size)
+    def __init__(self, position: Vector, size: int):
+        super().__init__(position, mass=100, size=size)
 
 
 class SatelliteB(Satellite):
-    def __init__(self, x: int, y: int, size: int):
-        super().__init__(x, y, weight=80, size=size)
+    def __init__(self, position: Vector, size: int):
+        super().__init__(position, mass=80, size=size)
 
 
 class SatelliteC(Satellite):
-    def __init__(self, x: int, y: int, size: int):
-        super().__init__(x, y, weight=120, size=size)
+    def __init__(self, position: Vector, size: int):
+        super().__init__(position, mass=120, size=size)
 
 
 class SatelliteD(Satellite):
-    def __init__(self, x: int, y: int, size: int):
-        super().__init__(x, y, weight=40, size=size)
+    def __init__(self, position: Vector, size: int):
+        super().__init__(position, mass=40, size=size)
 
 
 class SpaceJunk(Satellite):
-    def __init__(self, x: int, y: int, size: int):
-        super().__init__(x, y, weight=10, size=size)
-        self.is_crashed = True
+    def __init__(self, position: Vector, size: int):
+        super().__init__(position, mass=10, size=size)
+        self.update_crashed_status()
 
 
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
-
-
-def calculate_distance(coord_A: tuple, coords_B: tuple) -> float:
-    return np.math.sqrt((coords_B[0] - coord_A[0]) ** 2 + (coords_B[1] - coord_A[1]) ** 2)
 
 
 # =========================================================================== #

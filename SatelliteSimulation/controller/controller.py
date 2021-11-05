@@ -13,7 +13,8 @@ Controller of the satellite simulation.
 # =========================================================================== #
 import random
 
-from SatelliteSimulation.model.DisturbanceType import DisturbanceType
+from SatelliteSimulation.model.satellite_border import SatelliteBorder
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.model import Space
 from SatelliteSimulation.view.view import GUI
 
@@ -36,14 +37,14 @@ class Controller:
     def __init__(self):
         self.gui = GUI(controller=self, width=1920, height=1080)
         border_parameters = self.gui.get_satellite_border()
+        border: SatelliteBorder = SatelliteBorder(
+            x=border_parameters[0],
+            y=border_parameters[1],
+            width=border_parameters[2],
+            height=border_parameters[3],
+            padding=border_parameters[4])
 
-        self.space = Space(
-            satellite_amount=random.randint(2, 2),
-            border_corner_x=border_parameters[0],
-            border_corner_y=border_parameters[1],
-            border_width=border_parameters[2],
-            border_height=border_parameters[3],
-            border_offset=border_parameters[4])
+        self.space = Space(satellite_amount=random.randint(10, 10), border=border)
         self.gui.start_simulation_loop()
 
 
@@ -63,21 +64,15 @@ class Controller:
 
 
     def next_frame(self):
-        satellites_moved: bool = self.space.move_influenced_satellites()
-        if satellites_moved:
-            self.space.update_satellite_observance()
-        self.gui.update(self.space.satellites)
+        self.space.avoid_possible_future_collisions()
+        self.space.move_satellites()
+        self.space.update_satellite_observance()
+        self.space.check_and_handle_collisions()
+        self.gui.update(self.space.get_satellites())
 
 
-    def update_border_and_satellite_data(self):
-        border_corner_x, border_corner_y, border_width, border_height, border_padding = self.gui.get_satellite_border()
-
-        self.space.update_border_and_satellite_data(self.gui.get_scale_factor(),
-                                                    border_corner_x=border_corner_x,
-                                                    border_corner_y=border_corner_y,
-                                                    border_width=border_width,
-                                                    border_height=border_height,
-                                                    border_padding=border_padding)
+    def update_scale(self):
+        self.space.update_border_and_satellite_scale(self.gui.get_scale_factor())
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #

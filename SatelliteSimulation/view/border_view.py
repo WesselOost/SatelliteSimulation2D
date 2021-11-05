@@ -26,12 +26,13 @@ RED = (255, 0, 0)
 # =========================================================================== #
 
 
-class Border:
+class BorderView:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     def __init__(self, x: float, y: float, width: float, height: float, margin: float, padding: float):
+        #TODO get data from SatelliteBorder class
         self.__float_x: float = x + margin
         self.__float_y: float = y + margin
         self.__float_width: float = (width - margin * 2)

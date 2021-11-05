@@ -12,7 +12,8 @@ Basic math definitions and calculations.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import numpy as np
+
+from SatelliteSimulation.model.math.vector import *
 
 
 # =========================================================================== #
@@ -63,6 +64,7 @@ class StraightLineEquation:
 
 
     def calculate_t(self, point: tuple) -> float:
+        # TODO fix RuntimeWarning: divide by zero encountered in double_scalars
         return (point[0] - self.support_vector[0]) / self.direction_vector[0]
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
@@ -87,9 +89,9 @@ class LinearSystemOfEquations:
             intersection point, (inf,inf) if no or infinity intersections 
         """
         stack = np.vstack([g1.stack, g2.stack])
-        homogenous = np.hstack((stack, np.ones((4, 1))))
-        line1 = np.cross(homogenous[0], homogenous[1])
-        line2 = np.cross(homogenous[2], homogenous[3])
+        homogeneous = np.hstack((stack, np.ones((4, 1))))
+        line1 = np.cross(homogeneous[0], homogeneous[1])
+        line2 = np.cross(homogeneous[2], homogeneous[3])
         x, y, z = np.cross(line1, line2)
         if z == 0:
             return (float('inf'), float('inf'))
@@ -102,7 +104,6 @@ class LinearSystemOfEquations:
         # =========================================================================== #
         #  SECTION: Main Body
         # =========================================================================== #
-
 
 if __name__ == '__main__':
     pass

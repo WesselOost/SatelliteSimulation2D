@@ -16,14 +16,15 @@ import os
 import pygame
 
 from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
-from SatelliteSimulation.model.satellite import SpaceJunk
-from SatelliteSimulation.view.NavigationHandler import NavigationHandler
+from SatelliteSimulation.model.satellite.satellite import SpaceJunk
+from SatelliteSimulation.view.navigation_handler import NavigationHandler
 from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
 from SatelliteSimulation.view.earth import Earth
+from SatelliteSimulation.view.border_view import BorderView
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-from SatelliteSimulation.view.satellite_border import Border
 
 MAX_SURFACE_HEIGHT = 242
 MIN_SURFACE_WIDTH = 430
@@ -40,17 +41,12 @@ SATELLITE_2 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite
 SATELLITE_3 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite3.png"))
 SATELLITE_4 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite4.png"))
 
-SATELLITE_1_CRASHED = pygame.image.load(os.path.join(
-    ABSOLUTE_PATH, "Assets", "satellite1_crashed.png"))
-SATELLITE_2_CRASHED = pygame.image.load(os.path.join(
-    ABSOLUTE_PATH, "Assets", "satellite2_crashed.png"))
-SATELLITE_3_CRASHED = pygame.image.load(os.path.join(
-    ABSOLUTE_PATH, "Assets", "satellite3_crashed.png"))
-SATELLITE_4_CRASHED = pygame.image.load(os.path.join(
-    ABSOLUTE_PATH, "Assets", "satellite4_crashed.png"))
+SATELLITE_1_CRASHED = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1_crashed.png"))
+SATELLITE_2_CRASHED = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite2_crashed.png"))
+SATELLITE_3_CRASHED = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite3_crashed.png"))
+SATELLITE_4_CRASHED = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite4_crashed.png"))
 
-ASTEROID_1 = pygame.image.load(os.path.join(
-    ABSOLUTE_PATH, "Assets", "asteroid1.png"))
+ASTEROID_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "asteroid1.png"))
 
 
 # =========================================================================== #
@@ -66,8 +62,9 @@ class GUI:
         pygame.display.set_caption("Satellite simulation")
         self.__ratio = height / width
 
-        half_screen_size = self.create_correct_aspect_ratio_width_height(pygame.display.Info().current_w // 2,
-                                                                         pygame.display.Info().current_h // 2)
+        half_screen_size = self.create_correct_aspect_ratio_width_height(
+            pygame.display.Info().current_w // 2,
+            pygame.display.Info().current_h // 2)
 
         self.__surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
 
@@ -102,9 +99,9 @@ class GUI:
         self.__earth = Earth(self.__surface, DEFAULT_BUTTON_OFFSET,
                              earth_offset_x=(self.__surface.get_width() - top_button.x) // 2)
 
-        self.__satellite_border = Border(x=0, y=0, width=top_button.x,
-                                         height=top_button.y, margin=DEFAULT_BORDER_OFFSET,
-                                         padding=DEFAULT_BORDER_OFFSET / 3)
+        self.__satellite_border = BorderView(x=0, y=0, width=top_button.x,
+                                             height=top_button.y, margin=DEFAULT_BORDER_OFFSET,
+                                             padding=DEFAULT_BORDER_OFFSET / 3)
         self.__satellite_border.show_offset()
         self.__satellite_mini_border = self.__create_mini_border(
             self.__satellite_border.get_border(),
@@ -173,14 +170,14 @@ class GUI:
     # ----------------------------------------------------------------------- #
 
     def __create_mini_border(self, satellite_border: pygame.Rect, dotted_circle_position: tuple,
-                             dotted_circle_width: int) -> Border:
+                             dotted_circle_width: int) -> BorderView:
         mini_border_scale = 0.04
         mini_border_width = satellite_border.width * mini_border_scale
         mini_border_height = satellite_border.height * mini_border_scale
         mini_border_x = dotted_circle_position[0] + dotted_circle_width // 2 - mini_border_width // 2
         mini_border_y = dotted_circle_position[1] - mini_border_height // 2
 
-        return Border(
+        return BorderView(
             x=mini_border_x,
             y=mini_border_y,
             width=mini_border_width,
@@ -208,7 +205,7 @@ class GUI:
                     self.__scale_factor = self.__surface.get_height() / self.previous_height
                     self.__scale_on_changed(self.__scale_factor)
                     self.previous_height = self.__surface.get_height()
-                    self.__controller.update_border_and_satellite_data()
+                    self.__controller.update_scale()
             self.__disturbance_buttons.calculate_state()
             for click_event_text in self.__disturbance_buttons.get_new_click_events():
                 self.__controller.create_disturbance(click_event_text)
@@ -252,29 +249,29 @@ class GUI:
     def __draw_satellite(self, satellite: Satellite):
         satellite_img = None
         if isinstance(satellite, SatelliteA):
-            if satellite.is_crashed:
+            if satellite.is_crashed():
                 satellite_img = SATELLITE_1_CRASHED
             else:
                 satellite_img = SATELLITE_1
         elif isinstance(satellite, SatelliteB):
-            if satellite.is_crashed:
+            if satellite.is_crashed():
                 satellite_img = SATELLITE_2_CRASHED
             else:
                 satellite_img = SATELLITE_2
         elif isinstance(satellite, SatelliteC):
-            if satellite.is_crashed:
+            if satellite.is_crashed():
                 satellite_img = SATELLITE_3_CRASHED
             else:
                 satellite_img = SATELLITE_3
         elif isinstance(satellite, SatelliteD):
-            if satellite.is_crashed:
+            if satellite.is_crashed():
                 satellite_img = SATELLITE_4_CRASHED
             else:
                 satellite_img = SATELLITE_4
         elif isinstance(satellite, SpaceJunk):
             satellite_img = ASTEROID_1
-        satellite_img = pygame.transform.scale(satellite_img, (satellite.size, satellite.size))
-        self.__surface.blit(satellite_img, (satellite.x, satellite.y))
+        satellite_img = pygame.transform.scale(satellite_img, (satellite.size(), satellite.size()))
+        self.__surface.blit(satellite_img, (satellite.position.x(), satellite.position.y()))
 
 
 # =========================================================================== #
