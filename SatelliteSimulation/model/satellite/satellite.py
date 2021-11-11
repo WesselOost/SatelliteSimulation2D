@@ -46,7 +46,7 @@ class Satellite:
         self.__size = size
         self.__observed_satellites: dict = observed_satellites
         self.__previously_observed_satellites: dict = {}
-        self.__disturbances: list = [Disturbance(), Disturbance(), Disturbance()]
+        self.__disturbances: list = []
 
 
     # ----------------------------------------------------------------------- #

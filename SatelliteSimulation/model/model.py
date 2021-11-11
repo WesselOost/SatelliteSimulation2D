@@ -18,7 +18,7 @@ import math
 
 from SatelliteSimulation.model.collision_handling import *
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
-from SatelliteSimulation.model.disturbance.disturbance import Disturbance
+from SatelliteSimulation.model.disturbance.disturbance import *
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
 from SatelliteSimulation.model.math.velocity import Velocity
@@ -75,21 +75,18 @@ class Space:
 
 
     def create_disturbance(self, disturbance_type: DisturbanceType):
-        disturbance: Disturbance = Disturbance()
+
         if disturbance_type == DisturbanceType.MALFUNCTION:
-            disturbance.apply_malfunction(self.__satellites, self.__scale_factor)
+            Malfunction().apply_malfunction(self.__satellites, self.__scale_factor)
         elif disturbance_type == DisturbanceType.GRAVITATIONAL:
-            disturbance.set_reference_value(120)
-            disturbance.apply_gravitational_disturbance(self.__satellites)
+            GravitationalDisturbance(120).apply_disturbance(self.__satellites)
             print('damn gravity')
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
             ref: float = self.__border.height() // 10 * 1.2
-            disturbance.set_reference_value(ref ** 2)
-            disturbance.apply_radiation_disturbance(self.__satellites)
+            SolarRadiationDisturbance(ref ** 2).apply_disturbance(self.__satellites)
             print('sun burn')
         elif disturbance_type == DisturbanceType.MAGNETIC:
-            disturbance.set_reference_value(120)
-            disturbance.apply_magnetic_disturbance(self.__satellites)
+            MagneticDisturbance(12).apply_disturbance(self.__satellites)
             print('pls help Iron Man')
 
 
