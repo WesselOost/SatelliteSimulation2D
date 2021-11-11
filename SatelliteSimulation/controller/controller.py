@@ -62,6 +62,8 @@ class Controller:
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         self.space.navigate_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
+    def set_delta_time(self, delta_time: float):
+        self.space.set_delta_time(delta_time)
 
     def next_frame(self):
         self.space.avoid_possible_future_collisions()

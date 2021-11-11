@@ -41,6 +41,7 @@ class Space:
         self.__scale_factor: float = 1.0
         self.__border = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
+        self.__delta_time = 1
 
         self.update_satellite_observance()
 
@@ -51,6 +52,14 @@ class Space:
 
     def get_satellites(self) -> list:
         return self.__satellites
+
+
+    def delta_time(self) -> float:
+        return self.__delta_time
+
+
+    def set_delta_time(self, delta_time):
+        self.__delta_time = delta_time
 
 
     # ----------------------------------------------------------------------- #

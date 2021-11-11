@@ -191,7 +191,7 @@ class GUI:
         clock = pygame.time.Clock()
         run = True
         while run:
-            clock.tick(FRAME_RATE)
+            delta_time = clock.tick(FRAME_RATE) * .001 * FRAME_RATE
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -215,7 +215,7 @@ class GUI:
                                                      navigation_state[1],
                                                      navigation_state[2],
                                                      navigation_state[3])
-
+            self.__controller.set_delta_time(delta_time)
             self.__controller.next_frame()
         pygame.quit()
 
