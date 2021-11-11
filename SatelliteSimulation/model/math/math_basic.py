@@ -13,6 +13,7 @@ Basic math definitions and calculations.
 #  SECTION: Imports
 # =========================================================================== #
 import numpy as np
+from numpy.core.numeric import False_
 
 from SatelliteSimulation.model.math.vector import *
 
@@ -99,6 +100,15 @@ class LinearSystemOfEquations:
             return (float('inf'), float('inf'))
         return (x / z, y / z)
 
+    def check_collinearity(self, g1: StraightLineEquation, g2: StraightLineEquation) -> bool:
+        t_x = (g1.support_vector[0] - g2.support_vector[0])/g2.direction_vector[0]
+        t_y = (g1.support_vector[1] - g2.support_vector[1])/g2.direction_vector[1]
+        factor_x = g2.direction_vector[0]/g1.direction_vector[0]
+        factor_y = g2.direction_vector[1]/g1.direction_vector[1]
+        if t_x == t_y and factor_x==factor_y and factor_x <= 0:
+            return True
+        return False
+        
         # =========================================================================== #
         #  SECTION: Function definitions
         # =========================================================================== #
