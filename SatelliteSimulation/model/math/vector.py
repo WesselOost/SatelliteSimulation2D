@@ -83,11 +83,11 @@ class Vector:
 
     def dot_product(self, vector):
         return self._x * vector.x() + self._y * vector.y()
+    
 
 
     def __copy__(self):
         return Vector(self._x, self._y)
-
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -135,6 +135,9 @@ def divide(vector: Vector, scalar: float):
 def calculate_distance(vector1: Vector, vector2: Vector) -> float:
     vector: Vector = subtract(vector1, vector2)
     return vector.magnitude()
+
+def tuple_to_vector(given_tuple:tuple)->Vector:
+    return Vector(given_tuple[0],given_tuple[1])
 
 
 # =========================================================================== #

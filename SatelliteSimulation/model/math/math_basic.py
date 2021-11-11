@@ -55,8 +55,8 @@ class StraightLineEquation:
         # print(f"New equation: g{self.counter}: x(t)={self.direction_vector}t+{self.support_vector}")
 
 
-    def calculate_new_point(self, t: float) -> np.array:
-        return self.direction_vector * t * self.support_vector
+    def calculate_new_point(self, t: float) -> tuple:
+        return tuple(map(self.direction_vector * t * self.support_vector))
 
 
     def calculate_t_for_distance(self, distance: float) -> tuple:
@@ -67,6 +67,7 @@ class StraightLineEquation:
     def calculate_t(self, point: tuple) -> float:
         # TODO fix RuntimeWarning: divide by zero encountered in double_scalars
         return (point[0] - self.support_vector[0]) / self.direction_vector[0]
+    
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
