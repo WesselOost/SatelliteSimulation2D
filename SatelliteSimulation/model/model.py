@@ -21,6 +21,7 @@ from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
+from SatelliteSimulation.model.math.velocity import Velocity
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -89,11 +90,11 @@ class Space:
             if satellite.disturbance_duration() > 0:
                 satellite.decrement_disturbance_duration()
                 if satellite.disturbance_duration() <= 0:
-                    # satellite.velocity.clear()
-                    # TODO stop disturbance and decrement crashed satellites velocity
+                    # satellite.value.clear()
+                    # TODO stop disturbance and decrement crashed satellites value
                     pass
-            if satellite.velocity.magnitude() < 0.1:
-                satellite.velocity.clear()
+            # if satellite.value.magnitude() < 0.1:
+            #     satellite.value.clear()
 
 
     def check_and_handle_collisions(self):
@@ -185,26 +186,23 @@ class Space:
         satellite_size = satellite.size()
         satellite_right_edge = satellite_x + satellite_size
 
-        reverse_velocity_x = satellite.velocity.x() * -1
         if satellite_right_edge > border.right():
-            satellite.velocity.set_x(reverse_velocity_x)
             satellite.position.set_x(border.right() - satellite_size)
 
         if satellite_x < border.left():
-            satellite.velocity.set_x(reverse_velocity_x)
             satellite.position.set_x(border.left())
 
         satellite_y = satellite.position.y()
         satellite_bottom_edge = satellite_y + satellite_size
 
-        reverse_velocity_y = satellite.velocity.y() * -1
         if satellite_y < border.top():
-            satellite.velocity.set_y(reverse_velocity_y)
             satellite.position.set_y(border.top())
 
         if satellite_bottom_edge > border.bottom():
-            satellite.velocity.set_y(reverse_velocity_y)
             satellite.position.set_y(border.bottom() - satellite_size)
+        satellite.velocity.disturbance_velocity().clear()
+        satellite.velocity.navigation_velocity().clear()
+        satellite.velocity.collision_velocity().clear()
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):

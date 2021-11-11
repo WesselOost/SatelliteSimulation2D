@@ -22,6 +22,7 @@ import random
 #  SECTION: Class definitions
 # =========================================================================== #
 from SatelliteSimulation.model.math.vector import Vector
+from SatelliteSimulation.model.math.velocity import Velocity
 
 
 class Disturbance:
@@ -33,9 +34,10 @@ class Disturbance:
         # duration in frames
         self.__duration = random.randrange(60, 120, 1)
 
-        # velocity vector in Pixel
-        self.__velocity_x = random.uniform(-1, 1) * random.randint(0, 5)
-        self.__velocity_y = random.uniform(-1, 1) * random.randint(0, 5)
+        # value vector in Pixel
+        random_x = random.uniform(-1, 1) * random.randint(0, 5)
+        random_y = random.uniform(-1, 1) * random.randint(0, 5)
+        self.__velocity: Velocity = Velocity(random_x, random_y, acceleration=Vector(random_x, random_y).magnitude())
 
         self.__reference_value = reference_value
 
@@ -46,8 +48,12 @@ class Disturbance:
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
     def set_reference_value(self, ref: float):
-        #TODO why is this reference value necessary?
+        # TODO why is this reference value necessary?
         self.__reference_value = ref
+
+
+    def velocity(self) -> Velocity:
+        return self.__velocity
 
 
     # ----------------------------------------------------------------------- #
@@ -61,8 +67,8 @@ class Disturbance:
             if satellite.disturbance_duration() < self.__duration:
                 satellite.set_disturbance_duration(self.__duration)
 
-            satellite.velocity.add_to_x(self.__velocity_x * scale_factor)
-            satellite.velocity.add_to_y(self.__velocity_y * scale_factor)
+            satellite.velocity.disturbance_velocity().add_vector(Vector(self.__velocity.x() * scale_factor,
+                                                                 self.__velocity.y() * scale_factor))
         except IndexError:
             # TODO everything is crashed, game over (maybe game over screen :p)
             pass
@@ -71,25 +77,23 @@ class Disturbance:
     def apply_gravitational_disturbance(self, satellites: list):
         for satellite in satellites:
             satellite.set_disturbance_duration(self.__duration)
-            satellite.velocity.set_y(self.__change_gravity(satellite.mass()))
+            satellite.velocity.disturbance_velocity().set_y(self.__change_gravity(satellite.mass()))
 
 
     def apply_radiation_disturbance(self, satellites: list):
         for satellite in satellites:
             satellite.set_disturbance_duration(self.__duration)
-            velocity_x: float = self.__velocity_x * self.__add_radiation_pressure(satellite.surface())
-            velocity_y: float = self.__velocity_y * self.__add_radiation_pressure(satellite.surface())
-            satellite.velocity.set_xy(velocity_x, velocity_y)
+            velocity_x: float = self.__velocity.x() * self.__add_radiation_pressure(satellite.surface())
+            velocity_y: float = self.__velocity.y() * self.__add_radiation_pressure(satellite.surface())
+            satellite.velocity.disturbance_velocity().set_xy(velocity_x, velocity_y)
 
 
     def apply_magnetic_disturbance(self, satellites):
         for satellite in satellites:
             satellite.set_disturbance_duration(self.__duration)
-            velocity_x = self.__velocity_x * self.__add_magnetic_disturbance(
-                satellite.mass())
-            velocity_y = self.__velocity_y * self.__add_magnetic_disturbance(
-                satellite.mass())
-            satellite.velocity.set_xy(velocity_x, velocity_y)
+            velocity_x = self.__velocity.x() * self.__add_magnetic_disturbance(satellite.mass())
+            velocity_y = self.__velocity.y() * self.__add_magnetic_disturbance(satellite.mass())
+            satellite.velocity.disturbance_velocity().set_xy(velocity_x, velocity_y)
 
 
     # ----------------------------------------------------------------------- #
@@ -106,10 +110,11 @@ class Disturbance:
 
     def __add_radiation_pressure(self, surface: int) -> float:
         # Radiation pressure from the sun
-        if self.__velocity_x != 0 and self.__velocity_y != -1:
+        if self.__velocity.x() != 0 and self.__velocity.y() != -1:
             return (self.__reference_value / surface) * 0.1
-        self.__velocity_x = random.uniform(-1, 1) * random.randint(0, 5)
-        self.__velocity_y = random.uniform(-1, 1) * random.randint(0, 5)
+        x: float = random.uniform(-1, 1) * random.randint(0, 5)
+        y: float = random.uniform(-1, 1) * random.randint(0, 5)
+        self.__velocity.set_xy(x, y)
         return (surface / self.__reference_value) * 0.1
 
 

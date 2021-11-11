@@ -12,10 +12,9 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-
+from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.math.math_basic import *
 from SatelliteSimulation.model.math.vector import Vector
-
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -28,6 +27,7 @@ from SatelliteSimulation.model.math.vector import Vector
 # =========================================================================== #
 #  SECTION: Satellite in general
 # =========================================================================== #
+from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocity
 
 
 class Satellite:
@@ -37,16 +37,16 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
-        self.velocity: Vector = Vector(0, 0)
-
+        # TODO define max nav value with mass
+        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=2)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 30
-        self.__max_navigation_velocity: float = 40 / mass
         self.__disturbance_duration = 0
         self.__mass = mass
         self.__size = size
         self.__observed_satellites: dict = observed_satellites
         self.__previously_observed_satellites: dict = {}
+        self.__disturbances: list = [Disturbance(), Disturbance(), Disturbance()]
 
 
     # ----------------------------------------------------------------------- #
@@ -103,12 +103,13 @@ class Satellite:
 
     def update_scale(self, scale_factor: float):
         self.__observance_radius *= scale_factor
-        self.__max_navigation_velocity *= scale_factor
         self.__size *= scale_factor
         self.position.set_vector(multiply(self.position, scalar=scale_factor))
+        self.velocity.update_scale(scale_factor)
 
         if self.__disturbance_duration > 0:
-            self.velocity.set_vector(multiply(self.velocity, scalar=scale_factor))
+            self.velocity.disturbance_velocity().set_vector(
+                multiply(self.velocity.disturbance_velocity(), scalar=scale_factor))
 
 
     def update_crashed_status(self):
@@ -130,28 +131,35 @@ class Satellite:
 
 
     def move(self):
-        self.position.add_to_x(self.velocity.x())
-        self.position.add_to_y(self.velocity.y())
+        for disturbance in self.__disturbances:
+            pass
+        # TODO add acceleration
+        # self.velocity.update_velocities()
+        self.position.add_to_x(self.velocity.value().x())
+        self.position.add_to_y(self.velocity.value().y())
 
 
-    def moveTo(self, direction_in_degrees: int):
+    def navigate_to(self, direction_in_degrees: int):
         angle_in_radians = np.math.radians(direction_in_degrees)
-
-        max_nav_velocity = self.__max_navigation_velocity
-        self.velocity.set_x(max_nav_velocity * np.math.cos(angle_in_radians))
-        self.velocity.set_y(max_nav_velocity * np.math.sin(angle_in_radians))
+        max_nav_velocity = self.velocity.max_navigation_velocity()
+        x = max_nav_velocity * np.math.cos(angle_in_radians)
+        y = max_nav_velocity * np.math.sin(angle_in_radians)
+        self.velocity.set_navigation_velocity(Vector(x, y))
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        max_velocity = self.__max_navigation_velocity
+        self.velocity.navigation_velocity().set_acceleration(0.5)
+        nav_x: float = self.velocity.navigation_velocity().x()
+        nav_y: float = self.velocity.navigation_velocity().y()
+
         if pressed_left:
-            self.velocity.set_x(max_velocity * -1)
+            self.velocity.set_navigation_velocity(Vector(-1, nav_y))
         if pressed_up:
-            self.velocity.set_y(max_velocity * -1)
+            self.velocity.set_navigation_velocity(Vector(nav_x, -1))
         if pressed_right:
-            self.velocity.set_x(max_velocity)
+            self.velocity.set_navigation_velocity(Vector(1, nav_y))
         if pressed_down:
-            self.velocity.set_y(max_velocity)
+            self.velocity.set_navigation_velocity(Vector(nav_x, 1))
 
 
     def collision_possible(self, point1: tuple, point2: tuple, size: float) -> bool:
@@ -193,7 +201,7 @@ class Satellite:
     def __get_satellite_trajectory(self) -> StraightLineEquation:
         # TODO shift center to outer edge
         point1: Vector = self.center()
-        point2: tuple = (self.velocity.x() + point1.x(), self.velocity.y() + point1.y())
+        point2: tuple = (self.velocity.value().x() + point1.x(), self.velocity.value().y() + point1.y())
         return StraightLineEquation(point1.get_as_tuple(), point2)
 
 
@@ -204,7 +212,7 @@ class Satellite:
 
 
     def __avoid_collision_by_random_position(self):
-        #todo create own class for avoiding methods
+        # todo create own class for avoiding methods
         pass
 
 

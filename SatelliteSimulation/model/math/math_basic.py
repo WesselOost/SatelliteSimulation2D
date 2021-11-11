@@ -12,6 +12,7 @@ Basic math definitions and calculations.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import numpy as np
 
 from SatelliteSimulation.model.math.vector import *
 

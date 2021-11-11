@@ -12,7 +12,7 @@ a 2 dimensional vector class
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import numpy as np
+import math
 
 
 # =========================================================================== #
@@ -74,7 +74,7 @@ class Vector:
 
 
     def magnitude(self) -> float:
-        return np.math.sqrt(self._x ** 2 + self._y ** 2)
+        return math.sqrt(self._x ** 2 + self._y ** 2)
 
 
     def tangent(self):
@@ -99,6 +99,10 @@ class Vector:
 
     def add_to_y(self, y: float):
         self._y += y
+
+    def add_vector(self, vector):
+        self.add_to_x(vector.x())
+        self.add_to_y(vector.y())
 
 
     def __str__(self):

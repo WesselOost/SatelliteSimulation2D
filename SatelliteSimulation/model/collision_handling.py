@@ -12,9 +12,8 @@ Handles and detects collisions between 2 circles
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.math.math_basic import calculate_distance
 from SatelliteSimulation.model.satellite.satellite import Satellite
-from SatelliteSimulation.model.math.vector import multiply, Vector, add, subtract, divide
+from SatelliteSimulation.model.math.vector import *
 
 
 # =========================================================================== #
@@ -79,22 +78,22 @@ def collision_resolution(satellite1: Satellite, satellite2: Satellite):
     s1_velocity_result: Vector = add(s1_new_normal_velocity, s1_new_tangent_velocity)
     s2_velocity_result: Vector = add(s2_new_normal_velocity, s2_new_tangent_velocity)
 
-    satellite1.velocity.set_vector(s1_velocity_result)
-    satellite2.velocity.set_vector(s2_velocity_result)
+    satellite1.velocity.collision_velocity().set_vector(s1_velocity_result)
+    satellite2.velocity.collision_velocity().set_vector(s2_velocity_result)
 
 
 # =========================================================================== #
 #  SECTION: private Function definitions
 # =========================================================================== #
 def __satellites_move_towards_each_other(satellite1: Satellite, satellite2: Satellite) -> bool:
-    velocity_subtracted: Vector = subtract(satellite2.velocity, satellite1.velocity)
+    velocity_subtracted: Vector = subtract(satellite2.velocity.value(), satellite1.velocity.value())
     position_subtracted: Vector = subtract(satellite1.center(), satellite2.center())
     return velocity_subtracted.dot_product(position_subtracted) > 0
 
 
 def __calculate_new_normal_velocity(satellite1: Satellite, satellite2: Satellite, unit_normal: Vector) -> Vector:
-    s1_velocity_dp_normal: float = satellite1.velocity.dot_product(unit_normal)
-    s2_velocity_dp_normal: float = satellite2.velocity.dot_product(unit_normal)
+    s1_velocity_dp_normal: float = satellite1.velocity.value().dot_product(unit_normal)
+    s2_velocity_dp_normal: float = satellite2.velocity.value().dot_product(unit_normal)
 
     velocity_new_dp_normal: float = __calculate_new_dot_product_velocity(
         satellite1.mass(),
@@ -108,14 +107,14 @@ def __calculate_new_dot_product_velocity(mass1: float, mass2: float, velocity1_d
                                          velocity2_dot_product_normal: float) -> float:
     """
     FORMULA: v_1n` = (v_1n(m_1 - m_2) + 2m_2 * v_2n) / (m1 + m2)
-    :return: normalized velocity
+    :return: normalized value
     """
     return (velocity1_dot_product_normal * (mass1 - mass2) + 2 * mass2 * velocity2_dot_product_normal) / \
            (mass1 + mass2)
 
 
 def __calculate_new_tangent_velocity(satellite: Satellite, unit_tangent: Vector) -> Vector:
-    velocity_dp_tangent: float = satellite.velocity.dot_product(unit_tangent)
+    velocity_dp_tangent: float = satellite.velocity.value().dot_product(unit_tangent)
     return multiply(vector=unit_tangent, scalar=velocity_dp_tangent)
 
 
