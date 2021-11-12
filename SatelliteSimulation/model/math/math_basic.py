@@ -67,8 +67,14 @@ class StraightLineEquation:
         return np.linalg.norm(self.direction_vector)
 
     def calculate_t(self, point: tuple) -> float:
-        # TODO fix RuntimeWarning: divide by zero encountered in double_scalars
-        return (point[0] - self.support_vector[0]) / self.direction_vector[0]
+        if self.direction_vector[0] != 0:
+            t = (point[0] - self.support_vector[0])/self.direction_vector[0]
+            return t 
+        if self.direction_vector[1] != 0:
+            t = (point[1] - self.support_vector[1])/self.direction_vector[1]
+            return t 
+        else:
+            return None
     
     def distance_to_point(self, point:tuple)->float:
         location_vector = np.array(point)

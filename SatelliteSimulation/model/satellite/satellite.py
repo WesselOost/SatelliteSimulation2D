@@ -163,19 +163,9 @@ class Satellite:
             self.velocity.set_navigation_velocity(Vector(nav_x, 1))
 
 
-    def collision_possible(self, point1: tuple, point2: tuple, size: float) -> bool:
-        satellite_trajectory = self.__get_satellite_trajectory()
-        other_satellite_trajectories = [StraightLineEquation(point1, point2)]
-        other_satellite_trajectories.extend(self.__get_parallel_trajectory(size))
-        lgs = LinearSystemOfEquations()
-        for trajectory in other_satellite_trajectories:
-            intersection = lgs.get_intersection(satellite_trajectory, trajectory)
-
-
     def detect_possible_collisions(self, previous_observed_satellites) -> dict:
         #TODO consider acceleration
         possible_collisions: dict = dict()
-        lgs = LinearSystemOfEquations()
         satellite_trajectories = [self.__get_satellite_trajectory()]
         if self.velocity.value().magnitude() != 0:
             satellite_trajectories.extend(self.__get_parallel_trajectory(
@@ -189,8 +179,7 @@ class Satellite:
                     satellite_trajectories,
                     observed_trajectory,
                     observed_satellite)
-                #TODO clear dict if None as value 
-        return possible_collisions
+        return {key: value for key, value in possible_collisions.items() if value is not None}
 
 
     def avoid_possible_collisions(self, possible_collisions: dict):
@@ -287,7 +276,7 @@ class Satellite:
         nearest_hit = 1000
         for observed_trajectory in observed_trajectories:
             for satellite_trajectory in satellite_trajectories:
-                identical_trajectories:bool = lgs.check_identity()(satellite_trajectory, observed_trajectory)
+                identical_trajectories:bool = lgs.check_identity(satellite_trajectory, observed_trajectory)
                 if identical_trajectories:
                     intersection, t = lgs.point_and_moment_of_crash(
                         satellite_trajectory, observed_trajectory)

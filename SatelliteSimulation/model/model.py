@@ -119,8 +119,11 @@ class Space:
 
     def avoid_possible_future_collisions(self):
         for satellite in self.__satellites:
-            possible_collisions: dict = satellite.detect_possible_collisions(satellite.previously_observed_satellites())
-            satellite.avoid_possible_collisions(possible_collisions)
+            if not satellite.is_crashed():
+                possible_collisions: dict = satellite.detect_possible_collisions(satellite.previously_observed_satellites())
+                if possible_collisions:
+                    print(possible_collisions)
+                satellite.avoid_possible_collisions(possible_collisions)
 
 
     # ----------------------------------------------------------------------- #
