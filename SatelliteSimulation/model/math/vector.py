@@ -129,7 +129,10 @@ def multiply(vector: Vector, scalar: float):
 
 
 def divide(vector: Vector, scalar: float):
-    return Vector(vector.x() / scalar, vector.y() / scalar)
+    if scalar != 0:
+        return Vector(vector.x() / scalar, vector.y() / scalar)
+    else:
+        print("check vector division")
 
 
 def calculate_distance(vector1: Vector, vector2: Vector) -> float:

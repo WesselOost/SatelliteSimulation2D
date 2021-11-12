@@ -177,40 +177,19 @@ class Satellite:
         possible_collisions: dict = dict()
         lgs = LinearSystemOfEquations()
         satellite_trajectories = [self.__get_satellite_trajectory()]
-        satellite_trajectories.extend(self.__get_parallel_trajectory(
-            self.radius(), satellite_trajectories[0]))
+        if self.velocity.value().magnitude() != 0:
+            satellite_trajectories.extend(self.__get_parallel_trajectory(
+                self.radius(), satellite_trajectories[0]))
         for observed_satellite in self.__observed_satellites:
             if observed_satellite in previous_observed_satellites:
                 previous_position: tuple = previous_observed_satellites[observed_satellite]
                 current_position: tuple = self.observed_satellites()[observed_satellite]
-                observed_trajectories = [StraightLineEquation(previous_position, current_position)]
-                observed_trajectories.extend(self.__get_parallel_trajectory(
-                    observed_satellite.radius(),observed_trajectories[0]))
-                for observed_trajectory in observed_trajectories:
-                    for satellite_trajectory in satellite_trajectories:
-                        collinear: bool = lgs.check_collinearity(
-                            satellite_trajectory, observed_trajectory)
-                        if collinear: 
-                            #TODO calc intersection if collinear, at the moment not considered
-                            intersection: tuple = (float('inf'), float('inf'))
-                        else:
-                            intersection :tuple= lgs.get_intersection(observed_trajectory, satellite_trajectory)
-                        if intersection != (float('inf'), float('inf')) or collinear:
-                            observed_t :float= observed_trajectory.calculate_t(intersection)
-                            satellite_t :float = satellite_trajectory.calculate_t(intersection)
-                            satellite_at_observed_t :tuple = satellite_trajectory.calculate_new_point(observed_t)
-                            observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(
-                                satellite_t)
-                            distance = calculate_distance(  tuple_to_vector(satellite_at_observed_t),
-                                                            tuple_to_vector(observed_satellite_at_satellite_t))
-                            if distance <= self.size() or distance <= observed_satellite.size():
-                                if observed_satellite in possible_collisions:
-                                    if satellite_t < smallest_t:
-                                        smallest_t = satellite_t
-                                        possible_collisions[observed_satellite] = intersection
-                                else:
-                                    possible_collisions[observed_satellite]=intersection
-                                    smallest_t = satellite_t
+                observed_trajectory = StraightLineEquation(previous_position, current_position)
+                possible_collisions[observed_satellite] = self.__analyse_given_object_system(
+                    satellite_trajectories,
+                    observed_trajectory,
+                    observed_satellite)
+                #TODO clear dict if None as value 
         return possible_collisions
 
 
@@ -250,10 +229,104 @@ class Satellite:
             right_turned_normalized_vector.get_as_tuple(), point2_right)
         
         return left_trajectory, right_trajectory
-
-    def __is_intersection_risky(self, intersection_moment:float):
-        pass
     
+    def __analyse_given_object_system(self, 
+                                        satellite_trajectories:list, 
+                                        observed_trajectory: StraightLineEquation,
+                                        observed_object) -> tuple:
+        """
+        The given systems of two "moving" objects can be split up into 4 categories:
+        1. both objects are moving
+        2. object1 is moving, object2 is at rest
+        3. object1 is at rest, object2 is moving
+        4. both objects are at rest
+
+        Parameters
+        ----------
+        satellite_trajectories : list[StraightLineEquation]
+            trajectories  of the current satellite
+        observed_trajectory : StraightLineEquation
+            trajectory of the observed object
+
+        Returns
+        -------
+        dict
+            if a possible collision is detected it is added to the dict [oberved_object]=riskiest intersection
+        """
+        satellite_velocity = self.velocity.value().magnitude()
+        observed_velocity = observed_trajectory.direction_vector_magnitude()
+        if satellite_velocity == observed_velocity == 0:
+            return None
+        if satellite_velocity != 0 and observed_velocity == 0:
+            return self.__check_collision_with_non_moving_object(satellite_trajectories, observed_object)
+        
+        observed_trajectories = [observed_trajectory]
+        observed_trajectories.extend(self.__get_parallel_trajectory(
+            observed_object.radius(), observed_trajectory))
+        if satellite_velocity == 0 and observed_velocity != 0:
+            return self.__check_collision_with_non_moving_object(observed_trajectories, observed_object, resting_satellite=True)
+        if satellite_velocity != 0 and observed_velocity != 0:
+            return self.__check_collision_with_moving_object(satellite_trajectories, observed_trajectories, observed_object)
+
+    def __check_collision_with_non_moving_object(self, trajectories:list, other_object, resting_satellite=False)->tuple:
+        minimal_distance = self.radius() + other_object.radius()
+        for trajectory in trajectories:
+            if resting_satellite:
+                dist = trajectory.distance_to_point(self.center().get_as_tuple())
+            else:
+                dist = trajectory.distance_to_point(other_object.center().get_as_tuple())
+            if dist <= minimal_distance:
+                #TODO has to be improved center is not first point of collision
+                return other_object.center().get_as_tuple()
+        return None
+    
+    
+    def __check_collision_with_moving_object(self, satellite_trajectories:list, observed_trajectories:list, observed_object):
+        lgs = LinearSystemOfEquations()
+        riskiest_collision:tuple = None
+        nearest_hit = 1000
+        for observed_trajectory in observed_trajectories:
+            for satellite_trajectory in satellite_trajectories:
+                identical_trajectories:bool = lgs.check_identity()(satellite_trajectory, observed_trajectory)
+                if identical_trajectories:
+                    intersection, t = lgs.point_and_moment_of_crash(
+                        satellite_trajectory, observed_trajectory)
+                    is_risky = True
+                else:
+                    intersection: tuple = lgs.get_intersection(
+                        observed_trajectory, satellite_trajectory)
+                    is_risky, t = self.__is_intersection_risky_and_when(intersection,
+                                                                        satellite_trajectory,
+                                                                        observed_trajectory,
+                                                                        observed_object)
+                if is_risky and t<nearest_hit:
+                    nearest_hit = t
+                    riskiest_collision = intersection
+        return riskiest_collision
+    
+    def __is_intersection_risky_and_when(self,
+                                intersection: tuple,
+                                satellite_trajectory: StraightLineEquation,
+                                observed_trajectory: StraightLineEquation,
+                                observed_object)->tuple:
+        if intersection == (float('inf'), float('inf')):
+            print("something went wrong at __is_intersection_risky()")
+        else:
+            observed_t: float = observed_trajectory.calculate_t(
+                intersection)
+            satellite_t: float = satellite_trajectory.calculate_t(
+                intersection)
+            satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(
+                            observed_t)
+            observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(
+                            satellite_t)
+            distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
+                                        tuple_to_vector(observed_satellite_at_satellite_t))
+            t = min(satellite_t, observed_t)
+            if distance <= (self.radius() + observed_object.radius()) and t >=0:
+                return True, t
+            return False, t
+                        
     def __avoid_collision_by_random_position(self):
         # todo create own class for avoiding methods
         pass
