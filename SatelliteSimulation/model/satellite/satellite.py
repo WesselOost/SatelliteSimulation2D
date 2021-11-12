@@ -299,22 +299,22 @@ class Satellite:
                                 observed_trajectory: StraightLineEquation,
                                 observed_object)->tuple:
         if intersection == (float('inf'), float('inf')):
-            print("something went wrong at __is_intersection_risky()")
-        else:
-            observed_t: float = observed_trajectory.calculate_t(
-                intersection)
-            satellite_t: float = satellite_trajectory.calculate_t(
-                intersection)
-            satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(
-                            observed_t)
-            observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(
-                            satellite_t)
-            distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
-                                        tuple_to_vector(observed_satellite_at_satellite_t))
-            t = min(satellite_t, observed_t)
-            if distance <= (self.radius() + observed_object.radius()) and t >=0:
-                return True, t
-            return False, t
+            #TODO figure out what happend here
+            return False, None
+        observed_t: float = observed_trajectory.calculate_t(
+            intersection)
+        satellite_t: float = satellite_trajectory.calculate_t(
+            intersection)
+        satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(
+                        observed_t)
+        observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(
+                        satellite_t)
+        distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
+                                    tuple_to_vector(observed_satellite_at_satellite_t))
+        t = min(satellite_t, observed_t)
+        if distance <= (self.radius() + observed_object.radius()) and t >=0:
+            return True, t
+        return False, t
                         
     def __avoid_collision_by_random_position(self):
         # todo create own class for avoiding methods
