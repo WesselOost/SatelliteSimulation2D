@@ -21,7 +21,7 @@ Border view for the satellites
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from SatelliteSimulation.model.math.vector import Vector
+from model.math.vector import Vector
 
 
 class SatelliteBorder:

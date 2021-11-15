@@ -12,10 +12,10 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.disturbance.disturbance import Disturbance
-from SatelliteSimulation.model.math.math_basic import *
-from SatelliteSimulation.model.math.vector import *
-from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocity
+from model.disturbance.disturbance import Disturbance
+from model.math.math_basic import *
+from model.math.vector import *
+from model.satellite.satellite_velocity_handler import SatelliteVelocity
 
 # =========================================================================== #
 #  SECTION: Global definitions

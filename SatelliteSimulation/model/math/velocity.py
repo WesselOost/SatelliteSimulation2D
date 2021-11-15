@@ -21,7 +21,7 @@ Class description
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from SatelliteSimulation.model.math.vector import Vector, divide, multiply
+from model.math.vector import Vector, divide, multiply
 
 
 class Velocity(Vector):

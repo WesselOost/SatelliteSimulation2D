@@ -21,8 +21,8 @@ Class description
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from SatelliteSimulation.model.math.vector import Vector, add, multiply
-from SatelliteSimulation.model.math.velocity import Velocity
+from model.math.vector import Vector, add, multiply
+from model.math.velocity import Velocity
 
 
 class SatelliteVelocity:

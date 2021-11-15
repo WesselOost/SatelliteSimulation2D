@@ -11,8 +11,7 @@ Main module for the satellite simulation. Execute this to start the program.
 # =========================================================================== #
 #  SECTION: Imports                                                           
 # =========================================================================== #
-from SatelliteSimulation.controller.controller import Controller
-
+from controller.controller import Controller
 
 # =========================================================================== #
 #  SECTION: Global definitions

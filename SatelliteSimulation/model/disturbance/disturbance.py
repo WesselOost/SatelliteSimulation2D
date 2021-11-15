@@ -21,8 +21,8 @@ import random
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from SatelliteSimulation.model.math.vector import Vector
-from SatelliteSimulation.model.math.velocity import Velocity
+from model.math.vector import Vector
+from model.math.velocity import Velocity
 
 
 class Disturbance:

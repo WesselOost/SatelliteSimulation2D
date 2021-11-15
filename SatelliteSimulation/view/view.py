@@ -15,12 +15,12 @@ is implemented here. The GUI is based on the python library "pygame".
 import os
 import pygame
 
-from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
-from SatelliteSimulation.model.satellite.satellite import SpaceJunk
-from SatelliteSimulation.view.navigation_handler import NavigationHandler
-from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
-from SatelliteSimulation.view.earth import Earth
-from SatelliteSimulation.view.border_view import BorderView
+from model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
+from model.satellite.satellite import SpaceJunk
+from view.navigation_handler import NavigationHandler
+from view.disturbance_buttons import DisturbanceButtons
+from view.earth import Earth
+from view.border_view import BorderView
 
 # =========================================================================== #
 #  SECTION: Global definitions
