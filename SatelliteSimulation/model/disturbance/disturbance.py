@@ -13,7 +13,8 @@ Disturbances that can occur in space
 #  SECTION: Imports
 # =========================================================================== #
 import random
-
+from SatelliteSimulation.model.math.vector import Vector
+from SatelliteSimulation.model.math.velocity import Velocity
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -21,8 +22,7 @@ import random
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from model.math.vector import Vector
-from model.math.velocity import Velocity
+
 
 
 class Disturbance:

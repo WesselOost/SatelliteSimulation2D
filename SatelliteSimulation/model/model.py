@@ -16,12 +16,12 @@ import os
 import random
 import math
 
-from model.collision_handling import *
-from model.satellite_border import SatelliteBorder
-from model.disturbance.disturbance import *
-from model.disturbance.disturbance_type import DisturbanceType
-from model.satellite.satellite import *
-from model.math.velocity import Velocity
+from SatelliteSimulation.model.collision_handling import *
+from SatelliteSimulation.model.satellite_border import SatelliteBorder
+from SatelliteSimulation.model.disturbance.disturbance import *
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
+from SatelliteSimulation.model.satellite.satellite import *
+from SatelliteSimulation.model.math.velocity import Velocity
 
 # =========================================================================== #
 #  SECTION: Global definitions

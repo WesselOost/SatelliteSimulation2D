@@ -13,11 +13,10 @@ Controller of the satellite simulation.
 # =========================================================================== #
 import random
 
-from model.disturbance.disturbance_type import \
-    DisturbanceType
-from model.model import Space
-from model.satellite_border import SatelliteBorder
-from view.view import GUI
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
+from SatelliteSimulation.model.model import Space
+from SatelliteSimulation.model.satellite_border import SatelliteBorder
+from SatelliteSimulation.view.view import GUI
 
 # =========================================================================== #
 #  SECTION: Global definitions
