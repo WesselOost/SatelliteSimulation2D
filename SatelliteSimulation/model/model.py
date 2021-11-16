@@ -120,7 +120,7 @@ class Space:
     def avoid_possible_future_collisions(self):
         for satellite in self.__satellites:
             if not satellite.is_crashed():
-                possible_collisions: dict = satellite.detect_possible_collisions(satellite.previously_observed_satellites())
+                possible_collisions: dict = satellite.detect_possible_collisions()
                 if possible_collisions:
                     print(possible_collisions)
                 satellite.avoid_possible_collisions(possible_collisions)
@@ -147,8 +147,8 @@ class Space:
         border: SatelliteBorder = self.__border
         default_size: float = border.height() // 10
         satellite_type: int = random.randint(1, SATELLITE_TYPE_AMOUNT)
-        x = random.randrange(border.left(), border.right(), 1)
-        y = random.randrange(border.top(), border.bottom(), 1)
+        x = random.randrange(int(border.left()), int(border.right()), 1)
+        y = random.randrange(int(border.top()), int(border.bottom()), 1)
         position: Vector = Vector(x, y)
 
         if satellite_type == 1:
@@ -168,7 +168,7 @@ class Space:
         for satellite in self.__satellites:
             if satellite is not observing_satellite:
                 distance = calculate_distance(satellite.center(), observing_satellite.center())
-                if distance <= observing_satellite.observance_radius():
+                if distance <= satellite.observance_radius():
                     observed_satellites[satellite] = satellite.center().get_as_tuple()
                 else:
                     # remove unobserved satellite from dict
@@ -182,8 +182,8 @@ class Space:
 
         for satellite in satellites:
             distance: float = calculate_distance(new_satellite.center(), satellite.center())
-            minimal_distance = satellite.radius() + satellite.observance_radius() + \
-                               new_satellite.radius() + new_satellite.observance_radius()
+            minimal_distance = max(satellite.radius() + satellite.observance_radius(),
+                                   new_satellite.radius() + new_satellite.observance_radius())
             if distance < minimal_distance:
                 return False
         return True
