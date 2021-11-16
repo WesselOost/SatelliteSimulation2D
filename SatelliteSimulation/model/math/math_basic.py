@@ -124,20 +124,20 @@ class LinearSystemOfEquations:
                 return t >= 0 and g2.calculate_new_point(t)[0] == g1.support_vector[0]
         return False
     
-    def calculate_point_and_moment_of_crash(self, g1: StraightLineEquation, g2: StraightLineEquation) -> tuple:
+    def calculate_moment_of_crash(self, g1: StraightLineEquation, g2: StraightLineEquation) -> tuple:
         distance = np.linalg(g1.support_vector - g2.support_vector)
         velocity1 = g1.direction_vector_magnitude()
         velocity2 = g2.direction_vector_magnitude()
         t = (velocity1 + velocity2)/distance
-        return g1.calculate_new_point(t), t
+        return t
     
     def __check_parallelism(self, g1: StraightLineEquation, g2: StraightLineEquation)->bool:
         if g2.direction_vector[0] != 0:
             factor = g1.direction_vector[0]/g2.direction_vector[0]
-            return g1.direction_vector[1] * factor == g2.direction_vector[1]
+            return factor >=0 and g1.direction_vector[1] * factor == g2.direction_vector[1]
         if g2.direction_vector[1] != 0:
             factor = g1.direction_vector[1]/g2.direction_vector[1]
-            return g1.direction_vector[0] * factor == g2.direction_vector[0]
+            return factor >=0 and g1.direction_vector[0] * factor == g2.direction_vector[0]
         print("DEBUG: __check_parallelism() was not successful -.-")
 
     

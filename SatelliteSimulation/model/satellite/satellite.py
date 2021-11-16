@@ -272,13 +272,13 @@ class Satellite:
     def __check_collision_with_moving_object(self, satellite_trajectories:list, observed_trajectories:list, observed_object):
         lgs = LinearSystemOfEquations()
         riskiest_collision:tuple = None
-        nearest_hit = 1000
+        nearest_hit = 1000 #a big number (far in the future)
         for observed_trajectory in observed_trajectories:
             for satellite_trajectory in satellite_trajectories:
                 identical_trajectories:bool = lgs.check_identity(satellite_trajectory, observed_trajectory)
                 if identical_trajectories:
-                    intersection, t = lgs.point_and_moment_of_crash(
-                        satellite_trajectory, observed_trajectory)
+                    t = lgs.calculate_moment_of_crash(satellite_trajectory, observed_trajectory)
+                    intersection = satellite_trajectory.calculate_new_point(t)
                     is_risky = True
                 else:
                     intersection: tuple = lgs.get_intersection(
@@ -300,14 +300,10 @@ class Satellite:
         if intersection == (float('inf'), float('inf')):
             #TODO figure out what happend here
             return False, None
-        observed_t: float = observed_trajectory.calculate_t(
-            intersection)
-        satellite_t: float = satellite_trajectory.calculate_t(
-            intersection)
-        satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(
-                        observed_t)
-        observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(
-                        satellite_t)
+        observed_t: float = observed_trajectory.calculate_t(intersection)
+        satellite_t: float = satellite_trajectory.calculate_t(intersection)
+        satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(observed_t)
+        observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(satellite_t)
         distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
                                     tuple_to_vector(observed_satellite_at_satellite_t))
         t = min(satellite_t, observed_t)
