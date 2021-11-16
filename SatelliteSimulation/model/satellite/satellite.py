@@ -16,6 +16,7 @@ from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.math.math_basic import *
 from SatelliteSimulation.model.math.vector import *
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocity
+from SatelliteSimulation.model.collision import Collision
 
 
 # =========================================================================== #
@@ -207,7 +208,7 @@ class Satellite:
         left_turned_normalized_unit_vector: Vector = divide(left_tangent, left_tangent.magnitude())
         left_turned_normalized_vector: Vector = multiply(left_turned_normalized_unit_vector, shift)
         point2_left: tuple = (velocity.x() + left_turned_normalized_vector.x(),
-                              velocity.y() + left_turned_normalized_vector.y())
+                                velocity.y() + left_turned_normalized_vector.y())
         left_trajectory = StraightLineEquation(left_turned_normalized_vector.get_as_tuple(), point2_left)
 
         # right turned
@@ -215,7 +216,7 @@ class Satellite:
         right_turned_normalized_unit_vector: Vector = divide(right_tangent, right_tangent.magnitude())
         right_turned_normalized_vector: Vector = multiply(right_turned_normalized_unit_vector, shift)
         point2_right: tuple = (velocity.x() + right_turned_normalized_vector.x(),
-                               velocity.y() + right_turned_normalized_vector.y())
+                                velocity.y() + right_turned_normalized_vector.y())
         right_trajectory = StraightLineEquation(
             right_turned_normalized_vector.get_as_tuple(), point2_right)
 
@@ -223,9 +224,9 @@ class Satellite:
 
 
     def __analyse_given_object_system(self,
-                                      satellite_trajectories: list,
-                                      observed_trajectory: StraightLineEquation,
-                                      observed_object) -> tuple:
+                                    satellite_trajectories: list,
+                                    observed_trajectory: StraightLineEquation,
+                                    observed_object) -> Collision:
         """
         The given systems of two "moving" objects can be split up into 4 categories:
         1. both objects are moving
@@ -257,28 +258,31 @@ class Satellite:
             observed_object.radius(), observed_trajectory))
         if satellite_velocity == 0 and observed_velocity != 0:
             return self.__check_collision_with_non_moving_object(observed_trajectories, observed_object,
-                                                                 resting_satellite=True)
+                                                                resting_satellite=True)
         if satellite_velocity != 0 and observed_velocity != 0:
             return self.__check_collision_with_moving_object(satellite_trajectories, observed_trajectories,
-                                                             observed_object)
+                                                            observed_object)
 
 
     def __check_collision_with_non_moving_object(self, trajectories: list, other_object,
-                                                 resting_satellite=False) -> tuple:
+                                                resting_satellite=False) -> Collision:
         minimal_distance = self.radius() + other_object.radius()
         for trajectory in trajectories:
             if resting_satellite:
-                dist = trajectory.distance_to_point(self.center().get_as_tuple())
+                center :tuple = self.center().get_as_tuple()
+                dist = trajectory.distance_to_point(center)
             else:
-                dist = trajectory.distance_to_point(other_object.center().get_as_tuple())
+                center :tuple = other_object.center().get_as_tuple()
+                dist = trajectory.distance_to_point(center)
             if dist <= minimal_distance:
                 # TODO has to be improved center is not first point of collision
-                return other_object.center().get_as_tuple()
+                t = trajectory.plump_point(center)
+                return Collision(other_object.center().get_as_tuple(), t)
         return None
 
 
     def __check_collision_with_moving_object(self, satellite_trajectories: list, observed_trajectories: list,
-                                             observed_object):
+                                            observed_object)->Collision:
         lgs = LinearSystemOfEquations()
         riskiest_collision: tuple = None
         nearest_hit = 1000  # a big number (far in the future)
@@ -298,7 +302,7 @@ class Satellite:
                 if is_risky and t < nearest_hit:
                     nearest_hit = t
                     riskiest_collision = intersection
-        return riskiest_collision
+        return Collision(riskiest_collision, nearest_hit)
 
 
     def __is_intersection_risky_and_when(self,
