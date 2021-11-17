@@ -11,6 +11,11 @@ Controller of the satellite simulation.
 # =========================================================================== #
 #  SECTION: Imports                                                           
 # =========================================================================== #
+import os
+import sys
+sys.dont_write_bytecode = True
+sys.path.append(os.getcwd())
+
 import random
 import os
 import sys
