@@ -12,13 +12,11 @@ a Border with black background and light grey outline
 #  SECTION: Imports
 # =========================================================================== #
 import pygame
+from SatelliteSimulation.view import Color
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-LIGHT_GREY = (243, 243, 243)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
 
 
 # =========================================================================== #
@@ -53,10 +51,10 @@ class BorderView:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def draw(self, surface: pygame.Surface, line_width: int):
-        pygame.draw.rect(surface, BLACK, self.__border)
-        pygame.draw.rect(surface, LIGHT_GREY, self.__border, line_width)
+        pygame.draw.rect(surface, Color.BLACK, self.__border)
+        pygame.draw.rect(surface, Color.LIGHT_GREY, self.__border, line_width)
         if self.__show_padding:
-            pygame.draw.rect(surface, RED, self.__padded_border, 1)
+            pygame.draw.rect(surface, Color.RED, self.__padded_border, 1)
 
 
     # ----------------------------------------------------------------------- #

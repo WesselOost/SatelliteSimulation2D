@@ -17,6 +17,7 @@ import pygame
 
 from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
 from SatelliteSimulation.model.satellite.satellite import SpaceJunk
+from SatelliteSimulation.view import Color
 from SatelliteSimulation.view.navigation_handler import NavigationHandler
 from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
 from SatelliteSimulation.view.earth import Earth
@@ -32,7 +33,6 @@ MIN_SURFACE_WIDTH = 430
 DEFAULT_BUTTON_OFFSET = 50
 ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-LIGHT_GREY = (243, 243, 243)
 FONT_SIZE = 12
 FRAME_RATE = 60
 BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
@@ -67,6 +67,7 @@ class GUI:
             pygame.display.Info().current_h // 2)
 
         self.__surface: pygame.Surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
+        self.__surface.set_alpha(pygame.SRCALPHA)
         self.initial_height: int = self.__surface.get_height()
         self.__scale_factor: float = (self.initial_height / border_height) * 0.75
 
@@ -86,6 +87,7 @@ class GUI:
         self.__disturbance_buttons: DisturbanceButtons = self.__create_disturbance_btns(border)
 
         self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor)
+        self.__satellite_observance_line_thickness: float = 4 * self.__scale_factor
 
         self.__satellite_mini_border = self.__create_mini_border(border, self.__earth.get_dotted_circle_position())
 
@@ -139,6 +141,9 @@ class GUI:
 
         if satellites:
             for satellite in satellites:
+                self.__draw_satellite_observance_border(satellite)
+
+            for satellite in satellites:
                 self.__draw_satellite(satellite)
         else:
             # TODO raise Exception
@@ -148,13 +153,25 @@ class GUI:
         pygame.display.update()
 
 
+    def __draw_satellite_observance_border(self, satellite):
+        if not satellite.is_crashed():
+
+            color = Color.ORANGE if satellite.observed_satellites() else Color.GREY
+            if satellite.possible_collisions():
+                color = Color.RED
+
+            pygame.draw.circle(self.__surface, color, satellite.center().get_as_tuple(),
+                satellite.radius() + satellite.observance_radius(),
+                max(1, int(self.__satellite_observance_line_thickness)))
+
+
     def __draw_border_connection_lines(self, surface):
         satellite_border = self.__satellite_border.get_border_rectangle()
         satellite_mini_border = self.__satellite_mini_border.get_border_rectangle()
-        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
-        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
-        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
-        pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.topright, satellite_mini_border.topright, 3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topright, satellite_mini_border.topright, 3)
 
 
     def start_simulation_loop(self):
@@ -239,6 +256,7 @@ class GUI:
     def __scale_on_changed(self, scale_factor: float):
         self.__disturbance_buttons.on_size_changed(scale_factor)
         self.__earth.on_size_changed(self.__surface, scale_factor)
+        self.__satellite_observance_line_thickness *= scale_factor
 
         x, y, width, height, padding = self.__controller.get_satellite_border()
         self.__satellite_border.update_size(x, y, width, height, padding)
@@ -271,6 +289,7 @@ class GUI:
         elif isinstance(satellite, SpaceJunk):
             satellite_img = ASTEROID_1
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size(), satellite.size()))
+
         self.__surface.blit(satellite_img, (satellite.position.x(), satellite.position.y()))
 
 

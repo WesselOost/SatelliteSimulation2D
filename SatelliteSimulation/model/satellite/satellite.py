@@ -48,6 +48,7 @@ class Satellite:
         self.__size = size
         self.__observed_satellites: dict = observed_satellites
         self.__previously_observed_satellites: dict = {}
+        self.__possible_collisions: dict = {}
         self.__disturbances: list = [Disturbance(), Disturbance(), Disturbance()]
 
 
@@ -73,6 +74,9 @@ class Satellite:
 
     def previously_observed_satellites(self) -> dict:
         return self.__previously_observed_satellites
+
+    def possible_collisions(self) -> dict:
+        return self.__possible_collisions
 
 
     def center(self) -> Vector:
@@ -167,7 +171,7 @@ class Satellite:
             self.velocity.set_navigation_velocity(Vector(nav_x, 1))
 
 
-    def detect_possible_collisions(self) -> dict:
+    def update_possible_collisions(self) -> dict:
         # TODO consider acceleration
         possible_collisions: dict = dict()
         satellite_trajectories = [self.__get_satellite_trajectory()]
@@ -184,12 +188,12 @@ class Satellite:
                     observed_satellite)
         cleared_collisions = {
             key: value for key, value in possible_collisions.items() if value is not None}
-        return {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
+        self.__possible_collisions = {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
 
 
-    def avoid_possible_collisions(self, possible_collisions: dict):
+    def avoid_possible_collisions(self):
         pass
-        # first_collision = next(iter(possible_collisions))
+        # first_collision = next(iter(self.__possible_collsions))
 
 
     # ----------------------------------------------------------------------- #
