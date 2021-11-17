@@ -12,7 +12,8 @@ Class description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-
+from SatelliteSimulation.model.math.vector import Vector, add, multiply
+from SatelliteSimulation.model.math.velocity import Velocity
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -21,8 +22,6 @@ Class description
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-from model.math.vector import Vector, add, multiply
-from model.math.velocity import Velocity
 
 
 class SatelliteVelocity:
@@ -42,6 +41,7 @@ class SatelliteVelocity:
     # ----------------------------------------------------------------------- #
     def navigation_velocity(self) -> Velocity:
         return self.__navigation_velocity
+
 
     def max_navigation_velocity(self) -> float:
         return self.__max_navigation_velocity_magnitude
@@ -73,21 +73,21 @@ class SatelliteVelocity:
         if disturbance_magnitude != 0 or disturbance_acceleration > 0:
             self.__disturbance_velocity.set_vector(
                 multiply(self.__disturbance_velocity,
-                         disturbance_acceleration))
+                    disturbance_acceleration))
 
         navigation_magnitude = self.__navigation_velocity.magnitude()
         navigation_acceleration = self.__navigation_velocity.acceleration()
         if navigation_magnitude != 0 or navigation_acceleration > 0:
             self.set_navigation_velocity(
                 multiply(self.__navigation_velocity,
-                         navigation_acceleration))
+                    navigation_acceleration))
 
         collision_velocity = self.__collision_velocity.magnitude()
         collision_acceleration = self.__collision_velocity.acceleration()
         if collision_velocity != 0 or collision_acceleration > 0:
             self.__collision_velocity.set_vector(
                 multiply(self.__collision_velocity,
-                         collision_acceleration))
+                    collision_acceleration))
 
 
     def update_scale(self, scale_factor):

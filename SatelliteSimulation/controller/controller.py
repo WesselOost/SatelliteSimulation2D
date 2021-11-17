@@ -12,11 +12,17 @@ Controller of the satellite simulation.
 #  SECTION: Imports                                                           
 # =========================================================================== #
 import random
+import os
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.append(os.getcwd())
 
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.model import Space
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.view.view import GUI
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -34,16 +40,13 @@ class Controller:
     # ----------------------------------------------------------------------- #
 
     def __init__(self):
-        self.gui = GUI(controller=self, width=1920, height=1080)
-        border_parameters = self.gui.get_satellite_border()
-        border: SatelliteBorder = SatelliteBorder(
-            x=border_parameters[0],
-            y=border_parameters[1],
-            width=border_parameters[2],
-            height=border_parameters[3],
-            padding=border_parameters[4])
-
+        border: SatelliteBorder = SatelliteBorder(x=0, y=0, width=1920, height=1080, padding=30, margin=40)
         self.space = Space(satellite_amount=random.randint(10, 10), border=border)
+
+        self.gui = GUI(controller=self,
+            border_width=border.width(),
+            border_height=border.height())
+
         self.gui.start_simulation_loop()
 
 
@@ -61,8 +64,10 @@ class Controller:
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         self.space.navigate_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
+
     def set_delta_time(self, delta_time: float):
         self.space.set_delta_time(delta_time)
+
 
     def next_frame(self):
         self.space.avoid_possible_future_collisions()
@@ -72,8 +77,13 @@ class Controller:
         self.gui.update(self.space.get_satellites())
 
 
-    def update_scale(self):
-        self.space.update_border_and_satellite_scale(self.gui.get_scale_factor())
+    def update_scale(self, scale_factor: float):
+        self.space.update_border_and_satellite_scale(scale_factor)
+
+
+    def get_satellite_border(self) -> tuple:
+        border = self.space.get_border()
+        return border.x(), border.y(), border.width(), border.height(), border.padding()
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #

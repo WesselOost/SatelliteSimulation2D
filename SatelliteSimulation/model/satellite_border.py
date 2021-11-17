@@ -29,12 +29,13 @@ class SatelliteBorder:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: float, y: float, width: float, height: float, padding: float):
-        self.__x = x
-        self.__y = y
+    def __init__(self, x: float, y: float, width: float, height: float, padding: float, margin: float):
+        self.__x = x + margin
+        self.__y = y + margin
         self.__width = width
         self.__height = height
         self.__padding = padding
+        self.__margin = margin
 
 
     # ----------------------------------------------------------------------- #
@@ -59,6 +60,8 @@ class SatelliteBorder:
     def padding(self) -> float:
         return self.__padding
 
+    def margin(self) -> float:
+        return self.__margin
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -69,6 +72,7 @@ class SatelliteBorder:
         self.__width *= scale_factor
         self.__height *= scale_factor
         self.__padding *= scale_factor
+        self.__margin *= scale_factor
 
 
     def right(self) -> float:

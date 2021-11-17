@@ -31,34 +31,23 @@ class BorderView:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: float, y: float, width: float, height: float, margin: float, padding: float):
-        #TODO get data from SatelliteBorder class
-        self.__float_x: float = x + margin
-        self.__float_y: float = y + margin
-        self.__float_width: float = (width - margin * 2)
-        self.__float_height: float = (height - margin)
-        self.__margin: float = margin
-        self.__padding: float = padding
-
-        self.__border: pygame.Rect = pygame.Rect(self.__float_x, self.__float_y, self.__float_width,
-                                                 self.__float_height)
-        self.__show_offset = False
+    def __init__(self, x: float, y: float, width: float, height: float, padding: float):
+        self.__border: pygame.Rect = pygame.Rect(x, y, width, height)
+        self.__padded_border: pygame.Rect = pygame.Rect(self.__border.x + padding,
+            self.__border.y + padding,
+            self.__border.width - padding * 2,
+            self.__border.height - padding * 2)
+        self.__show_padding = False
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def get_border(self):
+    def get_border_rectangle(self):
         return self.__border
 
-
-    def get_padding(self) -> int:
-        return int(self.__padding)
-
-
-    def show_offset(self):
-        self.__show_offset = True
-
+    def show_padding(self, show_padding: bool):
+        self.__show_padding = show_padding
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -66,13 +55,8 @@ class BorderView:
     def draw(self, surface: pygame.Surface, line_width: int):
         pygame.draw.rect(surface, BLACK, self.__border)
         pygame.draw.rect(surface, LIGHT_GREY, self.__border, line_width)
-        if self.__show_offset:
-            border = self.__border.copy()
-            border.x += self.get_padding()
-            border.y += self.get_padding()
-            border.width -= self.get_padding() * 2
-            border.height -= self.get_padding() * 2
-            pygame.draw.rect(surface, RED, border, 1)
+        if self.__show_padding:
+            pygame.draw.rect(surface, RED, self.__padded_border, 1)
 
 
     # ----------------------------------------------------------------------- #
@@ -80,17 +64,16 @@ class BorderView:
     # ----------------------------------------------------------------------- #
 
     # =========================================================================== #
-    def on_size_changed(self, scale_factor: float):
-        self.__float_width *= scale_factor
-        self.__border.width = int(self.__float_width)
-        self.__float_height *= scale_factor
-        self.__border.height = int(self.__float_height)
-        self.__float_x *= scale_factor
-        self.__border.x = int(self.__float_x)
-        self.__float_y *= scale_factor
-        self.__border.y = int(self.__float_y)
-        self.__margin *= scale_factor
-        self.__padding *= scale_factor
+
+    def update_size(self, x: float, y: float, width: float, height: float, padding: float):
+        self.__border.width = int(width)
+        self.__border.height = int(height)
+        self.__border.x = int(x)
+        self.__border.y = int(y)
+        self.__padded_border.x = self.__border.x + padding
+        self.__padded_border.y = self.__border.y + padding
+        self.__padded_border.width = self.__border.width - padding * 2
+        self.__padded_border.height = self.__border.height - padding * 2
 
 
 #  SECTION: Function definitions

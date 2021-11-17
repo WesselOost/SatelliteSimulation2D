@@ -54,6 +54,10 @@ class Space:
         return self.__satellites
 
 
+    def get_border(self) -> SatelliteBorder:
+        return self.__border
+
+
     def delta_time(self) -> float:
         return self.__delta_time
 
@@ -183,7 +187,7 @@ class Space:
         for satellite in satellites:
             distance: float = calculate_distance(new_satellite.center(), satellite.center())
             minimal_distance = max(satellite.radius() + satellite.observance_radius(),
-                                   new_satellite.radius() + new_satellite.observance_radius())
+                new_satellite.radius() + new_satellite.observance_radius())
             if distance < minimal_distance:
                 return False
         return True

@@ -30,19 +30,19 @@ class Earth:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, surface: pygame.Surface, default_border_offset: int, earth_offset_x: int):
+    def __init__(self, x: float, surface: pygame.Surface, dotted_circle_offset: float):
         EARTH_IMG.convert()
         DOTTED_CIRCLE.convert()
         self.__surface = surface
-        self.__default_border_offset = default_border_offset
+        self.__center_x = x
+        self.__dotted_circle_offset = dotted_circle_offset
         self.__earth_img_angle = 0
         self.__earth_scale = 0.2
-        self.__earth_offset_x = earth_offset_x
         self.__set_dotted_circle_size_and_position()
         # position
         self.__dotted_circle_position = \
-            (self.__surface.get_width() - self.__dotted_circle.get_width()) // 2 - self.__earth_offset_x, \
-            self.__surface.get_height() - self.__dotted_circle.get_height() // 2
+            (self.__center_x - self.__dotted_circle.get_width() // 2), \
+                self.__surface.get_height() - self.__dotted_circle.get_height() // 2
 
 
     # ----------------------------------------------------------------------- #
@@ -72,25 +72,26 @@ class Earth:
     def on_size_changed(self, surface: pygame.Surface, scale_factor: float):
         self.__surface = surface
         self.__earth_scale *= scale_factor
-        self.__earth_offset_x *= scale_factor
-        self.__default_border_offset *= scale_factor
+        self.__center_x *= scale_factor
+        self.__dotted_circle_offset *= scale_factor
         self.__dotted_circle_position = self.__dotted_circle_position[0] * scale_factor, \
-                                        self.__dotted_circle_position[1] * scale_factor
+            self.__dotted_circle_position[1] * scale_factor
         self.__set_dotted_circle_size_and_position()
 
 
     def __rotate_and_draw_earth(self):
         self.__earth_img_angle -= 0.2
         earth_img_rotated = pygame.transform.rotozoom(EARTH_IMG, self.__earth_img_angle,
-                                                    self.__earth_scale)
-        image_position = (self.__surface.get_width() - earth_img_rotated.get_width()) // 2 - self.__earth_offset_x, \
-                         self.__surface.get_height() - earth_img_rotated.get_height() // 2
+            self.__earth_scale)
+        image_position = (self.__center_x - earth_img_rotated.get_width() // 2), \
+            self.__surface.get_height() - earth_img_rotated.get_height() // 2
+
         self.__surface.blit(earth_img_rotated, image_position)
 
 
     def __set_dotted_circle_size_and_position(self):
         # size
-        size = int(EARTH_IMG.get_width() * self.__earth_scale) + self.__default_border_offset
+        size = int(EARTH_IMG.get_width() * self.__earth_scale) + self.__dotted_circle_offset
         self.__dotted_circle = pygame.transform.scale(DOTTED_CIRCLE, (size, size))
 
 
