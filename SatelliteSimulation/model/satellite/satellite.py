@@ -161,6 +161,7 @@ class Satellite:
         nav_x: float = self.velocity.navigation_velocity().x()
         nav_y: float = self.velocity.navigation_velocity().y()
 
+        #TODO scale navigation
         if pressed_left:
             self.velocity.set_navigation_velocity(Vector(-1, nav_y))
         if pressed_up:

@@ -144,6 +144,7 @@ class LinearSystemOfEquations:
 
 
     def calculate_moment_of_crash(self, g1: StraightLineEquation, g2: StraightLineEquation) -> tuple:
+        #TODO fix np.linalg should this be np.linalg.norm ???
         distance = np.linalg(g1.support_vector - g2.support_vector)
         velocity1 = g1.direction_vector_magnitude()
         velocity2 = g2.direction_vector_magnitude()
