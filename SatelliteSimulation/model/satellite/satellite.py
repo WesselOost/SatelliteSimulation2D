@@ -302,7 +302,9 @@ class Satellite:
                 if is_risky and t < nearest_hit:
                     nearest_hit = t
                     riskiest_collision = intersection
-        return Collision(riskiest_collision, nearest_hit)
+        if riskiest_collision:
+            return Collision(riskiest_collision, nearest_hit)
+        return None
 
 
     def __is_intersection_risky_and_when(self,
