@@ -14,7 +14,7 @@ Handles and detects collisions between 2 circles
 # =========================================================================== #
 from SatelliteSimulation.model.satellite.satellite import Satellite
 
-from model.math.vector import *
+from SatelliteSimulation.model.math.vector import *
 
 
 # =========================================================================== #
@@ -105,7 +105,7 @@ def __calculate_new_normal_velocity(satellite1: Satellite, satellite2: Satellite
 
 
 def __calculate_new_dot_product_velocity(mass1: float, mass2: float, velocity1_dot_product_normal: float,
-                                         velocity2_dot_product_normal: float) -> float:
+        velocity2_dot_product_normal: float) -> float:
     """
     FORMULA: v_1n` = (v_1n(m_1 - m_2) + 2m_2 * v_2n) / (m1 + m2)
     :return: normalized value

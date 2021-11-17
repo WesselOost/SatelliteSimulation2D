@@ -15,6 +15,7 @@ Class description
 from SatelliteSimulation.model.math.vector import Vector, add, multiply
 from SatelliteSimulation.model.math.velocity import Velocity
 
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #

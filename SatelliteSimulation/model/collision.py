@@ -13,6 +13,8 @@ Collision object consisting out of the point and the time of collision
 #  SECTION: Imports
 # =========================================================================== #
 from model.math.vector import *
+
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -26,18 +28,23 @@ class Collision:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, point_of_crash:tuple, moment_of_crash:float):
+    def __init__(self, point_of_crash: tuple, moment_of_crash: float):
         self.__x = point_of_crash[0]
         self.__y = point_of_crash[1]
         self.__moment_of_crash = moment_of_crash
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def position(self)->Vector:
+    def position(self) -> Vector:
         return Vector(self.__x, self.__y)
-    
-    def time(self)->float:
+
+
+    def time(self) -> float:
         return self.__moment_of_crash
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
