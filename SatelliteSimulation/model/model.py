@@ -172,7 +172,7 @@ class Space:
         for satellite in self.__satellites:
             if satellite is not observing_satellite:
                 distance = calculate_distance(satellite.center(), observing_satellite.center())
-                if distance <= satellite.observance_radius():
+                if distance <= satellite.radius() + satellite.observance_radius():
                     observed_satellites[satellite] = satellite.center().get_as_tuple()
                 else:
                     # remove unobserved satellite from dict

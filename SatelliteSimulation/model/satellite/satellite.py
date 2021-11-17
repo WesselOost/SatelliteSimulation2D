@@ -40,7 +40,7 @@ class Satellite:
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
         # TODO define max nav value with mass
-        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=2)
+        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=10)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
         self.__disturbance_duration = 0
