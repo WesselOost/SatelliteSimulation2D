@@ -182,7 +182,9 @@ class Satellite:
                     satellite_trajectories,
                     observed_trajectory,
                     observed_satellite)
-        return {key: value for key, value in possible_collisions.items() if value is not None}
+        cleared_collisions = {
+            key: value for key, value in possible_collisions.items() if value is not None}
+        return {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
 
 
     def avoid_possible_collisions(self, possible_collisions: dict):
@@ -391,3 +393,4 @@ class SpaceJunk(Satellite):
 
 if __name__ == '__main__':
     pass
+
