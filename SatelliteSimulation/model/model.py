@@ -13,7 +13,6 @@ The used velocities are assumed to be constant during the movement.
 #  SECTION: Imports
 # =========================================================================== #
 import os
-import random
 import math
 
 from SatelliteSimulation.model.collision_handling import *
@@ -21,7 +20,6 @@ from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import *
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
-from SatelliteSimulation.model.math.velocity import Velocity
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -52,6 +50,10 @@ class Space:
 
     def get_satellites(self) -> list:
         return self.__satellites
+
+
+    def get_border(self) -> SatelliteBorder:
+        return self.__border
 
 
     def delta_time(self) -> float:
@@ -168,7 +170,7 @@ class Space:
         for satellite in self.__satellites:
             if satellite is not observing_satellite:
                 distance = calculate_distance(satellite.center(), observing_satellite.center())
-                if distance <= satellite.observance_radius():
+                if distance <= satellite.radius() + satellite.observance_radius():
                     observed_satellites[satellite] = satellite.center().get_as_tuple()
                 else:
                     # remove unobserved satellite from dict
@@ -183,7 +185,7 @@ class Space:
         for satellite in satellites:
             distance: float = calculate_distance(new_satellite.center(), satellite.center())
             minimal_distance = max(satellite.radius() + satellite.observance_radius(),
-                                   new_satellite.radius() + new_satellite.observance_radius())
+                new_satellite.radius() + new_satellite.observance_radius())
             if distance < minimal_distance:
                 return False
         return True

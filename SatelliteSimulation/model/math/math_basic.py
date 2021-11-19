@@ -83,20 +83,20 @@ class StraightLineEquation:
         return np.linalg.norm(
             np.cross(location_vector - self.support_vector, self.direction_vector)) / self.direction_vector_magnitude()
 
-    def plump_point(self, point:tuple)->float:
+
+    def plump_point(self, point: tuple) -> float:
         x = point[0]
         y = point[1]
         v_x = self.direction_vector[0]
         v_y = self.direction_vector[1]
         x_0 = self.support_vector[0]
         y_0 = self.support_vector[1]
-        squared_magnitude = v_x**2+v_y**2
+        squared_magnitude = v_x ** 2 + v_y ** 2
         if squared_magnitude != 0:
-            t = v_x*(x-x_0) + v_y*(y-y_0)/squared_magnitude
+            t = v_x * (x - x_0) + v_y * (y - y_0) / squared_magnitude
             return t
         return None
-        
-        
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #

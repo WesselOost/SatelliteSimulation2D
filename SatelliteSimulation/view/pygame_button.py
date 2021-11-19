@@ -37,7 +37,7 @@ class Button:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, button_text: str, font_size: int, x=0, y=0):
+    def __init__(self, x, y, width, font_size: float, button_text: str):
         self.__state = "released"
         self.__new_click_event = False
         self.x = x
@@ -45,12 +45,13 @@ class Button:
         self.__font_size = font_size
 
         self.__init_button(button_text, font_size)
+        self.set_width(width)
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def set_position(self, new_x: int, new_y: int):
+    def set_position(self, new_x: float, new_y: float):
         self.x = new_x
         self.y = new_y
         self.__body.x = new_x
@@ -68,6 +69,9 @@ class Button:
 
     def get_width(self) -> int:
         return self.__width
+
+    def get_height(self) -> int:
+        return  self.__body_height + self.__bottom_border_height
 
 
     def get_text(self) -> str:
@@ -127,9 +131,9 @@ class Button:
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
 
-    def __init_button(self, button_text: str, font_size: int):
+    def __init_button(self, button_text: str, font_size: float):
         # init button text
-        self.__font = pygame.font.SysFont("Verdana", font_size)
+        self.__font = pygame.font.SysFont("Verdana", int(font_size))
         self.__anti_alias = True
         self.__text = button_text
         self.__text_surface = self.__font.render(self.__text, self.__anti_alias, LIGHT_GREY)
@@ -147,9 +151,9 @@ class Button:
         self.__bottom_border_height = self.__body_height / 8
         self.__bottom_border_color = LIGHT_BLUE
         self.__bottom_border = pygame.Rect(self.x,
-                                        self.__body_height + self.y,
-                                        self.__width,
-                                        self.__bottom_border_height)
+                                           self.__body_height + self.y,
+                                           self.__width,
+                                           self.__bottom_border_height)
 
 
     def __draw_bottom_border(self, surface):
@@ -173,20 +177,20 @@ class Button:
 
     def __pressed_and_state_is_hovered(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
-            self.__mouse_pressed() and \
-            self.__state == HOVERED
+               self.__mouse_pressed() and \
+               self.__state == HOVERED
 
 
     def __hovered_and_state_changed(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
-                not self.__mouse_pressed() and \
-                self.__state != HOVERED
+               not self.__mouse_pressed() and \
+               self.__state != HOVERED
 
 
     def __released_and_state_changed(self, mouse_position) -> bool:
         return not self.__mouse_collide_with_button(mouse_position) and \
-                not self.__mouse_pressed() \
-                and self.__state != RELEASED
+               not self.__mouse_pressed() \
+               and self.__state != RELEASED
 
 
     def __mouse_collide_with_button(self, mouse_position) -> int:

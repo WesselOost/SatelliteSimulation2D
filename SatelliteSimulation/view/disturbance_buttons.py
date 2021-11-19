@@ -14,8 +14,9 @@ Disturbance Buttons for the UI
 import pygame
 
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
-#TODO don't import anything from model
+# TODO don't import anything from model
 from SatelliteSimulation.view.pygame_button import Button
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -26,22 +27,31 @@ from SatelliteSimulation.view.pygame_button import Button
 # =========================================================================== #
 
 
-
 class DisturbanceButtons:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self, offset: int, width: int, height: int, font_size: int):
-        self.__buttons = [
-            Button(button_text=DisturbanceType.GRAVITATIONAL.value, font_size=font_size),
-            Button(button_text=DisturbanceType.SOLAR_RADIATION.value, font_size=font_size),
-            Button(button_text=DisturbanceType.MAGNETIC.value, font_size=font_size),
-            Button(button_text=DisturbanceType.MALFUNCTION.value, font_size=font_size)]
-        self.__font_size = font_size
+    def __init__(self, x: float, y: float, width: float, padding: float, font_size: float):
+        self.__x: float = x
+        self.__y: float = y
+        button = Button(x, y, width, font_size, button_text=DisturbanceType.MALFUNCTION.value)
+        button_height: float = button.get_height()
 
-        self.__init_button_size_and_position(width, height, offset)
+        # TODO fix calculating y
+        height_padding: float = button_height + padding
+        self.__buttons = [
+            button,
+            Button(x, y + height_padding, width, font_size,
+                button_text=DisturbanceType.SOLAR_RADIATION.value),
+            Button(x, y + height_padding * 2, width, font_size,
+                button_text=DisturbanceType.MAGNETIC.value),
+            Button(x, y + height_padding * 3, width, font_size,
+                button_text=DisturbanceType.GRAVITATIONAL.value)]
+        self.__font_size = font_size
+        self.__height: float = y + height_padding * 3 + button_height
+
 
 
     # ----------------------------------------------------------------------- #
@@ -49,6 +59,18 @@ class DisturbanceButtons:
     # ----------------------------------------------------------------------- #
     def get_top_button(self) -> Button:
         return self.__buttons[-1]
+
+
+    def x(self) -> float:
+        return self.__x
+
+
+    def y(self) -> float:
+        return self.__y
+
+
+    def height(self) -> float:
+        return self.__height
 
 
     # ----------------------------------------------------------------------- #
@@ -68,14 +90,6 @@ class DisturbanceButtons:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-    def __init_button_size_and_position(self, width: int, height: int, offset: int):
-        max_button_width = max(button.get_width() for button in self.__buttons)
-        new_button_x = width - max_button_width - offset // 2
-        for i, button in enumerate(self.__buttons):
-            button.set_width(max_button_width)
-            new_button_y = (height - offset) if i == 0 else (self.__buttons[i - 1].y - offset)
-            button.set_position(new_button_x, new_button_y)
-
 
     def calculate_state(self):
         for button in self.__buttons:

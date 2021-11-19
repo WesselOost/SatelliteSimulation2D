@@ -40,7 +40,7 @@ class Satellite:
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
         # TODO define max nav value with mass
-        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=2)
+        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=10)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
         self.__disturbance_duration = 0
@@ -211,7 +211,7 @@ class Satellite:
         left_turned_normalized_unit_vector: Vector = divide(left_tangent, left_tangent.magnitude())
         left_turned_normalized_vector: Vector = multiply(left_turned_normalized_unit_vector, shift)
         point2_left: tuple = (velocity.x() + left_turned_normalized_vector.x(),
-                                velocity.y() + left_turned_normalized_vector.y())
+        velocity.y() + left_turned_normalized_vector.y())
         left_trajectory = StraightLineEquation(left_turned_normalized_vector.get_as_tuple(), point2_left)
 
         # right turned
@@ -219,7 +219,7 @@ class Satellite:
         right_turned_normalized_unit_vector: Vector = divide(right_tangent, right_tangent.magnitude())
         right_turned_normalized_vector: Vector = multiply(right_turned_normalized_unit_vector, shift)
         point2_right: tuple = (velocity.x() + right_turned_normalized_vector.x(),
-                                velocity.y() + right_turned_normalized_vector.y())
+        velocity.y() + right_turned_normalized_vector.y())
         right_trajectory = StraightLineEquation(
             right_turned_normalized_vector.get_as_tuple(), point2_right)
 
@@ -227,9 +227,9 @@ class Satellite:
 
 
     def __analyse_given_object_system(self,
-                                    satellite_trajectories: list,
-                                    observed_trajectory: StraightLineEquation,
-                                    observed_object) -> Collision:
+            satellite_trajectories: list,
+            observed_trajectory: StraightLineEquation,
+            observed_object) -> Collision:
         """
         The given systems of two "moving" objects can be split up into 4 categories:
         1. both objects are moving
@@ -261,21 +261,21 @@ class Satellite:
             observed_object.radius(), observed_trajectory))
         if satellite_velocity == 0 and observed_velocity != 0:
             return self.__check_collision_with_non_moving_object(observed_trajectories, observed_object,
-                                                                resting_satellite=True)
+                resting_satellite=True)
         if satellite_velocity != 0 and observed_velocity != 0:
             return self.__check_collision_with_moving_object(satellite_trajectories, observed_trajectories,
-                                                            observed_object)
+                observed_object)
 
 
     def __check_collision_with_non_moving_object(self, trajectories: list, other_object,
-                                                resting_satellite=False) -> Collision:
+            resting_satellite=False) -> Collision:
         minimal_distance = self.radius() + other_object.radius()
         for trajectory in trajectories:
             if resting_satellite:
-                center :tuple = self.center().get_as_tuple()
+                center: tuple = self.center().get_as_tuple()
                 dist = trajectory.distance_to_point(center)
             else:
-                center :tuple = other_object.center().get_as_tuple()
+                center: tuple = other_object.center().get_as_tuple()
                 dist = trajectory.distance_to_point(center)
             if dist <= minimal_distance:
                 # TODO has to be improved center is not first point of collision
@@ -285,7 +285,7 @@ class Satellite:
 
 
     def __check_collision_with_moving_object(self, satellite_trajectories: list, observed_trajectories: list,
-                                            observed_object)->Collision:
+            observed_object) -> Collision:
         lgs = LinearSystemOfEquations()
         riskiest_collision: tuple = None
         nearest_hit = 1000  # a big number (far in the future)
@@ -299,9 +299,9 @@ class Satellite:
                 else:
                     intersection: tuple = lgs.get_intersection(observed_trajectory, satellite_trajectory)
                     is_risky, t = self.__is_intersection_risky_and_when(intersection,
-                                                                        satellite_trajectory,
-                                                                        observed_trajectory,
-                                                                        observed_object)
+                        satellite_trajectory,
+                        observed_trajectory,
+                        observed_object)
                 if is_risky and t < nearest_hit:
                     nearest_hit = t
                     riskiest_collision = intersection
@@ -311,10 +311,10 @@ class Satellite:
 
 
     def __is_intersection_risky_and_when(self,
-                                         intersection: tuple,
-                                         satellite_trajectory: StraightLineEquation,
-                                         observed_trajectory: StraightLineEquation,
-                                         observed_object) -> tuple:
+            intersection: tuple,
+            satellite_trajectory: StraightLineEquation,
+            observed_trajectory: StraightLineEquation,
+            observed_object) -> tuple:
         if intersection == (float('inf'), float('inf')):
             # TODO figure out what happend here
             return False, None
@@ -323,7 +323,7 @@ class Satellite:
         satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(observed_t)
         observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(satellite_t)
         distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
-                                      tuple_to_vector(observed_satellite_at_satellite_t))
+            tuple_to_vector(observed_satellite_at_satellite_t))
         t = min(satellite_t, observed_t)
         if distance <= (self.radius() + observed_object.radius()) and t >= 0:
             return True, t
@@ -394,4 +394,3 @@ class SpaceJunk(Satellite):
 
 if __name__ == '__main__':
     pass
-

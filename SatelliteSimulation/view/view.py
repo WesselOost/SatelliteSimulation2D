@@ -25,15 +25,15 @@ from SatelliteSimulation.view.border_view import BorderView
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
+DOTTED_CIRCLE_OFFSET = 100
 
 MAX_SURFACE_HEIGHT = 242
 MIN_SURFACE_WIDTH = 430
-DEFAULT_BORDER_OFFSET = 30
-DEFAULT_BUTTON_OFFSET = 40
+DEFAULT_BUTTON_OFFSET = 50
 ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 LIGHT_GREY = (243, 243, 243)
-FONT_SIZE = 8
+FONT_SIZE = 12
 FRAME_RATE = 60
 BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
 SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
@@ -57,21 +57,40 @@ class GUI:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, controller, width: int, height: int):
+    def __init__(self, controller, border_width: float, border_height: float):
         pygame.init()
         pygame.display.set_caption("Satellite simulation")
-        self.__ratio = height / width
+        self.__ratio: float = border_height / border_width
 
-        half_screen_size = self.create_correct_aspect_ratio_width_height(
+        half_screen_size: tuple = self.create_correct_aspect_ratio_width_height(
             pygame.display.Info().current_w // 2,
             pygame.display.Info().current_h // 2)
 
-        self.__surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
+        self.__surface: pygame.Surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
+        self.initial_height: int = self.__surface.get_height()
+        self.__scale_factor: float = (self.initial_height / border_height) * 0.75
 
-        self.previous_height = self.__surface.get_height()
-        self.__scale_factor = 1
+        self.image_performance_boost()
 
-        # performance boost
+        self.__controller = controller
+        self.__controller.update_scale(self.__scale_factor)
+        self.__navigation_handler = NavigationHandler()
+
+        self.__simulation_started = False
+
+        x, y, width, height, padding = self.__controller.get_satellite_border()
+        self.__satellite_border = BorderView(x, y, width, height, padding)
+        self.__satellite_border.show_padding(True)
+
+        border: pygame.Rect = self.__satellite_border.get_border_rectangle()
+        self.__disturbance_buttons: DisturbanceButtons = self.__create_disturbance_btns(border)
+
+        self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor)
+
+        self.__satellite_mini_border = self.__create_mini_border(border, self.__earth.get_dotted_circle_position())
+
+
+    def image_performance_boost(self):
         BACKGROUND_IMG.convert()
         SATELLITE_1.convert()
         SATELLITE_2.convert()
@@ -83,46 +102,25 @@ class GUI:
         SATELLITE_4_CRASHED.convert()
         ASTEROID_1.convert()
 
-        self.__controller = controller
-        self.__navigation_handler = NavigationHandler()
 
-        self.__simulation_started = False
+    def __create_disturbance_btns(self, satellite_border: pygame.Rect) -> DisturbanceButtons:
+        scaled_button_offset = DEFAULT_BUTTON_OFFSET * self.__scale_factor
+        satellite_border_width_and_x = (satellite_border.x + satellite_border.width)
+        disturbance_btns_width: float = self.__surface.get_width() - satellite_border_width_and_x - \
+                                        (scaled_button_offset * 2)
 
-        self.__disturbance_buttons = DisturbanceButtons(
-            DEFAULT_BUTTON_OFFSET,
-            self.__surface.get_width(),
-            self.__surface.get_height(),
-            FONT_SIZE)
-
-        top_button = self.__disturbance_buttons.get_top_button()
-
-        self.__earth = Earth(self.__surface, DEFAULT_BUTTON_OFFSET,
-                             earth_offset_x=(self.__surface.get_width() - top_button.x) // 2)
-
-        self.__satellite_border = BorderView(x=0, y=0, width=top_button.x,
-                                             height=top_button.y, margin=DEFAULT_BORDER_OFFSET,
-                                             padding=DEFAULT_BORDER_OFFSET / 3)
-        self.__satellite_border.show_offset()
-        self.__satellite_mini_border = self.__create_mini_border(
-            self.__satellite_border.get_border(),
-            self.__earth.get_dotted_circle_position(),
-            self.__earth.get_dotted_circle_width()
-        )
+        disturbance_btns_x: float = satellite_border_width_and_x + scaled_button_offset
+        disturbance_btns_y: float = satellite_border.y
+        return DisturbanceButtons(x=disturbance_btns_x,
+            y=disturbance_btns_y + scaled_button_offset,
+            width=disturbance_btns_width,
+            padding=scaled_button_offset,
+            font_size=FONT_SIZE)
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def get_satellite_border(self) -> tuple:
-        border = self.__satellite_border.get_border()
-        return \
-            border.x, \
-            border.y, \
-            border.width, \
-            border.height, \
-            self.__satellite_border.get_padding()
-
-
     def get_scale_factor(self) -> float:
         return self.__scale_factor
 
@@ -151,8 +149,8 @@ class GUI:
 
 
     def __draw_border_connection_lines(self, surface):
-        satellite_border = self.__satellite_border.get_border()
-        satellite_mini_border = self.__satellite_mini_border.get_border()
+        satellite_border = self.__satellite_border.get_border_rectangle()
+        satellite_mini_border = self.__satellite_mini_border.get_border_rectangle()
         pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
         pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
         pygame.draw.aaline(surface, LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
@@ -169,12 +167,11 @@ class GUI:
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
 
-    def __create_mini_border(self, satellite_border: pygame.Rect, dotted_circle_position: tuple,
-                             dotted_circle_width: int) -> BorderView:
+    def __create_mini_border(self, satellite_border: pygame.Rect, dotted_circle_position: tuple) -> BorderView:
         mini_border_scale = 0.04
         mini_border_width = satellite_border.width * mini_border_scale
         mini_border_height = satellite_border.height * mini_border_scale
-        mini_border_x = dotted_circle_position[0] + dotted_circle_width // 2 - mini_border_width // 2
+        mini_border_x = satellite_border.center[0] - mini_border_width // 2
         mini_border_y = dotted_circle_position[1] - mini_border_height // 2
 
         return BorderView(
@@ -182,7 +179,6 @@ class GUI:
             y=mini_border_y,
             width=mini_border_width,
             height=mini_border_height,
-            margin=0,
             padding=0
         )
 
@@ -202,19 +198,20 @@ class GUI:
                         self.create_correct_aspect_ratio_width_height(event.w, event.h),
                         pygame.RESIZABLE)
 
-                    self.__scale_factor = self.__surface.get_height() / self.previous_height
+                    self.__scale_factor = self.__surface.get_height() / self.initial_height
+                    self.__controller.update_scale(self.__scale_factor)
                     self.__scale_on_changed(self.__scale_factor)
-                    self.previous_height = self.__surface.get_height()
-                    self.__controller.update_scale()
+                    self.initial_height = self.__surface.get_height()
+
             self.__disturbance_buttons.calculate_state()
             for click_event_text in self.__disturbance_buttons.get_new_click_events():
                 self.__controller.create_disturbance(click_event_text)
             if self.__navigation_handler.should_navigate():
                 navigation_state = self.__navigation_handler.get_button_states()
                 self.__controller.navigate_satellite(navigation_state[0],
-                                                     navigation_state[1],
-                                                     navigation_state[2],
-                                                     navigation_state[3])
+                    navigation_state[1],
+                    navigation_state[2],
+                    navigation_state[3])
             self.__controller.set_delta_time(delta_time)
             self.__controller.next_frame()
         pygame.quit()
@@ -242,8 +239,11 @@ class GUI:
     def __scale_on_changed(self, scale_factor: float):
         self.__disturbance_buttons.on_size_changed(scale_factor)
         self.__earth.on_size_changed(self.__surface, scale_factor)
-        self.__satellite_border.on_size_changed(scale_factor)
-        self.__satellite_mini_border.on_size_changed(scale_factor)
+
+        x, y, width, height, padding = self.__controller.get_satellite_border()
+        self.__satellite_border.update_size(x, y, width, height, padding)
+        self.__satellite_mini_border = self.__create_mini_border(self.__satellite_border.get_border_rectangle(),
+            self.__earth.get_dotted_circle_position())
 
 
     def __draw_satellite(self, satellite: Satellite):
