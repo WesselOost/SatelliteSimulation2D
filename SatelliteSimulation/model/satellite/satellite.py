@@ -190,7 +190,7 @@ class Satellite:
         # Test collision avoidance
         first_key = list(possible_collisions)[0]
         point_to_avoid :Vector= possible_collisions[first_key].position()
-        self.__avoid_collision_by_90_degrees_angle(self, point_to_avoid)
+        self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
 
 
     # ----------------------------------------------------------------------- #
