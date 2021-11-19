@@ -182,14 +182,15 @@ class Satellite:
                     satellite_trajectories,
                     observed_trajectory,
                     observed_satellite)
-        cleared_collisions = {
-            key: value for key, value in possible_collisions.items() if value is not None}
+        cleared_collisions = {k: v for k, v in possible_collisions.items() if v is not None}
         return {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
 
 
     def avoid_possible_collisions(self, possible_collisions: dict):
-        pass
-        # first_collision = next(iter(possible_collisions))
+        # Test collision avoidance
+        first_key = list(possible_collisions)[0]
+        point_to_avoid :Vector= possible_collisions[first_key].position()
+        self.__avoid_collision_by_90_degrees_angle(self, point_to_avoid)
 
 
     # ----------------------------------------------------------------------- #
@@ -334,7 +335,7 @@ class Satellite:
         pass
 
 
-    def __avoid_collision_by_90_degrees_angle(self):
+    def __avoid_collision_by_90_degrees_angle(self, point_to_avoid:Vector):
         pass
 
 
@@ -351,7 +352,7 @@ class Satellite:
 
 
 # =========================================================================== #
-#  SECTION: Satellite types A-D
+#  SECTION: Satellite types A-D + SpaceJunk
 # =========================================================================== #
 
 

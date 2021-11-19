@@ -123,7 +123,7 @@ class Space:
                 possible_collisions: dict = satellite.detect_possible_collisions()
                 if possible_collisions:
                     print(possible_collisions)
-                satellite.avoid_possible_collisions(possible_collisions)
+                    satellite.avoid_possible_collisions(possible_collisions)
 
 
     # ----------------------------------------------------------------------- #
