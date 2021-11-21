@@ -204,7 +204,7 @@ class Satellite:
                     observed_satellite)
 
         cleared_collisions = {k: v for k, v in possible_collisions.items() if v is not None}
-        return {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
+        self.__possible_collisions = {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
 
     def avoid_possible_collisions(self):
         # Test collision avoidance

@@ -12,6 +12,7 @@ The used velocities are assumed to be constant during the movement.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
 import os
 import math
 
@@ -82,14 +83,14 @@ class Space:
             Malfunction().apply_malfunction(self.__satellites, self.__scale_factor)
         elif disturbance_type == DisturbanceType.GRAVITATIONAL:
             GravitationalDisturbance(120).apply_disturbance(self.__satellites)
-            print('damn gravity')
+            logging.info('damn gravity')
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
             ref: float = self.__border.height() // 10 * 1.2
             SolarRadiationDisturbance(ref ** 2).apply_disturbance(self.__satellites)
-            print('sun burn')
+            logging.info('sun burn')
         elif disturbance_type == DisturbanceType.MAGNETIC:
             MagneticDisturbance(12).apply_disturbance(self.__satellites)
-            print('pls help Iron Man')
+            logging.info('pls help Iron Man')
 
 
     def move_satellites(self):
@@ -126,7 +127,7 @@ class Space:
 
                 if satellite.possible_collisions():
                     for possible_collision in satellite.possible_collisions():
-                        print(possible_collision)
+                        logging.debug(possible_collision)
                         satellite.avoid_possible_collisions()
 
     # ----------------------------------------------------------------------- #

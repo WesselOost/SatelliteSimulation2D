@@ -12,6 +12,8 @@ Basic math definitions and calculations.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
+
 import numpy as np
 
 from SatelliteSimulation.model.basic_math.vector import *
@@ -159,7 +161,7 @@ class LinearSystemOfEquations:
         if g2.direction_vector[1] != 0:
             factor = g1.direction_vector[1] / g2.direction_vector[1]
             return factor >= 0 and g1.direction_vector[0] * factor == g2.direction_vector[0]
-        print("DEBUG: __check_parallelism() was not successful -.-")
+        logging.debug("__check_parallelism() was not successful -.-")
 
         # =========================================================================== #
         #  SECTION: Function definitions

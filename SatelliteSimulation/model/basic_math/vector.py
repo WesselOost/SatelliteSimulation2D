@@ -12,6 +12,7 @@ a 2 dimensional vector class
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
 import math
 
 
@@ -137,7 +138,7 @@ def divide(vector: Vector, scalar: float):
     if scalar != 0:
         return Vector(vector.x() / scalar, vector.y() / scalar)
     else:
-        print("check vector division")
+        logging.debug("check vector division")
 
 
 def calculate_distance(vector1: Vector, vector2: Vector) -> float:

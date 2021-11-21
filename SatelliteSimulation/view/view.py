@@ -12,6 +12,7 @@ is implemented here. The GUI is based on the python library "pygame".
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
 import os
 import pygame
 
@@ -153,7 +154,7 @@ class GUI:
                 self.__draw_satellite(satellite)
         else:
             # TODO raise Exception
-            print()
+            pass
         self.__disturbance_buttons.draw(surface)
 
         pygame.display.update()
