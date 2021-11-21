@@ -127,8 +127,7 @@ class Space:
                 if satellite.possible_collisions():
                     for possible_collision in satellite.possible_collisions():
                         print(possible_collision)
-                satellite.avoid_possible_collisions()
-
+                        satellite.avoid_possible_collisions()
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
