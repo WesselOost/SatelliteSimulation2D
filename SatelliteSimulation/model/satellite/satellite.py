@@ -13,9 +13,9 @@ a bunch of possible satellites and their abilities
 #  SECTION: Imports
 # =========================================================================== #
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
-from SatelliteSimulation.model.math.math_basic import *
-from SatelliteSimulation.model.math.vector import *
-from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocity
+from SatelliteSimulation.model.basic_math.math_basic import *
+from SatelliteSimulation.model.basic_math.vector import *
+from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
 from SatelliteSimulation.model.collision import Collision
 
 
@@ -40,7 +40,7 @@ class Satellite:
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
         # TODO define max nav value with mass
-        self.velocity: SatelliteVelocity = SatelliteVelocity(max_navigation_velocity_magnitude=10)
+        self.velocity: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=10)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
         self.__disturbance_duration = 0
@@ -74,6 +74,7 @@ class Satellite:
 
     def previously_observed_satellites(self) -> dict:
         return self.__previously_observed_satellites
+
 
     def possible_collisions(self) -> dict:
         return self.__possible_collisions
@@ -115,6 +116,7 @@ class Satellite:
         self.__size *= scale_factor
         self.position.set_vector(multiply(self.position, scalar=scale_factor))
         self.velocity.update_scale(scale_factor)
+        self.update_arrow()
 
         if self.__disturbance_duration > 0:
             self.velocity.disturbance_velocity().set_vector(
@@ -144,8 +146,21 @@ class Satellite:
             pass
         # TODO add acceleration
         # self.velocity.update_velocities()
+        self.update_arrow()
+
         self.position.add_to_x(self.velocity.value().x())
         self.position.add_to_y(self.velocity.value().y())
+
+
+    def update_arrow(self):
+        velocity = self.velocity.value()
+        if velocity.magnitude() != 0:
+            unit_normal_direction_vector: Vector = self.velocity.value().unit_normal()
+
+            start_vector: Vector = Vector(self.center().x() + self.radius() * unit_normal_direction_vector.x(),
+                self.center().y() + self.radius() * unit_normal_direction_vector.y())
+
+            self.velocity.update_velocity_arrow(start_vector)
 
 
     def navigate_to(self, direction_in_degrees: int):
@@ -161,7 +176,7 @@ class Satellite:
         nav_x: float = self.velocity.navigation_velocity().x()
         nav_y: float = self.velocity.navigation_velocity().y()
 
-        #TODO scale navigation
+        # TODO scale navigation
         if pressed_left:
             self.velocity.set_navigation_velocity(Vector(-1, nav_y))
         if pressed_up:
@@ -189,7 +204,8 @@ class Satellite:
                     observed_satellite)
         cleared_collisions = {
             key: value for key, value in possible_collisions.items() if value is not None}
-        self.__possible_collisions = {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
+        self.__possible_collisions = {k: v for k, v in
+            sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
 
 
     def avoid_possible_collisions(self):

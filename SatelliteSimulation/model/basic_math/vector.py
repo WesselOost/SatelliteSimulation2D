@@ -83,11 +83,15 @@ class Vector:
 
     def dot_product(self, vector):
         return self._x * vector.x() + self._y * vector.y()
-    
+
+
+    def unit_normal(self):
+        return divide(self, self.magnitude())
 
 
     def __copy__(self):
         return Vector(self._x, self._y)
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -99,6 +103,7 @@ class Vector:
 
     def add_to_y(self, y: float):
         self._y += y
+
 
     def add_vector(self, vector):
         self.add_to_x(vector.x())
@@ -139,8 +144,9 @@ def calculate_distance(vector1: Vector, vector2: Vector) -> float:
     vector: Vector = subtract(vector1, vector2)
     return vector.magnitude()
 
-def tuple_to_vector(given_tuple:tuple)->Vector:
-    return Vector(given_tuple[0],given_tuple[1])
+
+def tuple_to_vector(given_tuple: tuple) -> Vector:
+    return Vector(given_tuple[0], given_tuple[1])
 
 
 # =========================================================================== #

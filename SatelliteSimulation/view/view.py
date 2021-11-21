@@ -15,7 +15,7 @@ is implemented here. The GUI is based on the python library "pygame".
 import os
 import pygame
 
-from SatelliteSimulation.model.math.vector import *
+from SatelliteSimulation.model.basic_math.vector import *
 from SatelliteSimulation.model.model import Satellite, SatelliteA, SatelliteB, SatelliteC, SatelliteD
 from SatelliteSimulation.model.satellite.satellite import SpaceJunk
 from SatelliteSimulation.view import Color
@@ -82,7 +82,7 @@ class GUI:
 
         x, y, width, height, padding = self.__controller.get_satellite_border()
         self.__satellite_border = BorderView(x, y, width, height, padding)
-        self.__satellite_border.show_padding(True)
+        # self.__satellite_border.show_padding(True)
 
         border: pygame.Rect = self.__satellite_border.get_border_rectangle()
         self.__disturbance_buttons: DisturbanceButtons = self.__create_disturbance_btns(border)
@@ -146,19 +146,8 @@ class GUI:
                 self.__draw_satellite_observance_border(satellite)
 
             for satellite in satellites:
-                velocity: Vector = satellite.velocity.value()
-
-                if velocity.magnitude() != 0:
-                    normalized_vector = divide(velocity, velocity.magnitude())
-
-                    start_vector = Vector(satellite.center().x() + satellite.radius() * normalized_vector.x(),
-                        satellite.center().y() + satellite.radius() * normalized_vector.y())
-                    start_position = start_vector.get_as_tuple()
-
-                    normalized_direction_vector = add(start_vector, normalized_vector).get_as_tuple()
-                    end_position = self.scale_direction_vector(start_position, normalized_direction_vector,
-                        self.__velocity_arrow_default_size * velocity.magnitude())
-                    self.draw_arrow(start_position, end_position)
+                if satellite.velocity.value().magnitude() != 0:
+                    self.__draw_satellite_velocity(satellite)
 
             for satellite in satellites:
                 self.__draw_satellite(satellite)
@@ -170,34 +159,14 @@ class GUI:
         pygame.display.update()
 
 
-    def draw_arrow(self, start_position, end_position):
-        # line portion
-        line_thickness = max(1, int(self.__satellite_observance_line_thickness * 1.5))
-        pygame.draw.line(self.__surface, Color.RED, end_position, start_position, line_thickness)
-
-        # triangle portion
-        start_of_arrow_head = self.scale_direction_vector(end_position, start_position, line_thickness * 3)
-        left_corner = self.rotate_point_around_axis(start_of_arrow_head, end_position,
-            math.pi / 6)  # rotate it for side 1
-        right_corner = self.rotate_point_around_axis(start_of_arrow_head, end_position,
-            -math.pi / 6)  # rotate for side 2
-        tip_of_arrow = self.scale_direction_vector(end_position, start_position, - line_thickness)
-
-        pygame.draw.polygon(self.__surface, Color.RED, [left_corner, right_corner, tip_of_arrow])
-
-
-    def scale_direction_vector(self, start_position, end_position, length) -> tuple:
-        (x0, y0), (x1, y1) = start_position, end_position  # break out individual values from points
-        dx, dy = (x1 - x0), (y1 - y0)  # get delta in x and y directions
-        distance = math.sqrt(dx * dx + dy * dy)  # calculate distance of original
-        return x0 + dx / distance * length, y0 + dy / distance * length  # return two new points , p2
-
-
-    def rotate_point_around_axis(self, point, axis, theta):  # rotate point p around axis by angle theta
-        sin = math.sin(theta)
-        cos = math.cos(theta)
-        return cos * (point[0] - axis[0]) - sin * (point[1] - axis[1]) + axis[0], sin * (point[0] - axis[0]) + cos * (
-                point[1] - axis[1]) + axis[1]
+    def __draw_satellite_velocity(self, satellite):
+        arrow = satellite.velocity.arrow()
+        # arrow body
+        pygame.draw.line(self.__surface, Color.RED, arrow.end_of_line(), arrow.start_of_line(),
+            int(arrow.line_thickness()))
+        # arrow head
+        pygame.draw.polygon(self.__surface, Color.RED,
+            [arrow.head_left(), arrow.head_right(), arrow.head_tip()])
 
 
     def __draw_satellite_observance_border(self, satellite):
@@ -272,11 +241,11 @@ class GUI:
             for click_event_text in self.__disturbance_buttons.get_new_click_events():
                 self.__controller.create_disturbance(click_event_text)
             if self.__navigation_handler.should_navigate():
-                navigation_state = self.__navigation_handler.get_button_states()
-                self.__controller.navigate_satellite(navigation_state[0],
-                    navigation_state[1],
-                    navigation_state[2],
-                    navigation_state[3])
+                pressed_left, pressed_up, pressed_right, pressed_down = self.__navigation_handler.get_button_states()
+                self.__controller.navigate_satellite(pressed_left,
+                    pressed_up,
+                    pressed_right,
+                    pressed_down)
             self.__controller.set_delta_time(delta_time)
             self.__controller.next_frame()
         pygame.quit()

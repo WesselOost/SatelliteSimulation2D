@@ -14,7 +14,7 @@ Handles and detects collisions between 2 circles
 # =========================================================================== #
 from SatelliteSimulation.model.satellite.satellite import Satellite
 
-from SatelliteSimulation.model.math.vector import *
+from SatelliteSimulation.model.basic_math.vector import *
 
 
 # =========================================================================== #

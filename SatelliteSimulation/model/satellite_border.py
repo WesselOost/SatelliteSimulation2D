@@ -12,7 +12,7 @@ Border view for the satellites
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from model.math.vector import Vector
+from SatelliteSimulation.model.basic_math.vector import Vector
 
 
 # =========================================================================== #

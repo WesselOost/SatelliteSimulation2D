@@ -12,7 +12,7 @@ Collision object consisting out of the point and the time of collision
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from model.math.vector import *
+from SatelliteSimulation.model.basic_math.vector import *
 
 
 # =========================================================================== #
