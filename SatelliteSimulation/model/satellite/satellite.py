@@ -12,6 +12,8 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import random
+
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
 from SatelliteSimulation.model.basic_math.vector import *
@@ -37,19 +39,22 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
+    satellite_id = 0
+
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
+        Satellite.satellite_id += 1
+        self.satellite_id = Satellite.satellite_id
         # TODO define max nav value with mass
         self.velocity: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=10)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
-        self.__disturbance_duration = 0
         self.__mass = mass
         self.__size = size
         self.__observed_satellites: dict = observed_satellites
         self.__previously_observed_satellites: dict = {}
         self.__possible_collisions: dict = {}
-        self.__disturbances: list = [Disturbance(), Disturbance(), Disturbance()]
+        self.__disturbances: list = []
 
 
     # ----------------------------------------------------------------------- #
@@ -65,7 +70,7 @@ class Satellite:
 
 
     def surface(self) -> float:
-        return self.__size ** 2
+        return (self.__size / 2) * math.pi
 
 
     def observed_satellites(self) -> dict:
@@ -88,14 +93,6 @@ class Satellite:
         return self.__size / 2
 
 
-    def disturbance_duration(self) -> int:
-        return self.__disturbance_duration
-
-
-    def set_disturbance_duration(self, duration: float):
-        self.__disturbance_duration = duration
-
-
     def observance_radius(self) -> float:
         return self.__observance_radius
 
@@ -103,12 +100,16 @@ class Satellite:
     def is_crashed(self) -> bool:
         return self.__is_crashed
 
+    def append_disturbance(self, disturbance: Disturbance):
+        self.__disturbances.append(disturbance)
+
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def __str__(self):
-        return f'{type(self)} center={self.center()}, velocity={self.velocity.value()}, radius={self.radius()}'
+        return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity.value()}, radius={self.radius()}'
 
 
     def update_scale(self, scale_factor: float):
@@ -117,10 +118,8 @@ class Satellite:
         self.position.set_vector(multiply(self.position, scalar=scale_factor))
         self.velocity.update_scale(scale_factor)
         self.update_arrow()
-
-        if self.__disturbance_duration > 0:
-            self.velocity.disturbance_velocity().set_vector(
-                multiply(self.velocity.disturbance_velocity(), scalar=scale_factor))
+        for disturbance in self.__disturbances:
+            disturbance.velocity().set_vector(multiply(disturbance.velocity(), scalar=scale_factor))
 
 
     def update_crashed_status(self):
@@ -133,23 +132,12 @@ class Satellite:
         self.__observed_satellites = satellites
 
 
-    def clear_disturbance_duration(self):
-        self.__disturbance_duration = 0
-
-
-    def decrement_disturbance_duration(self):
-        self.__disturbance_duration -= 1
-
-
-    def move(self):
-        for disturbance in self.__disturbances:
-            pass
-        # TODO add acceleration
-        # self.velocity.update_velocities()
+    def move(self, delta_time:float):
+        self.velocity.update_velocities(self.__disturbances)
+        self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
         self.update_arrow()
-
-        self.position.add_to_x(self.velocity.value().x())
-        self.position.add_to_y(self.velocity.value().y())
+        self.position.add_to_x(self.velocity.value().x() * delta_time)
+        self.position.add_to_y(self.velocity.value().y() * delta_time)
 
 
     def update_arrow(self):
@@ -172,7 +160,8 @@ class Satellite:
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        self.velocity.navigation_velocity().set_acceleration(0.5)
+        #todo fix navigation duration
+        self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
         nav_x: float = self.velocity.navigation_velocity().x()
         nav_y: float = self.velocity.navigation_velocity().y()
 
@@ -187,7 +176,7 @@ class Satellite:
             self.velocity.set_navigation_velocity(Vector(nav_x, 1))
 
 
-    def update_possible_collisions(self) -> dict:
+    def update_possible_collisions(self):
         # TODO consider acceleration
         possible_collisions: dict = dict()
         satellite_trajectories = [self.__get_satellite_trajectory()]
@@ -210,7 +199,8 @@ class Satellite:
         # Test collision avoidance
         first_key = list(self.__possible_collisions)[0]
         point_to_avoid: Vector = self.__possible_collisions[first_key].position()
-        self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
+        # self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
+        self.__avoid_collision_by_random_position()
 
 
     # ----------------------------------------------------------------------- #
@@ -351,11 +341,14 @@ class Satellite:
 
 
     def __avoid_collision_by_random_position(self):
+        self.navigate_to(random.randint(0,360))
+
         # todo create own class for avoiding methods
+
         pass
 
 
-    def __avoid_collision_by_90_degrees_angle(self, point_to_avoid:Vector):
+    def __avoid_collision_by_90_degrees_angle(self, point_to_avoid: Vector):
         pass
 
 

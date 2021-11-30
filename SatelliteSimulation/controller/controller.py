@@ -46,7 +46,7 @@ class Controller:
 
     def __init__(self):
         border: SatelliteBorder = SatelliteBorder(x=0, y=0, width=1920, height=1080, padding=30, margin=40)
-        self.space = Space(satellite_amount=random.randint(10, 10), border=border)
+        self.space = Space(satellite_amount=random.randint(5,15), border=border)
 
         self.gui = GUI(controller=self,
             border_width=border.width(),

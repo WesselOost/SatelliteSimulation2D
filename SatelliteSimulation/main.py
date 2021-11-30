@@ -34,7 +34,9 @@ def main():
 #  SECTION: Main Body                                                         
 # =========================================================================== #
 if __name__ == '__main__':
+    # level = logging.INFO
     level = logging.DEBUG
+    # level = logging.ERROR
     format = '[%(levelname)s] %(asctime)s - %(message)s'
     logging.basicConfig(level=level, format=format)
     main()

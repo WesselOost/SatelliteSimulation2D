@@ -12,9 +12,12 @@ Disturbances that can occur in space
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import copy
 import random
-from SatelliteSimulation.model.basic_math.vector import Vector
+from SatelliteSimulation.model.basic_math.vector import Vector, multiply
 from SatelliteSimulation.model.basic_math.velocity import Velocity
+
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -22,7 +25,6 @@ from SatelliteSimulation.model.basic_math.velocity import Velocity
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-
 
 
 class Disturbance:
@@ -35,9 +37,7 @@ class Disturbance:
         self._duration = random.randrange(60, 120, 1)
 
         # value vector in Pixel
-        random_x = random.uniform(-1, 1) * random.randint(0, 5)
-        random_y = random.uniform(-1, 1) * random.randint(0, 5)
-        self._velocity: Velocity = Velocity(random_x, random_y, acceleration=Vector(random_x, random_y).magnitude())
+        self._velocity: Velocity = Velocity(0, 0)
 
 
     # ----------------------------------------------------------------------- #
@@ -47,76 +47,78 @@ class Disturbance:
     def velocity(self) -> Velocity:
         return self._velocity
 
+
+    def set_velocity_trajectory(self, v_max:float):
+        self._velocity.solve_equation_and_set_v1_v2(v_max=v_max, t_vertex=self._duration / 2)
+
+
+    def _random_value(self)-> float:
+        return random.uniform(-1, 1) * random.randint(0, 5)
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
 
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Private Methods
-    # ----------------------------------------------------------------------- #
+# ----------------------------------------------------------------------- #
+#  SUBSECTION: Private Methods
+# ----------------------------------------------------------------------- #
 
-    # =========================================================================== #
-    #  SECTION: Disturbance types
-    # =========================================================================== #
+# =========================================================================== #
+#  SECTION: Disturbance types
+# =========================================================================== #
 
 
 class Malfunction(Disturbance):
-    def __init__(self):
+    def __init__(self, scale_factor: float):
         super().__init__()
-
-
-    def apply_malfunction(self, satellites, scale_factor: float):
-        try:
-            satellite = random.choice([satellite for satellite in satellites if not satellite.is_crashed()])
-
-            if satellite.disturbance_duration() < self._duration:
-                satellite.set_disturbance_duration(self._duration)
-
-            satellite.velocity.disturbance_velocity().add_vector(Vector(self._velocity.x() * scale_factor,
-                                                                        self._velocity.y() * scale_factor))
-        except IndexError:
-            # TODO everything is crashed, game over (maybe game over screen :p)
-            pass
+        self.velocity().set_vector(multiply(Vector(x=self._random_value(), y=self._random_value()), scale_factor))
+        self.set_velocity_trajectory(random.randint(1, 3) * scale_factor)
 
 
 class SolarRadiationDisturbance(Disturbance):
-    def __init__(self, max_surface: float):
+    def __init__(self, max_surface: float, scale_factor: float):
         super().__init__()
         self.__max_surface = max_surface
+        self.__scale_factor = scale_factor
+        self.__radiation_strength = random.randint(50, 100)
+
+        velocity_x: float = self._random_value() * scale_factor
+        velocity_y: float = self._random_value() * scale_factor
+        self._velocity.set_xy(velocity_x, velocity_y)
 
 
-    def apply_disturbance(self, satellites: list):
-        for satellite in satellites:
-            satellite.set_disturbance_duration(self._duration)
-            velocity_x: float = self._velocity.x() * self.__add_radiation_pressure(satellite.surface())
-            velocity_y: float = self._velocity.y() * self.__add_radiation_pressure(satellite.surface())
-            satellite.velocity.disturbance_velocity().set_xy(velocity_x, velocity_y)
+    def update_surface(self, surface: float):
+        #TODO use vector multiply
+        # velocity_x: float = self._velocity.x() * self.__add_radiation_pressure(surface)
+        # velocity_y: float = self._velocity.y() * self.__add_radiation_pressure(surface)
+        # self._velocity.set_xy(velocity_x, velocity_y)
+        self.set_velocity_trajectory(self.__add_radiation_pressure(surface) * self.__scale_factor)
 
 
-    def __add_radiation_pressure(self, surface: int) -> float:
-        # Radiation pressure from the sun
-        if self._velocity.x() != 0 and self._velocity.y() != -1:
-            return (self.__max_surface / surface) * 0.1
-        x: float = random.uniform(-1, 1) * random.randint(0, 5)
-        y: float = random.uniform(-1, 1) * random.randint(0, 5)
-        self._velocity.set_xy(x, y)
-        return (surface / self.__max_surface) * 0.1
+    def __add_radiation_pressure(self, surface: float) -> float:
+        return (surface / self.__max_surface) * self.__radiation_strength
+
+
+    # # #TODO fix copy disturbance.
+    # def __deepcopy__(self, memodict={}):
+    #
+    #
+    # def __copy__(self):
+    #     disturbance = type(self)(self.__max_surface, self.__scale_factor)
+    #     disturbance.__dict__.update(self.__dict__)
+    #     return disturbance
 
 
 class GravitationalDisturbance(Disturbance):
-    def __init__(self, max_mass: float):
+    def __init__(self, max_mass: float, mass: float, scale_factor: float):
         super().__init__()
         self.__max_mass = max_mass
         self.__binary_direction = random.uniform(-1, 1)
+        self._velocity.set_y(self.__change_gravity(mass) * scale_factor)
 
 
-    def apply_disturbance(self, satellites: list):
-        for satellite in satellites:
-            satellite.set_disturbance_duration(self._duration)
-            satellite.velocity.disturbance_velocity().set_y(self.__change_gravity(satellite.mass()))
-
-
-    def __change_gravity(self, mass: int) -> float:
+    def __change_gravity(self, mass: float) -> float:
         # LAW: F_G = G * (M*m)/r^2, M>m
         # with G, m = const and r~const (because shift is to little)
         # => F_G = const * M
@@ -126,20 +128,15 @@ class GravitationalDisturbance(Disturbance):
 
 
 class MagneticDisturbance(Disturbance):
-    def __init__(self, max_mass: float):
+    def __init__(self, max_mass: float, mass: float, scale_factor: float):
         super().__init__()
         self.__max_mass = max_mass
+        velocity_x = self._velocity.x() * self.__add_magnetic_disturbance(mass) * scale_factor
+        velocity_y = self._velocity.y() * self.__add_magnetic_disturbance(mass) * scale_factor
+        self._velocity.set_xy(velocity_x, velocity_y)
 
 
-    def apply_disturbance(self, satellites):
-        for satellite in satellites:
-            satellite.set_disturbance_duration(self._duration)
-            velocity_x = self._velocity.x() * self.__add_magnetic_disturbance(satellite.mass())
-            velocity_y = self._velocity.y() * self.__add_magnetic_disturbance(satellite.mass())
-            satellite.velocity.disturbance_velocity().set_xy(velocity_x, velocity_y)
-
-
-    def __add_magnetic_disturbance(self, mass: int) -> float:
+    def __add_magnetic_disturbance(self, mass: float) -> float:
         # assumption a satellite with more mass contains more metal
         # and more charge => is more attracted to the magnetic force
         # of the earth

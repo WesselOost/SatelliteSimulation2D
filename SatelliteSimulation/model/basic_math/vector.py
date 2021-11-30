@@ -69,7 +69,7 @@ class Vector:
         self._y = y
 
 
-    def clear(self):
+    def  clear(self):
         self.set_x(0)
         self.set_y(0)
 
@@ -134,11 +134,13 @@ def multiply(vector: Vector, scalar: float):
     return Vector(vector.x() * scalar, vector.y() * scalar)
 
 
-def divide(vector: Vector, scalar: float):
+def divide(vector: Vector, scalar: float) -> Vector:
     if scalar != 0:
         return Vector(vector.x() / scalar, vector.y() / scalar)
     else:
-        logging.debug("check vector division")
+        # logging.debug("check vector division")
+        scalar = 10**(-100)
+        return Vector(vector.x() / scalar, vector.y() / scalar)
 
 
 def calculate_distance(vector1: Vector, vector2: Vector) -> float:

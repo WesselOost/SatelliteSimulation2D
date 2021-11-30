@@ -75,31 +75,19 @@ class SatelliteVelocityHandler:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def update_velocities(self):
-        disturbance_magnitude = self.__disturbance_velocity.magnitude()
-        disturbance_acceleration = self.__disturbance_velocity.acceleration()
-        if disturbance_magnitude != 0 or disturbance_acceleration > 0:
-            self.__disturbance_velocity.set_vector(
-                multiply(self.__disturbance_velocity,
-                    disturbance_acceleration))
+    def update_velocities(self, disturbances: list):
+        self.__disturbance_velocity.clear()
+        for disturbance in disturbances:
+            disturbance.velocity().update()
+            self.__disturbance_velocity.add_vector(disturbance.velocity())
+        # if self.__disturbance_velocity.magnitude() > 0:
+        #     logging.debug(f'disturbance magnitude {self.disturbance_velocity().magnitude()}')
 
-        navigation_magnitude = self.__navigation_velocity.magnitude()
-        navigation_acceleration = self.__navigation_velocity.acceleration()
-        if navigation_magnitude != 0 or navigation_acceleration > 0:
-            self.set_navigation_velocity(
-                multiply(self.__navigation_velocity,
-                    navigation_acceleration))
-
-        collision_velocity = self.__collision_velocity.magnitude()
-        collision_acceleration = self.__collision_velocity.acceleration()
-        if collision_velocity != 0 or collision_acceleration > 0:
-            self.__collision_velocity.set_vector(
-                multiply(self.__collision_velocity,
-                    collision_acceleration))
+        self.__navigation_velocity.update()
+        self.__collision_velocity.update()
 
 
     def update_velocity_arrow(self, start_vector: Vector):
-
         unit_normal_direction_vector: Vector = add(start_vector, self.value().unit_normal())
 
         self.__velocity_arrow.update_arrow(start_vector, unit_normal_direction_vector,

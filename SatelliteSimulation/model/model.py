@@ -80,30 +80,36 @@ class Space:
     def create_disturbance(self, disturbance_type: DisturbanceType):
 
         if disturbance_type == DisturbanceType.MALFUNCTION:
-            Malfunction().apply_malfunction(self.__satellites, self.__scale_factor)
-        elif disturbance_type == DisturbanceType.GRAVITATIONAL:
-            GravitationalDisturbance(120).apply_disturbance(self.__satellites)
-            logging.info('damn gravity')
+            satellite = random.choice([satellite for satellite in self.__satellites if not satellite.is_crashed()])
+            satellite.append_disturbance(Malfunction(self.__scale_factor))
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
-            ref: float = self.__border.height() // 10 * 1.2
-            SolarRadiationDisturbance(ref ** 2).apply_disturbance(self.__satellites)
+            # TODO check max surface
+            max_surface: float = (self.__border.height() // 10 * 1.2) ** 2
+            disturbance = SolarRadiationDisturbance(max_surface, self.__scale_factor)
+            logging.error("")
+            for satellite in self.__satellites:
+                disturbance_copy = copy.deepcopy(disturbance)
+                disturbance_copy.update_surface(satellite.surface())
+                satellite.append_disturbance(disturbance_copy)
             logging.info('sun burn')
+        elif disturbance_type == DisturbanceType.GRAVITATIONAL:
+            for satellite in self.__satellites:
+                satellite.append_disturbance(GravitationalDisturbance(max_mass=120,
+                                                                      mass=satellite.mass(),
+                                                                      scale_factor=self.__scale_factor))
+            logging.info('damn gravity')
+
         elif disturbance_type == DisturbanceType.MAGNETIC:
-            MagneticDisturbance(12).apply_disturbance(self.__satellites)
+            for satellite in self.__satellites:
+                satellite.append_disturbance(MagneticDisturbance(max_mass=120,
+                                                                 mass=satellite.mass(),
+                                                                 scale_factor=self.__scale_factor))
             logging.info('pls help Iron Man')
 
 
     def move_satellites(self):
         for satellite in self.__satellites:
-            satellite.move()
-            if satellite.disturbance_duration() > 0:
-                satellite.decrement_disturbance_duration()
-                if satellite.disturbance_duration() <= 0:
-                    # satellite.value.clear()
-                    # TODO stop disturbance and decrement crashed satellites value
-                    pass
-            # if satellite.value.magnitude() < 0.1:
-            #     satellite.value.clear()
+            satellite.move(self.__delta_time)
 
 
     def check_and_handle_collisions(self):
@@ -129,6 +135,7 @@ class Space:
                     for possible_collision in satellite.possible_collisions():
                         logging.debug(possible_collision)
                         satellite.avoid_possible_collisions()
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
