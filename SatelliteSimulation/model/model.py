@@ -12,6 +12,7 @@ The used velocities are assumed to be constant during the movement.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import copy
 import logging
 import os
 import math
@@ -86,25 +87,26 @@ class Space:
             # TODO check max surface
             max_surface: float = (self.__border.height() // 10 * 1.2) ** 2
             disturbance = SolarRadiationDisturbance(max_surface, self.__scale_factor)
-            logging.error("")
             for satellite in self.__satellites:
-                disturbance_copy = copy.deepcopy(disturbance)
-                disturbance_copy.update_surface(satellite.surface())
-                satellite.append_disturbance(disturbance_copy)
+                self.append_disturbance_to_satellite(disturbance, satellite, satellite.surface())
             logging.info('sun burn')
         elif disturbance_type == DisturbanceType.GRAVITATIONAL:
+            disturbance = GravitationalDisturbance(max_mass=120, scale_factor=self.__scale_factor)
             for satellite in self.__satellites:
-                satellite.append_disturbance(GravitationalDisturbance(max_mass=120,
-                                                                      mass=satellite.mass(),
-                                                                      scale_factor=self.__scale_factor))
+                self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
             logging.info('damn gravity')
 
         elif disturbance_type == DisturbanceType.MAGNETIC:
+            disturbance = MagneticDisturbance(max_mass=120, scale_factor=self.__scale_factor)
             for satellite in self.__satellites:
-                satellite.append_disturbance(MagneticDisturbance(max_mass=120,
-                                                                 mass=satellite.mass(),
-                                                                 scale_factor=self.__scale_factor))
+                self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
             logging.info('pls help Iron Man')
+
+
+    def append_disturbance_to_satellite(self, disturbance, satellite, influence_attribute):
+        disturbance_copy = copy.deepcopy(disturbance)
+        disturbance_copy.update_trajectory(influence_attribute)
+        satellite.append_disturbance(disturbance_copy)
 
 
     def move_satellites(self):
