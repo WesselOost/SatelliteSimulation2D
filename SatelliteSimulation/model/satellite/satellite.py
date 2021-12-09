@@ -157,6 +157,7 @@ class Satellite:
         x = max_nav_velocity * np.math.cos(angle_in_radians)
         y = max_nav_velocity * np.math.sin(angle_in_radians)
         self.velocity.set_navigation_velocity(Vector(x, y))
+        self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
