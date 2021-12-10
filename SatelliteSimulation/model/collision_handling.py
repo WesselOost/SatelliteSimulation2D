@@ -103,9 +103,49 @@ def apply_ratio_border_shift(border, satellite1, satellite1_new_position, satell
     satellite2_trajectory.print_equation()
     print("="*30)
     intersections: list = [lgs.get_intersection(border.eq_top(), satellite1_trajectory),
-                            lgs.get_intersection(border.eq_right(), satellite1_trajectory),
-                            lgs.get_intersection(border.eq_bottom(), satellite1_trajectory),
-                            lgs.get_intersection(border.eq_left(), satellite1_trajectory)]
+                           lgs.get_intersection(border.eq_right(), satellite1_trajectory),
+                           lgs.get_intersection(border.eq_bottom(), satellite1_trajectory),
+                           lgs.get_intersection(border.eq_left(), satellite1_trajectory)]
+
+    if satellite1_new_position.x() + satellite1.radius()  >= border.right():
+        print("border right overlap")
+        start_point: Vector = satellite1.center()
+        start_point.add_to_x(satellite1.radius())
+
+        end_point: Vector = satellite1_new_position
+        end_point.add_to_x(satellite1.radius())
+        satellite1_trajectory: StraightLineEquation = StraightLineEquation(start_point.get_as_tuple(),
+                                                                           end_point.get_as_tuple())
+
+    if satellite1_new_position.x() - satellite1.radius() <= border.left():
+        print("border left overlap")
+        start_point: Vector = satellite1.center()
+        start_point.add_to_x(satellite1.radius() * -1)
+
+        end_point: Vector = satellite1_new_position
+        end_point.add_to_x(satellite1.radius() * -1)
+        satellite1_trajectory: StraightLineEquation = StraightLineEquation(start_point.get_as_tuple(),
+                                                                           end_point.get_as_tuple())
+
+    if satellite1_new_position.y() + satellite1.radius() >= border.bottom():
+        print("border bottom overlap")
+        start_point:Vector = satellite1.center()
+        start_point.add_to_y(satellite1.radius())
+
+        end_point: Vector = satellite1_new_position
+        end_point.add_to_y(satellite1.radius())
+        satellite1_trajectory: StraightLineEquation = StraightLineEquation(start_point.get_as_tuple(),
+                                                                           end_point.get_as_tuple())
+
+    if satellite1_new_position.y() - satellite1.radius() <= border.top():
+        print("border top overlap")
+        start_point: Vector = satellite1.center()
+        start_point.add_to_y(satellite1.radius() * -1)
+
+        end_point: Vector = satellite1_new_position
+        end_point.add_to_y(satellite1.radius() * -1)
+        satellite1_trajectory: StraightLineEquation = StraightLineEquation(start_point.get_as_tuple(),
+                                                                           end_point.get_as_tuple())
 
     radial_vector: Vector = satellite1_trajectory.calculate_radial_vector(satellite1.radius())
     # radial_vector = multiply(satellite1.center().unit_normal(), satellite1.radius())
@@ -137,7 +177,7 @@ def apply_ratio_border_shift(border, satellite1, satellite1_new_position, satell
                 print(f'unit normal2 {unit_normal2}')
                 print(f"scalar produkt: {unit_normal.dot_product(unit_normal2)}")
                 shift = satellite2_trajectory.direction_vector_magnitude() + center_overlap + \
-                    satellite2.radius()
+                        satellite2.radius()
                 print(f'shift{shift}')
                 print(f'center overlap {center_overlap}')
                 print(f'possible movement {possible_movement}')
