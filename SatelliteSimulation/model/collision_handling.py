@@ -93,24 +93,26 @@ def apply_ratio_border_shift(border, satellite1, satellite1_new_position, satell
 
     lgs = LinearSystemOfEquations()
 
-    print(f'border({border.x()},{border.y()})')
+    print(f'StraightLineEquations (4x board, 2x trajectory):')
     border.eq_top().print_equation()
     border.eq_right().print_equation()
     border.eq_left().print_equation()
     border.eq_bottom().print_equation()
 
     satellite1_trajectory.print_equation()
-
+    satellite2_trajectory.print_equation()
+    print("="*30)
     intersections: list = [lgs.get_intersection(border.eq_top(), satellite1_trajectory),
-                           lgs.get_intersection(border.eq_right(), satellite1_trajectory),
-                           lgs.get_intersection(border.eq_bottom(), satellite1_trajectory),
-                           lgs.get_intersection(border.eq_left(), satellite1_trajectory)]
+                            lgs.get_intersection(border.eq_right(), satellite1_trajectory),
+                            lgs.get_intersection(border.eq_bottom(), satellite1_trajectory),
+                            lgs.get_intersection(border.eq_left(), satellite1_trajectory)]
 
     radial_vector: Vector = satellite1_trajectory.calculate_radial_vector(satellite1.radius())
     # radial_vector = multiply(satellite1.center().unit_normal(), satellite1.radius())
     radial_vector2: Vector = satellite2_trajectory.calculate_radial_vector(satellite2.radius())
 
-    print(f'radial vector {radial_vector} mag {radial_vector.magnitude()}')
+    #print(f'radial vector {radial_vector} mag {radial_vector.magnitude()}')
+    print(f'for loop start:')
     for n, intersection in enumerate(intersections):
         print(f'n = {n} intersection {intersection}')
         if intersection != (float('inf'), float('inf')):
@@ -129,22 +131,23 @@ def apply_ratio_border_shift(border, satellite1, satellite1_new_position, satell
                 # border_overlap: float = satellite1.radius() + center_overlap
                 possible_movement: float = calculate_distance(add(satellite1.center(), radial_vector), intersection_vector)
 
-                unit_normal = satellite1_new_position.unit_normal()
-                print(unit_normal)
+                unit_normal = satellite1_trajectory.unit_normal_direction_vector()
+                unit_normal2 = satellite2_trajectory.unit_normal_direction_vector()
+                print(f'unit normal {unit_normal}')
+                print(f'unit normal2 {unit_normal2}')
+                print(f"scalar produkt: {unit_normal.dot_product(unit_normal2)}")
+                shift = satellite2_trajectory.direction_vector_magnitude() + center_overlap + \
+                    satellite2.radius()
+                print(f'shift{shift}')
+                print(f'center overlap {center_overlap}')
                 print(f'possible movement {possible_movement}')
                 print(satellite1)
                 satellite1.position.add_vector(multiply(unit_normal, possible_movement))
                 print(satellite1)
                 print(satellite2)
-
-                # print(f'border overlap {border_overlap}')
-                print(f'center overlap {center_overlap}')
-                unit_normal2 = satellite2_new_position.unit_normal()
-                print(f'unit normal2 {unit_normal2}')
-                shift = satellite2_new_position.magnitude() + center_overlap + satellite2.radius()
-                print(f'shift{shift}')
-                satellite2.position.set_vector(shift)
+                satellite2.position.add_vector(multiply(unit_normal2, shift))
                 print(satellite2)
+                
 
 # from arrow class was just to try out
 def shift_vector_by_length(start_position: Vector, direction_vector: Vector, length: float) -> Vector:

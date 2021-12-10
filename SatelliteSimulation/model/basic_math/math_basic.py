@@ -107,6 +107,10 @@ class StraightLineEquation:
             t = v_x * (x - x_0) + v_y * (y - y_0) / squared_magnitude
             return t
         return None
+    
+    def unit_normal_direction_vector(self)->Vector:
+        unit_normal = self.direction_vector / self.direction_vector_magnitude()
+        return Vector(unit_normal[0],unit_normal[1])
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
