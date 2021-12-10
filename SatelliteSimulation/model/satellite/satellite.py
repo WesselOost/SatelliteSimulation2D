@@ -46,7 +46,7 @@ class Satellite:
         Satellite.satellite_id += 1
         self.satellite_id = Satellite.satellite_id
         # TODO define max nav value with mass
-        self.velocity: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=10)
+        self.velocity: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=4)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
         self.__mass = mass
@@ -125,6 +125,7 @@ class Satellite:
     def update_crashed_status(self):
         if not self.__is_crashed:
             self.__is_crashed = True
+            self.velocity.navigation_velocity().clear()
 
 
     def update_observed_satellites(self, satellites: dict):
@@ -201,7 +202,7 @@ class Satellite:
         first_key = list(self.__possible_collisions)[0]
         point_to_avoid: Vector = self.__possible_collisions[first_key].position()
         # self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
-        self.__avoid_collision_by_random_position()
+        # self.__avoid_collision_by_random_position()
 
 
     # ----------------------------------------------------------------------- #

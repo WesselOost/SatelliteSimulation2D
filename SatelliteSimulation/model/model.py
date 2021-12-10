@@ -39,7 +39,7 @@ class Space:
     # ----------------------------------------------------------------------- #
     def __init__(self, satellite_amount: int, border: SatelliteBorder):
         self.__scale_factor: float = 1.0
-        self.__border = border
+        self.__border: SatelliteBorder = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
         self.__delta_time = 1
 
@@ -116,11 +116,13 @@ class Space:
 
     def check_and_handle_collisions(self):
         for index, satellite in enumerate(self.__satellites):
-            # [index + 1] prevents checking previously compared satellites
-            check_and_handle_satellite_collisions(satellite, self.__satellites[index + 1:])
-
             if not self.__border.is_object_inside_border(center=satellite.center(), radius=satellite.radius()):
                 self.__handle_border_overlap(satellite)
+
+            # [index + 1] prevents checking previously compared satellites
+            check_and_handle_satellite_collisions(self.__border, satellite, self.__satellites[index + 1:])
+
+
 
 
     def update_satellite_observance(self):

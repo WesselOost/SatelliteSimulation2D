@@ -59,6 +59,10 @@ class Velocity(Vector):
     def t(self):
         return self.__t
 
+    def set_t(self, new_t: float):
+        self.__t: float = new_t
+
+
 
     def increment_t(self):
         self.__t += 1

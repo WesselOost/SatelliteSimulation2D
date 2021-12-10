@@ -12,6 +12,7 @@ Border view for the satellites
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
 from SatelliteSimulation.model.basic_math.vector import Vector
 
 
@@ -60,8 +61,10 @@ class SatelliteBorder:
     def padding(self) -> float:
         return self.__padding
 
+
     def margin(self) -> float:
         return self.__margin
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -79,16 +82,36 @@ class SatelliteBorder:
         return self.__x + self.__width - self.__padding
 
 
+    def eq_right(self) -> StraightLineEquation:
+        return StraightLineEquation((self.right(), self.top()),
+                                    (self.right(), self.bottom()))
+
+
     def left(self) -> float:
         return self.__x + self.__padding
+
+
+    def eq_left(self) -> StraightLineEquation:
+        return StraightLineEquation((self.left(), self.top()),
+                                    (self.left(), self.bottom()))
 
 
     def top(self) -> float:
         return self.__y + self.__padding
 
 
+    def eq_top(self) -> StraightLineEquation:
+        return StraightLineEquation((self.left(), self.top()),
+                                    (self.right(), self.top()))
+
+
     def bottom(self) -> float:
         return self.__y + self.__height - self.__padding
+
+
+    def eq_bottom(self) -> StraightLineEquation:
+        return StraightLineEquation((self.left(), self.bottom()),
+                                    (self.right(), self.bottom()))
 
 
     def is_object_inside_border(self, center: Vector, radius: float) -> bool:

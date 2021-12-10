@@ -42,7 +42,7 @@ class StraightLineEquation:
         self.support_vector: np.array = np.array(vector1)
         self.counter = StraightLineEquation.counter
         StraightLineEquation.counter += 1
-        self.print_equation()
+        # self.print_equation()
 
 
     # ----------------------------------------------------------------------- #
@@ -54,7 +54,7 @@ class StraightLineEquation:
     # ----------------------------------------------------------------------- #
     def print_equation(self):
         pass
-        # print(f"New equation: g{self.counter}: x(t)={self.direction_vector}t+{self.support_vector}")
+        print(f"New equation: g{self.counter}: x(t)={self.direction_vector}t+{self.support_vector}")
 
 
     def calculate_new_point(self, t: float) -> tuple:
@@ -63,7 +63,16 @@ class StraightLineEquation:
 
     def calculate_t_for_distance(self, distance: float) -> tuple:
         t = distance / self.direction_vector_magnitude()
-        return t, -t
+        return t, t * -1
+
+    def calculate_radial_vector(self, distance: float) -> Vector:
+        unit_normal = self.direction_vector / self.direction_vector_magnitude()
+        return Vector(unit_normal[0] * distance, unit_normal[1] * distance)
+        # t1, t2 = self.calculate_t_for_distance(distance)
+
+        # if t1 > 0:
+        #     return self.calculate_new_point(t1)
+        # return self.calculate_new_point(t2)
 
 
     def direction_vector_magnitude(self) -> float:
