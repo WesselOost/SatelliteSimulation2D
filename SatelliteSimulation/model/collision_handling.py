@@ -66,23 +66,24 @@ def satellite_overlap_resolution_by_shifting_both_equally(border: SatelliteBorde
     satellite2_in_border: bool = border.is_object_inside_border(satellite2_new_position, satellite2.radius())
 
 
-    if not satellite1_in_border and not satellite2_in_border:
-        logging.error("both satellites outside of the border")
-    elif not satellite1_in_border and satellite2_in_border:
-        print(
-            f's1 center {satellite1.center().get_as_tuple()} new position {satellite1_new_position.get_as_tuple()} radius {satellite1.radius()}')
+    # if not satellite1_in_border and not satellite2_in_border:
+    #     logging.error("both satellites outside of the border")
+    # elif not satellite1_in_border and satellite2_in_border:
+    #     print(
+    #         f's1 center {satellite1.center().get_as_tuple()} new position {satellite1_new_position.get_as_tuple()} radius {satellite1.radius()}')
+    #
+    #     apply_ratio_border_shift(border, satellite1, satellite1_new_position, satellite2, satellite2_new_position)
+    # elif satellite1_in_border and not satellite2_in_border:
+    #     print(
+    #         f's2 center {satellite2.center().get_as_tuple()} new position {satellite2_new_position.get_as_tuple()} radius {satellite2.radius()}')
+    #     apply_ratio_border_shift(border, satellite2, satellite2_new_position, satellite1, satellite1_new_position)
+    #
+    # else:
 
-        apply_ratio_border_shift(border, satellite1, satellite1_new_position, satellite2, satellite2_new_position)
-    elif satellite1_in_border and not satellite2_in_border:
-        print(
-            f's2 center {satellite2.center().get_as_tuple()} new position {satellite2_new_position.get_as_tuple()} radius {satellite2.radius()}')
-        apply_ratio_border_shift(border, satellite2, satellite2_new_position, satellite1, satellite1_new_position)
-
-    else:
-        satellite1_new_position: Vector = add(satellite1.position, multiply(Vector(shift_x, shift_y), -1))
-        satellite2_new_position: Vector = add(satellite2.position, Vector(shift_x, shift_y))
-        satellite1.position.set_vector(satellite1_new_position)
-        satellite2.position.set_vector(satellite2_new_position)
+    satellite1_new_position: Vector = add(satellite1.position, multiply(Vector(shift_x, shift_y), -1))
+    satellite2_new_position: Vector = add(satellite2.position, Vector(shift_x, shift_y))
+    satellite1.position.set_vector(satellite1_new_position)
+    satellite2.position.set_vector(satellite2_new_position)
 
 
 def apply_ratio_border_shift(border, satellite1, satellite1_new_position, satellite2, satellite2_new_position):

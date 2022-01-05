@@ -46,13 +46,14 @@ class Controller:
 
     def __init__(self):
         border: SatelliteBorder = SatelliteBorder(x=0, y=0, width=1920, height=1080, padding=30, margin=40)
-        self.space = Space(satellite_amount=random.randint(5,15), border=border)
+        self.space = Space(satellite_amount=15, border=border)
 
         self.gui = GUI(controller=self,
             border_width=border.width(),
             border_height=border.height())
 
-        self.gui.start_simulation_loop()
+        self.__run = True
+        self.start_simulation_loop()
 
 
     # ----------------------------------------------------------------------- #
@@ -62,6 +63,19 @@ class Controller:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
+    def start_simulation_loop(self):
+        while self.__run:
+            self.set_delta_time(self.gui.calculate_delta_time())
+            self.gui.handle_events()
+            self.gui.calculate_button_states_and_handle_click_events()
+            self.gui.handle_user_navigation()
+            self.next_frame()
+        self.gui.quit()
+
+    def quit(self):
+        self.__run = False
+
+
     def create_disturbance(self, disturbanceType: DisturbanceType):
         self.space.create_disturbance(disturbanceType)
 

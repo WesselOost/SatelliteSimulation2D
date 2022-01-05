@@ -95,6 +95,9 @@ class GUI:
         self.__satellite_mini_border = self.__create_mini_border(border, self.__earth.get_dotted_circle_position())
 
 
+        self.__clock = pygame.time.Clock()
+
+
     def image_performance_boost(self):
         BACKGROUND_IMG.convert()
         SATELLITE_1.convert()
@@ -310,6 +313,43 @@ class GUI:
         satellite_img = pygame.transform.scale(satellite_img, (satellite.size(), satellite.size()))
 
         self.__surface.blit(satellite_img, (satellite.position.x(), satellite.position.y()))
+
+
+    def calculate_delta_time(self):
+        return self.__clock.tick(FRAME_RATE) * .001 * FRAME_RATE
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.__controller.quit()
+            self.__navigation_handler.handle_key_events(event)
+            if event.type == pygame.VIDEORESIZE:
+                self.__surface = pygame.display.set_mode(
+                    self.create_correct_aspect_ratio_width_height(event.w, event.h),
+                    pygame.RESIZABLE)
+
+                self.__scale_factor = self.__surface.get_height() / self.initial_height
+                self.__controller.update_scale(self.__scale_factor)
+                self.__scale_on_changed(self.__scale_factor)
+                self.initial_height = self.__surface.get_height()
+
+
+    def calculate_button_states_and_handle_click_events(self):
+        self.__disturbance_buttons.calculate_state()
+        for click_event_text in self.__disturbance_buttons.get_new_click_events():
+            self.__controller.create_disturbance(click_event_text)
+
+
+    def handle_user_navigation(self):
+        if self.__navigation_handler.should_navigate():
+            pressed_left, pressed_up, pressed_right, pressed_down = self.__navigation_handler.get_button_states()
+            self.__controller.navigate_satellite(pressed_left,
+                                                 pressed_up,
+                                                 pressed_right,
+                                                 pressed_down)
+
+    def quit(self):
+        pygame.quit()
 
 
 # =========================================================================== #

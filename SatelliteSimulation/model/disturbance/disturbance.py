@@ -107,7 +107,7 @@ class GravitationalDisturbance(Disturbance):
     def __init__(self, max_mass: float, scale_factor: float):
         super().__init__(scale_factor)
         self._max_mass = max_mass
-        self._strength = random.randint(3, 8)
+        self._strength = random.randint(2, 4)
         self._velocity.set_y(self._random_value() * self.scale_factor())
 
 

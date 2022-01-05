@@ -202,7 +202,7 @@ class Satellite:
         first_key = list(self.__possible_collisions)[0]
         point_to_avoid: Vector = self.__possible_collisions[first_key].position()
         # self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
-        # self.__avoid_collision_by_random_position()
+        self.__avoid_collision_by_random_position()
 
 
     # ----------------------------------------------------------------------- #
