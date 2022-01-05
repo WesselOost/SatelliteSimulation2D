@@ -116,13 +116,61 @@ class Space:
 
     def check_and_handle_collisions(self):
         for index, satellite in enumerate(self.__satellites):
-            if not self.__border.is_object_inside_border(center=satellite.center(), radius=satellite.radius()):
-                self.__handle_border_overlap(satellite)
-
             # [index + 1] prevents checking previously compared satellites
-            check_and_handle_satellite_collisions(self.__border, satellite, self.__satellites[index + 1:])
+            check_and_handle_satellite_collisions(satellite, self.__satellites[index + 1:])
+        a_satellite_out_of_border = True
+        satellite_overlap = True
+        while a_satellite_out_of_border and satellite_overlap:
+            satellite_overlap = False
+            a_satellite_out_of_border = False
+            for satellite in self.__satellites:
+                if not self.__border.is_object_inside_border(center=satellite.center(), radius=satellite.radius()):
+                    a_satellite_out_of_border = True
+                    x_shift, y_shift = self.__handle_border_overlap(satellite)
+                    satellite_overlap = satellites_overlap or self.handle_satellite_overlap_shifts(x_shift, y_shift)
 
 
+    def handle_satellite_overlap_shifts(self, x_shift, y_shift) -> bool:
+        overlap_occurred: bool = False
+        for i, sat1 in enumerate(self.__satellites):
+            for sat2 in self.__satellites[i + 1:]:
+
+                if satellites_overlap(sat1, sat2):
+                    overlap_occurred = True
+                    self.shift_x(sat1, sat2, x_shift)
+                    self.shift_y(sat1, sat2, y_shift)
+
+        return overlap_occurred
+
+
+    def shift_x(self, sat1: Satellite, sat2: Satellite, x_shift: float):
+        x1 = sat1.position.x()
+        x2 = sat2.position.x()
+        if self.no_shift_or_positions_equal(x1, x2, x_shift):
+            pass
+        elif self.p1_further_from_border_than_p2(x1, x2, x_shift):
+            sat1.position.add_to_x(x_shift)
+        else:
+            sat2.position.add_to_x(x_shift)
+
+
+    def shift_y(self, sat1: Satellite, sat2: Satellite, y_shift: float):
+        y1 = sat1.position.y()
+        y2 = sat2.position.y()
+        if self.no_shift_or_positions_equal(y1, y2, y_shift):
+            pass
+        elif self.p1_further_from_border_than_p2(y1, y2, y_shift):
+            sat1.position.add_to_y(y_shift)
+        else:
+            sat2.position.add_to_y(y_shift)
+
+
+    def no_shift_or_positions_equal(self, p1, p2, shift):
+        return shift == 0 or p1 == p2
+
+
+    def p1_further_from_border_than_p2(self, p1: float, p2: float, shift: float) -> bool:
+        return (shift > 0 and p1 > p2) or (shift < 0 and p1 < p2)
 
 
     def update_satellite_observance(self):
@@ -203,29 +251,38 @@ class Space:
         return True
 
 
-    def __handle_border_overlap(self, satellite: Satellite):
+    def __handle_border_overlap(self, satellite: Satellite) -> tuple:
         border: SatelliteBorder = self.__border
         satellite_x = satellite.position.x()
         satellite_size = satellite.size()
         satellite_right_edge = satellite_x + satellite_size
 
+        new_x: float = satellite_x
+
         if satellite_right_edge > border.right():
-            satellite.position.set_x(border.right() - satellite_size)
+            new_x = border.right() - satellite_size
 
         if satellite_x < border.left():
-            satellite.position.set_x(border.left())
+            new_x = border.left()
+
+        satellite.position.set_x(new_x)
 
         satellite_y = satellite.position.y()
         satellite_bottom_edge = satellite_y + satellite_size
+        new_y: float = satellite_y
 
         if satellite_y < border.top():
-            satellite.position.set_y(border.top())
+            new_y = border.top()
 
         if satellite_bottom_edge > border.bottom():
-            satellite.position.set_y(border.bottom() - satellite_size)
+            new_y = border.bottom() - satellite_size
+
+        satellite.position.set_y(new_y)
         satellite.velocity.disturbance_velocity().clear()
         satellite.velocity.navigation_velocity().clear()
         satellite.velocity.collision_velocity().clear()
+
+        return new_x - satellite_x, new_y - satellite_y
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
