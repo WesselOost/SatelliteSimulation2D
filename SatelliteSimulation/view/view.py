@@ -35,7 +35,7 @@ MIN_SURFACE_WIDTH = 430
 DEFAULT_BUTTON_OFFSET = 50
 ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-FONT_SIZE = 12
+FONT_SIZE = 24
 FRAME_RATE = 60
 BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
 SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
@@ -88,7 +88,7 @@ class GUI:
         border: pygame.Rect = self.__satellite_border.get_border_rectangle()
         self.__disturbance_buttons: DisturbanceButtons = self.__create_disturbance_btns(border)
 
-        self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor)
+        self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor, self.__scale_factor)
         self.__satellite_observance_line_thickness: float = 4 * self.__scale_factor
         self.__velocity_arrow_default_size: float = 40 * self.__scale_factor
 
@@ -120,7 +120,7 @@ class GUI:
             y=disturbance_btns_y + scaled_button_offset,
             width=disturbance_btns_width,
             padding=scaled_button_offset,
-            font_size=FONT_SIZE)
+            font_size=FONT_SIZE * self.__scale_factor)
 
 
     # ----------------------------------------------------------------------- #
