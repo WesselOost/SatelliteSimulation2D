@@ -38,7 +38,7 @@ def check_and_handle_satellite_collisions(satellite: Satellite, satellites: list
 
 
 def collision_detected(satellite1: Satellite, satellite2: Satellite) -> bool:
-    if satellites_overlap(satellite1, satellite2) and satellites_move_towards_each_other(satellite1, satellite2):
+    if satellites_overlap(satellite1, satellite2):
         return True
     return False
 

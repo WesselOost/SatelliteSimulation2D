@@ -120,14 +120,18 @@ class Space:
             check_and_handle_satellite_collisions(satellite, self.__satellites[index + 1:])
         a_satellite_out_of_border = True
         satellite_overlap = True
-        while a_satellite_out_of_border and satellite_overlap:
+        max_iterations: int = 20
+
+        while a_satellite_out_of_border and satellite_overlap and max_iterations != 0:
             satellite_overlap = False
             a_satellite_out_of_border = False
+
             for satellite in self.__satellites:
                 if not self.__border.is_object_inside_border(center=satellite.center(), radius=satellite.radius()):
                     a_satellite_out_of_border = True
                     x_shift, y_shift = self.__handle_border_overlap(satellite)
                     satellite_overlap = satellites_overlap or self.handle_satellite_overlap_shifts(x_shift, y_shift)
+            max_iterations -= 1
 
 
     def handle_satellite_overlap_shifts(self, x_shift, y_shift) -> bool:
@@ -278,8 +282,7 @@ class Space:
             new_y = border.bottom() - satellite_size
 
         satellite.position.set_y(new_y)
-        satellite.velocity.disturbance_velocity().clear()
-        satellite.velocity.navigation_velocity().clear()
+        satellite.velocity.clear_navigation_and_disturbance_velocity()
         satellite.velocity.collision_velocity().clear()
 
         return new_x - satellite_x, new_y - satellite_y
