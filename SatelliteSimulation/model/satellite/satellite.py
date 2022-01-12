@@ -125,7 +125,7 @@ class Satellite:
     def update_crashed_status(self):
         if not self.__is_crashed:
             self.__is_crashed = True
-            self.velocity.navigation_velocity().clear()
+
 
 
     def update_observed_satellites(self, satellites: dict):

@@ -28,10 +28,13 @@ def check_and_handle_satellite_collisions(satellite: Satellite, satellites: list
     for other_satellite in satellites:
         # only check for collisions with satellites that are in the observance radius
         if other_satellite in satellite.observed_satellites() and collision_detected(satellite, other_satellite):
-            satellite.update_crashed_status()
-            other_satellite.update_crashed_status()
             satellite_overlap_resolution_by_shifting_both_equally(satellite, other_satellite)
             collision_resolution(satellite, other_satellite)
+            satellite.update_crashed_status()
+            other_satellite.update_crashed_status()
+
+            satellite.velocity.clear_navigation_and_disturbance_velocity()
+            other_satellite.velocity.clear_navigation_and_disturbance_velocity()
 
 
 def collision_detected(satellite1: Satellite, satellite2: Satellite) -> bool:
