@@ -19,6 +19,7 @@ from SatelliteSimulation.model.basic_math.vector import *
 #  SECTION: Global definitions
 # =========================================================================== #
 EMPTY_VECTOR = Vector(0, 0)
+VELOCITY_ARROW_DEFAULT_SIZE = 24
 
 
 # =========================================================================== #
@@ -31,7 +32,7 @@ class Arrow:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, start_vector: Vector, unit_normal_direction_vector: Vector, length: float):
+    def __init__(self, start_vector: Vector, unit_normal_direction_vector: Vector, magnitude: float):
         '''
         5 vectors that form together an arrow
         the en_of_line is not the end of the arrow, otherwise it would stick out pas the triangular tip of the arrow.
@@ -43,20 +44,21 @@ class Arrow:
         head_right: coordinates of the right corner of the arrow head
         '''
         self.__line_thickness: float = 6
+        length: float = magnitude * VELOCITY_ARROW_DEFAULT_SIZE
         if (length > 0):
             self.__start_of_line: Vector = start_vector
             self.__head_tip: Vector = self.__shift_vector_by_length(self.__start_of_line,
-                unit_normal_direction_vector, length)
+                                                                    unit_normal_direction_vector, length)
 
             self.__end_of_line: Vector = self.__shift_vector_by_length(self.__head_tip, self.__start_of_line,
-                self.__line_thickness)
+                                                                       self.__line_thickness)
 
             start_of_arrow_head = self.__shift_vector_by_length(self.__head_tip, self.__start_of_line,
-                self.__line_thickness * 3)
+                                                                self.__line_thickness * 3)
             self.__head_left: Vector = self.__rotate_point_around_axis(start_of_arrow_head, self.__head_tip,
-                math.pi / 6)
+                                                                       math.pi / 6)
             self.__head_right: Vector = self.__rotate_point_around_axis(start_of_arrow_head, self.__head_tip,
-                -math.pi / 6)
+                                                                        -math.pi / 6)
         else:
             self.__start_of_line: Vector = EMPTY_VECTOR.__copy__()
             self.__end_of_line: Vector = EMPTY_VECTOR.__copy__()
@@ -95,42 +97,10 @@ class Arrow:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def update_screen_scale(self, scale_factor):
-        self.__line_thickness *= scale_factor
-        self.__start_of_line: Vector = multiply(self.__start_of_line, scale_factor)
-        self.__head_tip: Vector = multiply(self.__head_tip, scale_factor)
 
-        self.__end_of_line: Vector = multiply(self.__end_of_line, scale_factor)
-
-        self.__head_left: Vector = multiply(self.__head_left, scale_factor)
-        self.__head_right: Vector = multiply(self.__head_right, scale_factor)
-
-
-    def update_arrow(self, start_vector: Vector, unit_normal_direction_vector: Vector, length: float):
-        if length > 0:
-            self.__start_of_line.set_vector(start_vector)
-
-            self.__head_tip.set_vector(self.__shift_vector_by_length(self.__start_of_line,
-                unit_normal_direction_vector, length))
-            self.__end_of_line.set_vector(self.__shift_vector_by_length(self.__head_tip, self.__start_of_line,
-                self.__line_thickness))
-
-            start_of_head = self.__shift_vector_by_length(self.__head_tip, self.__start_of_line,
-                self.__line_thickness * 3)
-            self.__head_left.set_vector(self.__rotate_point_around_axis(start_of_head, self.__head_tip,
-                math.pi / 6))
-            self.__head_right.set_vector(self.__rotate_point_around_axis(start_of_head, self.__head_tip,
-                -math.pi / 6))
-        else:
-            self.__start_of_line.set_vector(EMPTY_VECTOR)
-            self.__end_of_line.set_vector(EMPTY_VECTOR)
-            self.__head_tip.set_vector(EMPTY_VECTOR)
-            self.__head_left.set_vector(EMPTY_VECTOR)
-            self.__head_right.set_vector(EMPTY_VECTOR)
-
-            # ----------------------------------------------------------------------- #
-            #  SUBSECTION: Private Methods
-            # ----------------------------------------------------------------------- #
+    # ----------------------------------------------------------------------- #
+    #  SUBSECTION: Private Methods
+    # ----------------------------------------------------------------------- #
 
 
     def __shift_vector_by_length(self, start_position: Vector, direction_vector: Vector, length: float) -> Vector:

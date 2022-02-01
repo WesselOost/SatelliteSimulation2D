@@ -17,6 +17,7 @@ import logging
 import os
 import math
 
+from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.collision_handling import *
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import *
@@ -112,6 +113,10 @@ class Space:
     def move_satellites(self):
         for satellite in self.__satellites:
             satellite.move(self.__delta_time)
+
+
+    def get_velocity_arrows(self) -> list:
+        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites if satellite.velocity.value().magnitude() != 0]))
 
 
     def check_and_handle_collisions(self):
@@ -296,6 +301,18 @@ class Space:
         # =========================================================================== #
         #  SECTION: Function definitions
         # =========================================================================== #
+
+
+def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
+    magnitude: float = satellite.velocity.value().magnitude()
+    unit_normal: Vector = satellite.velocity.value().unit_normal()
+    radius: float = satellite.radius()
+    center: Vector = satellite.center()
+
+    start_vector: Vector = Vector(center.x() + radius * unit_normal.x(), center.y() + radius * unit_normal.y())
+    unit_normal_direction_vector: Vector = add(start_vector, unit_normal)
+
+    return Arrow(start_vector, unit_normal_direction_vector, magnitude)
 
 
 # =========================================================================== #
