@@ -35,7 +35,7 @@ MIN_SURFACE_WIDTH = 430
 DEFAULT_BUTTON_OFFSET = 50
 ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-FONT_SIZE = 12
+FONT_SIZE = 24
 FRAME_RATE = 60
 BACKGROUND_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "galaxy_background.jpg"))
 SATELLITE_1 = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "satellite1.png"))
@@ -88,7 +88,7 @@ class GUI:
         border: pygame.Rect = self.__satellite_border.get_border_rectangle()
         self.__disturbance_buttons: DisturbanceButtons = self.__create_disturbance_btns(border)
 
-        self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor)
+        self.__earth = Earth(border.center[0], self.__surface, DOTTED_CIRCLE_OFFSET * self.__scale_factor, self.__scale_factor)
         self.__satellite_observance_line_thickness: float = 4 * self.__scale_factor
         self.__velocity_arrow_default_size: float = 40 * self.__scale_factor
 
@@ -123,7 +123,7 @@ class GUI:
             y=disturbance_btns_y + scaled_button_offset,
             width=disturbance_btns_width,
             padding=scaled_button_offset,
-            font_size=FONT_SIZE)
+            font_size=FONT_SIZE * self.__scale_factor)
 
 
     # ----------------------------------------------------------------------- #
@@ -136,7 +136,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def update(self, satellites: list):
+    def update(self, satellites: list, arrows: list):
         surface = self.__surface
 
         surface.blit(BACKGROUND_IMG, (0, 0))
@@ -149,9 +149,9 @@ class GUI:
             for satellite in satellites:
                 self.__draw_satellite_observance_border(satellite)
 
-            for satellite in satellites:
-                if satellite.velocity.value().magnitude() != 0:
-                    self.__draw_satellite_velocity(satellite)
+            if arrows:
+                for arrow in arrows:
+                    self.__draw_satellite_velocity(arrow)
 
             for satellite in satellites:
                 self.__draw_satellite(satellite)
@@ -163,8 +163,7 @@ class GUI:
         pygame.display.update()
 
 
-    def __draw_satellite_velocity(self, satellite):
-        arrow = satellite.velocity.arrow()
+    def __draw_satellite_velocity(self, arrow):
         # arrow body
         pygame.draw.line(self.__surface, Color.RED, arrow.end_of_line(), arrow.start_of_line(),
             int(arrow.line_thickness()))

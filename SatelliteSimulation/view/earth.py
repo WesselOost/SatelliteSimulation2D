@@ -30,14 +30,14 @@ class Earth:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x: float, surface: pygame.Surface, dotted_circle_offset: float):
+    def __init__(self, x: float, surface: pygame.Surface, dotted_circle_offset: float, scale_factor: float):
         EARTH_IMG.convert()
         DOTTED_CIRCLE.convert()
         self.__surface = surface
         self.__center_x = x
         self.__dotted_circle_offset = dotted_circle_offset
         self.__earth_img_angle = 0
-        self.__earth_scale = 0.2
+        self.__earth_scale = 0.4 * scale_factor
         self.__set_dotted_circle_size_and_position()
         # position
         self.__dotted_circle_position = \

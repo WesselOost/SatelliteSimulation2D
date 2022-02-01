@@ -12,6 +12,7 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
 import random
 
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
@@ -103,6 +104,8 @@ class Satellite:
     def append_disturbance(self, disturbance: Disturbance):
         self.__disturbances.append(disturbance)
 
+    def get_id(self) -> int:
+        return self.satellite_id
 
 
     # ----------------------------------------------------------------------- #
@@ -117,7 +120,6 @@ class Satellite:
         self.__size *= scale_factor
         self.position.set_vector(multiply(self.position, scalar=scale_factor))
         self.velocity.update_scale(scale_factor)
-        self.update_arrow()
         for disturbance in self.__disturbances:
             disturbance.velocity().set_vector(multiply(disturbance.velocity(), scalar=scale_factor))
 
@@ -136,20 +138,10 @@ class Satellite:
     def move(self, delta_time:float):
         self.velocity.update_velocities(self.__disturbances)
         self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
-        self.update_arrow()
-        self.position.add_to_x(self.velocity.value().x() * delta_time)
-        self.position.add_to_y(self.velocity.value().y() * delta_time)
 
-
-    def update_arrow(self):
-        velocity = self.velocity.value()
-        if velocity.magnitude() != 0:
-            unit_normal_direction_vector: Vector = self.velocity.value().unit_normal()
-
-            start_vector: Vector = Vector(self.center().x() + self.radius() * unit_normal_direction_vector.x(),
-                self.center().y() + self.radius() * unit_normal_direction_vector.y())
-
-            self.velocity.update_velocity_arrow(start_vector)
+        #TODO: maybe use delta_time
+        self.position.add_to_x(self.velocity.value().x())
+        self.position.add_to_y(self.velocity.value().y())
 
 
     def navigate_to(self, direction_in_degrees: int):

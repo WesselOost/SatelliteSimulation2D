@@ -19,7 +19,7 @@ from SatelliteSimulation.model.basic_math.velocity import Velocity
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-VELOCITY_ARROW_DEFAULT_SIZE = 24
+
 
 
 # =========================================================================== #
@@ -37,7 +37,6 @@ class SatelliteVelocityHandler:
         self.__max_navigation_velocity_magnitude: float = max_navigation_velocity_magnitude
         self.__disturbance_velocity: Velocity = Velocity(0, 0)
         self.__collision_velocity: Velocity = Velocity(0, 0)
-        self.__velocity_arrow: Arrow = Arrow(Vector(0, 0), Vector(0, 0), 0)
 
 
     # ----------------------------------------------------------------------- #
@@ -68,10 +67,6 @@ class SatelliteVelocityHandler:
         return add(self.__navigation_velocity, add(self.__disturbance_velocity, self.__collision_velocity))
 
 
-    def arrow(self) -> Arrow:
-        return self.__velocity_arrow
-
-
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
@@ -87,20 +82,11 @@ class SatelliteVelocityHandler:
         self.__collision_velocity.update()
 
 
-    def update_velocity_arrow(self, start_vector: Vector):
-        unit_normal_direction_vector: Vector = add(start_vector, self.value().unit_normal())
-
-        self.__velocity_arrow.update_arrow(start_vector, unit_normal_direction_vector,
-            length=VELOCITY_ARROW_DEFAULT_SIZE * self.value().magnitude())
-
-
     def update_scale(self, scale_factor):
         self.__max_navigation_velocity_magnitude *= scale_factor
         self.__collision_velocity.update_scale(scale_factor)
         self.__navigation_velocity.update_scale(scale_factor)
         self.__disturbance_velocity.update_scale(scale_factor)
-        self.__velocity_arrow.update_screen_scale(scale_factor)
-
 
 # ----------------------------------------------------------------------- #
 #  SUBSECTION: Private Methods

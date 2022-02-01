@@ -91,9 +91,10 @@ class Controller:
     def next_frame(self):
         self.space.avoid_possible_future_collisions()
         self.space.move_satellites()
+        arrows: list = self.space.get_velocity_arrows()
         self.space.update_satellite_observance()
         self.space.check_and_handle_collisions()
-        self.gui.update(self.space.get_satellites())
+        self.gui.update(self.space.get_satellites(), arrows)
 
 
     def update_scale(self, scale_factor: float):
