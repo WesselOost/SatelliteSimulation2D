@@ -82,7 +82,7 @@ class Vector:
         return Vector(-self.y(), self.x())
 
 
-    def dot_product(self, vector):
+    def dot_product(self, vector) -> float:
         return self._x * vector.x() + self._y * vector.y()
 
 
