@@ -49,8 +49,8 @@ class Button:
         self.__font_size_reference: float = font_size
         self.__font_size: float = font_size
 
-        self.__init_button(button_text, font_size)
-        self.set_width(width)
+        self.__init_button(button_text, font_size, width)
+        # self.set_width(width)
 
 
     # ----------------------------------------------------------------------- #
@@ -63,13 +63,6 @@ class Button:
         self.__body.y = new_y
         self.__bottom_border.x = new_x
         self.__bottom_border.y = new_y + self.__body_height
-
-
-    def set_width(self, new_width):
-        self.__width = new_width
-        self.__body.width = new_width
-        self.__bottom_border.width = new_width
-        self.__text_offset_x = (self.__width - self.__text_surface.get_width()) // 2
 
 
     def get_width(self) -> int:
@@ -100,9 +93,9 @@ class Button:
             self.__set_state(PRESSED, int(self.__body.y + self.__bottom_border.height), TRANSPARENT)
             self.__new_click_event = True
         elif self.__hovered_and_state_changed(mouse_position):
-            self.__set_state(HOVERED, self.y, GREEN)
+            self.__set_state(HOVERED, int(self.y), GREEN)
         elif self.__released_and_state_changed(mouse_position):
-            self.__set_state(RELEASED, self.y, LIGHT_BLUE)
+            self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
 
 
     def new_click_event(self) -> bool:
@@ -113,7 +106,7 @@ class Button:
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
 
-    def __init_button(self, button_text: str, font_size: float):
+    def __init_button(self, button_text: str, font_size: float, width: float):
         # init button text
         self.__font = pygame.font.SysFont("Verdana", int(font_size))
         self.__anti_alias = True
@@ -121,7 +114,7 @@ class Button:
         self.__text_surface = self.__font.render(self.__text, self.__anti_alias, LIGHT_GREY)
 
         offset = self.__text_surface.get_height()
-        self.__width = self.__text_surface.get_width() + offset
+        self.__width = width
         self.__text_offset_x = (self.__width - self.__text_surface.get_width()) // 2
         self.__text_offset_y = offset // 2
 
