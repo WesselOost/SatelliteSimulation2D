@@ -31,7 +31,7 @@ import sys
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
+from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.model import Space
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.view.view import GUI

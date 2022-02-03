@@ -13,8 +13,7 @@ Disturbance Buttons for the UI
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
-# TODO don't import anything from model
+from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
 from SatelliteSimulation.view.objects.pygame_button import Button
 
 

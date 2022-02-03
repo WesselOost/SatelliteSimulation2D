@@ -12,16 +12,13 @@ The used velocities are assumed to be constant during the movement.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import copy
-import logging
 import os
-import math
 
 from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.collision_handling import *
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import *
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
+from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
 
 # =========================================================================== #
