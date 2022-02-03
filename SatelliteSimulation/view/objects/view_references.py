@@ -46,7 +46,8 @@ class ReferenceViews:
         border_view_height: float = height * BORDER_PERCENTAGE
         border_padding: float = padding * BORDER_PERCENTAGE
         margin: float = width * MARGIN_PERCENTAGE
-        self.__border: BorderView = BorderView(0, 0, border_view_width, border_view_height, margin, border_padding)
+        self.__border: BorderView = BorderView(0, 0, border_view_width, border_view_height, margin, border_padding,
+                                               line_width=max(1, int(height * 0.004)))
 
         # create button controls
         border_as_rectangle: pygame.Rect = self.__border.get_border_rectangle()
@@ -73,12 +74,14 @@ class ReferenceViews:
         mini_border_x = border_center_x - mini_border_width // 2
         mini_border_y = self.__earth.get_dotted_circle_position()[1] - mini_border_height // 2
 
+
         self.__mini_border: BorderView = BorderView(mini_border_x,
                                                     mini_border_y,
                                                     mini_border_width,
                                                     mini_border_height,
                                                     margin=0,
-                                                    padding=0)
+                                                    padding=0,
+                                                    line_width=1)
 
 
     # ----------------------------------------------------------------------- #
@@ -132,7 +135,8 @@ class ReferenceViews:
         height: float = border_as_rectangle.height * scale_factor
         margin: float = border.margin * scale_factor
         padding: float = border.padding * scale_factor
-        return BorderView(x, y, width, height, margin, padding)
+        line_width: int = max(1, int(border.line_width * scale_factor))
+        return BorderView(x, y, width, height, margin, padding, line_width)
 
     # =========================================================================== #
     #  SECTION: Function definitions

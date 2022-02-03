@@ -64,14 +64,12 @@ class GUI:
         self.__controller = controller
         self.__navigation_handler = NavigationHandler()
 
-        self.__reference_objects: ReferenceViews = ReferenceViews(border_width, border_height, border_padding)
-        self.__satellite_border = self.__reference_objects.border_view(self.__scale_factor)
-        self.__disturbance_buttons = self.__reference_objects.button_control_panel(self.__scale_factor)
-        self.__earth = self.__reference_objects.earth(self.__scale_factor)
-        self.__satellite_mini_border = self.__reference_objects.mini_border_view(self.__scale_factor)
+        self.__reference_views: ReferenceViews = ReferenceViews(border_width, border_height, border_padding)
+        self.__satellite_border = self.__reference_views.border_view(self.__scale_factor)
+        self.__disturbance_buttons = self.__reference_views.button_control_panel(self.__scale_factor)
+        self.__earth = self.__reference_views.earth(self.__scale_factor)
+        self.__satellite_mini_border = self.__reference_views.mini_border_view(self.__scale_factor)
 
-        self.__satellite_observance_line_thickness: float = 4 * self.__scale_factor
-        self.__velocity_arrow_default_size: float = 40 * self.__scale_factor
 
         self.__clock = pygame.time.Clock()
 
@@ -81,7 +79,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
 
     def get_satellite_border_scale(self) -> float:
-        return self.__scale_factor * self.__reference_objects.get_satellite_border_percentage()
+        return self.__scale_factor * self.__reference_views.get_satellite_border_percentage()
 
 
     # ----------------------------------------------------------------------- #
@@ -94,8 +92,8 @@ class GUI:
         surface.blit(self.__background_img, (0, 0))
         self.__earth.draw(self.__surface)
         self.__draw_border_connection_lines(surface)
-        self.__satellite_border.draw(surface, 2)
-        self.__satellite_mini_border.draw(surface, 1)
+        self.__satellite_border.draw(surface)
+        self.__satellite_mini_border.draw(surface)
 
         self.__disturbance_buttons.draw(surface)
 
@@ -159,13 +157,10 @@ class GUI:
 
 
     def __scale_on_changed(self, scale_factor: float):
-        self.__satellite_border = self.__reference_objects.border_view(self.__scale_factor)
-        self.__disturbance_buttons = self.__reference_objects.button_control_panel(self.__scale_factor)
-        self.__earth = self.__reference_objects.earth(self.__scale_factor)
-        self.__satellite_mini_border = self.__reference_objects.mini_border_view(self.__scale_factor)
-
-        self.__satellite_observance_line_thickness *= scale_factor
-        self.__velocity_arrow_default_size *= scale_factor
+        self.__satellite_border = self.__reference_views.border_view(self.__scale_factor)
+        self.__disturbance_buttons = self.__reference_views.button_control_panel(self.__scale_factor)
+        self.__earth = self.__reference_views.earth(self.__scale_factor)
+        self.__satellite_mini_border = self.__reference_views.mini_border_view(self.__scale_factor)
 
 
     def __draw_satellite(self, satellite: SatelliteView):
@@ -194,11 +189,8 @@ class GUI:
 
                 self.__scale_factor = self.__surface.get_height() / self.__initial_height
                 self.__scale_on_changed(self.__scale_factor)
-                print(self.__background_img.get_size())
                 self.__background_img = self.__images.get_background()
-                print(self.__background_img.get_size())
                 self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
-                print(self.__background_img.get_size())
 
 
     def calculate_button_states_and_handle_click_events(self):
