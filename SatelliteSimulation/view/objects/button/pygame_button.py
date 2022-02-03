@@ -11,24 +11,24 @@ Button module for the satellite simulation written in pygame.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import math
-
+from enum import Enum
+from SatelliteSimulation.view.resources.Color import *
 import pygame
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-from SatelliteSimulation.view.resources.Color import *
-
-RELEASED = "released"
-HOVERED = "hovered"
-PRESSED = "pressed"
-DISABLED = "disabled"
 
 
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
+class ButtonState(Enum):
+    RELEASED = "released"
+    HOVERED = "hovered"
+    PRESSED = "pressed"
+    DISABLED = "disabled"
+
 class Button:
 
     # ----------------------------------------------------------------------- #
@@ -36,7 +36,7 @@ class Button:
     # ----------------------------------------------------------------------- #
     def __init__(self, x: float, y: float, width: float, font_size: float, button_text: str):
         # todo change to enum
-        self.__state: str = RELEASED
+        self.__state: ButtonState = ButtonState.RELEASED
         self.__new_click_event: bool = False
         self.__reference_x: float = x
         self.__reference_y: float = y
@@ -47,7 +47,6 @@ class Button:
         self.__font_size: float = font_size
 
         self.__init_button(button_text, font_size, width)
-        # self.set_width(width)
 
 
     # ----------------------------------------------------------------------- #
@@ -85,25 +84,25 @@ class Button:
 
 
     def disable(self):
-        self.__set_state(DISABLED, int(self.y), GREY)
+        self.__set_state(ButtonState.DISABLED, int(self.y), GREY)
         self.__body_color = MEDIUM_GREY
 
     def enable(self):
-        self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
+        self.__set_state(ButtonState.RELEASED, int(self.y), LIGHT_BLUE)
         self.__body_color = BLUE
 
 
     def calculate_state(self):
-        if self.__state is not DISABLED:
+        if self.__state is not ButtonState.DISABLED:
             mouse_position = pygame.mouse.get_pos()
             self.__new_click_event = False
             if self.__pressed_and_state_is_hovered(mouse_position):
-                self.__set_state(PRESSED, int(self.__body.y + self.__bottom_border.height), TRANSPARENT)
+                self.__set_state(ButtonState.PRESSED, int(self.__body.y + self.__bottom_border.height), TRANSPARENT)
                 self.__new_click_event = True
             elif self.__hovered_and_state_changed(mouse_position):
-                self.__set_state(HOVERED, int(self.y), GREEN)
+                self.__set_state(ButtonState.HOVERED, int(self.y), GREEN)
             elif self.__released_and_state_changed(mouse_position):
-                self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
+                self.__set_state(ButtonState.RELEASED, int(self.y), LIGHT_BLUE)
 
 
     def new_click_event(self) -> bool:
@@ -154,7 +153,7 @@ class Button:
         surface.blit(self.__text_surface, (self.x + self.__text_offset_x, self.__body.y + self.__text_offset_y))
 
 
-    def __set_state(self, state: str, body_y: int, border_color: tuple):
+    def __set_state(self, state: ButtonState, body_y: int, border_color: tuple):
         self.__state = state
         self.__body.y = body_y
         self.__bottom_border_color = border_color
@@ -163,19 +162,19 @@ class Button:
     def __pressed_and_state_is_hovered(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
                self.__mouse_pressed() and \
-               self.__state == HOVERED
+               self.__state == ButtonState.HOVERED
 
 
     def __hovered_and_state_changed(self, mouse_position) -> bool:
         return self.__mouse_collide_with_button(mouse_position) and \
                not self.__mouse_pressed() and \
-               self.__state != HOVERED
+               self.__state != ButtonState.HOVERED
 
 
     def __released_and_state_changed(self, mouse_position) -> bool:
         return not self.__mouse_collide_with_button(mouse_position) and \
                not self.__mouse_pressed() \
-               and self.__state != RELEASED
+               and self.__state != ButtonState.RELEASED
 
 
     def __mouse_collide_with_button(self, mouse_position) -> int:
