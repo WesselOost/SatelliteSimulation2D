@@ -11,13 +11,13 @@ An earth Icon that rotates with a dotted outline around it
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import os
 import pygame
+
+from SatelliteSimulation.view.images import Images
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
 
 # =========================================================================== #
@@ -29,12 +29,12 @@ class Earth:
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     def __init__(self, center_x: float, surface_height: float, earth_size: float, dotted_circle_padding):
-        self.EARTH_IMG = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "earth.png"))
-        self.DOTTED_CIRCLE = pygame.image.load(os.path.join(ABSOLUTE_PATH, "Assets", "dashed_circle.png"))
-        self.EARTH_IMG.convert()
-        self.DOTTED_CIRCLE.convert()
+        images = Images()
+        self.__earth_img: pygame.Surface = images.get_earth()
+        self.__dotted_circle: pygame.Surface = images.get_dotted_circle()
 
-        self.EARTH_IMG = pygame.transform.scale(self.EARTH_IMG, (earth_size, earth_size))
+
+        self.__earth_img = pygame.transform.scale(self.__earth_img, (earth_size, earth_size))
         self.__center_x = center_x
         self.__dotted_circle_padding = dotted_circle_padding
         self.__earth_img_angle = 0
@@ -47,7 +47,7 @@ class Earth:
         dotted_circle_x: float = center_x - (dotted_circle_size // 2)
         dotted_circle_y: float = surface_height - (dotted_circle_size // 2)
         self.__dotted_circle_position: tuple = (dotted_circle_x, dotted_circle_y)
-        self.__dotted_circle: pygame.Surface = pygame.transform.scale(self.DOTTED_CIRCLE,
+        self.__dotted_circle: pygame.Surface = pygame.transform.scale(self.__dotted_circle,
                                                                       (dotted_circle_size, dotted_circle_size))
 
 
@@ -90,7 +90,7 @@ class Earth:
 
     def __rotate_and_draw_earth(self, surface: pygame.Surface):
         self.__earth_img_angle -= 0.2
-        earth_img_rotated = pygame.transform.rotozoom(self.EARTH_IMG, self.__earth_img_angle, 1)
+        earth_img_rotated = pygame.transform.rotozoom(self.__earth_img, self.__earth_img_angle, 1)
         image_position = (self.__center_x - earth_img_rotated.get_width() // 2), \
                          surface.get_height() - earth_img_rotated.get_height() // 2
 

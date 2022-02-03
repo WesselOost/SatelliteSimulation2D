@@ -39,7 +39,18 @@ ASSETS_PATH = os.path.join(ABSOLUTE_ROOT_PATH, "Assets")
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-class Images:
+class ImageSingletonMeta(type):
+    _instances = {}
+
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+class Images(metaclass=ImageSingletonMeta):
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -89,17 +100,9 @@ class Images:
     def get_dotted_circle(self):
         return self.__images[DOTTED_CIRCLE]
 
-
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-
-    def set_earth_size(self, earth_size: tuple):
-        self.__images[EARTH] = pygame.transform.scale(self.__images[EARTH], earth_size)
-
-
-    def set_background_size(self, border_size: tuple):
-        self.__images[BACKGROUND] = pygame.transform.scale(self.__images[BACKGROUND], border_size)
 
 
 # ----------------------------------------------------------------------- #

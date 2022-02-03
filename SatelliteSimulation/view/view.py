@@ -58,7 +58,8 @@ class GUI:
         self.__scale_factor: float = self.__surface.get_height() / border_height
 
         self.__images = Images()
-        self.__images.set_background_size(self.__surface.get_size())
+        self.__background_img = self.__images.get_background()
+        self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
 
         self.__controller = controller
         self.__navigation_handler = NavigationHandler()
@@ -90,7 +91,7 @@ class GUI:
     def update(self, satellites: list, arrows: list, satellite_observance_borders: list):
         surface = self.__surface
 
-        surface.blit(self.__images.get_background(), (0, 0))
+        surface.blit(self.__background_img, (0, 0))
         self.__earth.draw(self.__surface)
         self.__draw_border_connection_lines(surface)
         self.__satellite_border.draw(surface, 2)
@@ -193,7 +194,11 @@ class GUI:
 
                 self.__scale_factor = self.__surface.get_height() / self.__initial_height
                 self.__scale_on_changed(self.__scale_factor)
-                self.__images.set_background_size(self.__surface.get_size())
+                print(self.__background_img.get_size())
+                self.__background_img = self.__images.get_background()
+                print(self.__background_img.get_size())
+                self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
+                print(self.__background_img.get_size())
 
 
     def calculate_button_states_and_handle_click_events(self):
