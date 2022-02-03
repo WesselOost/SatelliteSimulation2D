@@ -20,7 +20,7 @@ Class Description
 import pygame
 
 from SatelliteSimulation.view.objects.border_view import BorderView
-from SatelliteSimulation.view.objects.button_control_panel import ButtonControlPanel
+from SatelliteSimulation.view.objects.button.button_control_panel import ButtonControlPanel
 from SatelliteSimulation.view.objects.earth import Earth
 
 BORDER_PERCENTAGE = 0.75
