@@ -18,18 +18,12 @@ import pygame
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
+from SatelliteSimulation.view.resources.Color import *
+
 RELEASED = "released"
 HOVERED = "hovered"
 PRESSED = "pressed"
 DISABLED = "disabled"
-
-LIGHT_GREY = (243, 243, 243)
-DISABLED_LIGHT = (160, 160, 160)
-DARK_GREY = (80, 80, 80)
-LIGHT_BLUE = (121, 155, 194)
-BLUE = (38, 81, 121)
-GREEN = (132, 194, 172)
-TRANSPARENT = (0, 0, 0, 0)
 
 
 # =========================================================================== #
@@ -91,8 +85,8 @@ class Button:
 
 
     def disable(self):
-        self.__set_state(DISABLED, int(self.y), DARK_GREY)
-        self.__body_color = DISABLED_LIGHT
+        self.__set_state(DISABLED, int(self.y), GREY)
+        self.__body_color = MEDIUM_GREY
 
     def enable(self):
         self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
