@@ -21,8 +21,11 @@ import pygame
 RELEASED = "released"
 HOVERED = "hovered"
 PRESSED = "pressed"
+DISABLED = "disabled"
 
 LIGHT_GREY = (243, 243, 243)
+DISABLED_LIGHT = (160, 160, 160)
+DARK_GREY = (80, 80, 80)
 LIGHT_BLUE = (121, 155, 194)
 BLUE = (38, 81, 121)
 GREEN = (132, 194, 172)
@@ -40,7 +43,7 @@ class Button:
     def __init__(self, x: float, y: float, width: float, font_size: float, button_text: str):
         # todo change to enum
         self.__state: str = RELEASED
-        self.__new_click_event: bool= False
+        self.__new_click_event: bool = False
         self.__reference_x: float = x
         self.__reference_y: float = y
         self.__reference_width: float = width
@@ -65,11 +68,12 @@ class Button:
         self.__bottom_border.y = new_y + self.__body_height
 
 
-    def get_width(self) -> int:
+    def get_width(self) -> float:
         return self.__width
 
+
     def get_height(self) -> int:
-        return  self.__body_height + self.__bottom_border_height
+        return self.__body_height + self.__bottom_border_height
 
 
     def get_text(self) -> str:
@@ -86,16 +90,26 @@ class Button:
         self.__draw_text(surface)
 
 
+    def disable(self):
+        self.__set_state(DISABLED, int(self.y), DARK_GREY)
+        self.__body_color = DISABLED_LIGHT
+
+    def enable(self):
+        self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
+        self.__body_color = BLUE
+
+
     def calculate_state(self):
-        mouse_position = pygame.mouse.get_pos()
-        self.__new_click_event = False
-        if self.__pressed_and_state_is_hovered(mouse_position):
-            self.__set_state(PRESSED, int(self.__body.y + self.__bottom_border.height), TRANSPARENT)
-            self.__new_click_event = True
-        elif self.__hovered_and_state_changed(mouse_position):
-            self.__set_state(HOVERED, int(self.y), GREEN)
-        elif self.__released_and_state_changed(mouse_position):
-            self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
+        if self.__state is not DISABLED:
+            mouse_position = pygame.mouse.get_pos()
+            self.__new_click_event = False
+            if self.__pressed_and_state_is_hovered(mouse_position):
+                self.__set_state(PRESSED, int(self.__body.y + self.__bottom_border.height), TRANSPARENT)
+                self.__new_click_event = True
+            elif self.__hovered_and_state_changed(mouse_position):
+                self.__set_state(HOVERED, int(self.y), GREEN)
+            elif self.__released_and_state_changed(mouse_position):
+                self.__set_state(RELEASED, int(self.y), LIGHT_BLUE)
 
 
     def new_click_event(self) -> bool:
@@ -120,6 +134,7 @@ class Button:
 
         # init button body
         self.__body_height = self.__text_surface.get_height() + offset
+        self.__body_color = BLUE
         self.__body = pygame.Rect(self.x, self.y, self.__width, self.__body_height)
 
         # init button border
@@ -131,13 +146,14 @@ class Button:
                                            self.__bottom_border_height)
 
 
+
     def __draw_bottom_border(self, surface):
         pygame.draw.rect(surface, self.__bottom_border_color, self.__bottom_border)
 
 
     def __draw_body(self, surface):
         corner_arch = int(self.__body_height // 4)
-        pygame.draw.rect(surface, BLUE, self.__body, 0, 0, corner_arch, corner_arch)
+        pygame.draw.rect(surface, self.__body_color, self.__body, 0, 0, corner_arch, corner_arch)
 
 
     def __draw_text(self, surface):
