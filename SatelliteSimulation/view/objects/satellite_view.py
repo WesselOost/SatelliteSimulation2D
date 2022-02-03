@@ -12,7 +12,6 @@ Class Description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.view.satellite_observance_border import SatelliteObservanceBorderView
 
 
 # =========================================================================== #

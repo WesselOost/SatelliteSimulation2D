@@ -18,9 +18,9 @@ from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
 from SatelliteSimulation.model.satellite.satellite import Satellite
 from SatelliteSimulation.view import Color
-from SatelliteSimulation.view.arrow_view import ArrowView
-from SatelliteSimulation.view.satellite_observance_border import SatelliteObservanceBorderView
-from SatelliteSimulation.view.satellite_view import SatelliteView
+from SatelliteSimulation.view.objects.arrow_view import ArrowView
+from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
+from SatelliteSimulation.view.objects.satellite_view import SatelliteView
 
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())

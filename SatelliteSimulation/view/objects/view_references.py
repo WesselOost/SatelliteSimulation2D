@@ -19,9 +19,9 @@ Class Description
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.border_view import BorderView
-from SatelliteSimulation.view.disturbance_buttons import DisturbanceButtons
-from SatelliteSimulation.view.earth import Earth
+from SatelliteSimulation.view.objects.border_view import BorderView
+from SatelliteSimulation.view.objects.button_control_panel import ButtonControlPanel
+from SatelliteSimulation.view.objects.earth import Earth
 
 BORDER_PERCENTAGE = 0.75
 MARGIN_PERCENTAGE = 0.01
@@ -54,7 +54,7 @@ class ReferenceViews:
         button_width: float = left_over_width - (margin * 5)
         button_x: float = (width - left_over_width) + margin * 3
         button_y: float = border_as_rectangle.y + margin
-        self.__disturbance_buttons: DisturbanceButtons = DisturbanceButtons(button_x,
+        self.__disturbance_buttons: ButtonControlPanel = ButtonControlPanel(button_x,
                                                                             button_y,
                                                                             button_width,
                                                                             height_padding=margin,
@@ -100,15 +100,15 @@ class ReferenceViews:
         return self.__scale_border_view(self.__mini_border, scale_factor)
 
 
-    def button_control_panel(self, scale_factor: float) -> DisturbanceButtons:
-        button_control_panel: DisturbanceButtons = self.__disturbance_buttons
+    def button_control_panel(self, scale_factor: float) -> ButtonControlPanel:
+        button_control_panel: ButtonControlPanel = self.__disturbance_buttons
         x: float = button_control_panel.x * scale_factor
         y: float = button_control_panel.y * scale_factor
         width: float = button_control_panel.width * scale_factor
         padding: float = button_control_panel.height_padding * scale_factor
         font_size: float = button_control_panel.font * scale_factor
 
-        return DisturbanceButtons(x, y, width, padding, font_size)
+        return ButtonControlPanel(x, y, width, padding, font_size)
 
 
     def earth(self, scale_factor: float) -> Earth:

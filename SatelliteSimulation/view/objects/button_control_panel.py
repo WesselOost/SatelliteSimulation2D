@@ -15,7 +15,7 @@ import pygame
 
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 # TODO don't import anything from model
-from SatelliteSimulation.view.pygame_button import Button
+from SatelliteSimulation.view.objects.pygame_button import Button
 
 
 # =========================================================================== #
@@ -27,7 +27,7 @@ from SatelliteSimulation.view.pygame_button import Button
 # =========================================================================== #
 
 
-class DisturbanceButtons:
+class ButtonControlPanel:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor

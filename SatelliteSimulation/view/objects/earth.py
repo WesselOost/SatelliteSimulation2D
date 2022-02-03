@@ -17,7 +17,7 @@ import pygame
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
 
 # =========================================================================== #
