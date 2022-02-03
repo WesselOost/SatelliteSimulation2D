@@ -32,7 +32,7 @@ ASTEROID = "asteroid1.png"
 EARTH = "earth.png"
 DOTTED_CIRCLE = "dashed_circle.png"
 
-ABSOLUTE_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ABSOLUTE_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 ASSETS_PATH = os.path.join(ABSOLUTE_ROOT_PATH, "Assets")
 
 

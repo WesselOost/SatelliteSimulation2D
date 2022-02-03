@@ -12,7 +12,7 @@ Class Description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.view import Color
+from SatelliteSimulation.view.resources import Color
 
 
 # =========================================================================== #

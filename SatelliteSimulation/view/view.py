@@ -14,9 +14,9 @@ is implemented here. The GUI is based on the python library "pygame".
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view import Color
+from SatelliteSimulation.view.resources import Color
 from SatelliteSimulation.view.objects.arrow_view import ArrowView
-from SatelliteSimulation.view.images import Images
+from SatelliteSimulation.view.resources.images import Images
 from SatelliteSimulation.view.navigation_handler import NavigationHandler
 from SatelliteSimulation.view.objects.view_references import ReferenceViews
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView

@@ -12,7 +12,7 @@ a Border with black background and light grey outline
 #  SECTION: Imports
 # =========================================================================== #
 import pygame
-from SatelliteSimulation.view import Color
+from SatelliteSimulation.view.resources import Color
 
 
 # =========================================================================== #

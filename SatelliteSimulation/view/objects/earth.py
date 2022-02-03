@@ -13,7 +13,7 @@ An earth Icon that rotates with a dotted outline around it
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.images import Images
+from SatelliteSimulation.view.resources.images import Images
 
 # =========================================================================== #
 #  SECTION: Global definitions
