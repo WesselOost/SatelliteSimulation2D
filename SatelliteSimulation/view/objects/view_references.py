@@ -73,8 +73,6 @@ class ReferenceViews:
         mini_border_height = border_as_rectangle.height * MINI_BORDER_SCALE
         mini_border_x = border_center_x - mini_border_width // 2
         mini_border_y = self.__earth.get_dotted_circle_position()[1] - mini_border_height // 2
-
-
         self.__mini_border: BorderView = BorderView(mini_border_x,
                                                     mini_border_y,
                                                     mini_border_width,
