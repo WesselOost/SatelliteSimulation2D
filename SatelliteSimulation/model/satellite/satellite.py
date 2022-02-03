@@ -14,6 +14,7 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 import logging
 import random
+from abc import ABC
 
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
@@ -35,12 +36,13 @@ from SatelliteSimulation.model.collision import Collision
 # =========================================================================== #
 
 
-class Satellite:
-
+class Satellite(ABC):
+    """Abstract Satellite class should not be instantiated directly"""
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     satellite_id = 0
+
 
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
@@ -66,7 +68,7 @@ class Satellite:
         return self.__mass
 
 
-    def size(self) -> float:
+    def size(self) -> int:
         return self.__size
 
 
@@ -101,8 +103,10 @@ class Satellite:
     def is_crashed(self) -> bool:
         return self.__is_crashed
 
+
     def append_disturbance(self, disturbance: Disturbance):
         self.__disturbances.append(disturbance)
+
 
     def get_id(self) -> int:
         return self.satellite_id
@@ -113,15 +117,6 @@ class Satellite:
     # ----------------------------------------------------------------------- #
     def __str__(self):
         return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity.value()}, radius={self.radius()}'
-
-
-    def update_scale(self, scale_factor: float):
-        self.__observance_radius *= scale_factor
-        self.__size *= scale_factor
-        self.position.set_vector(multiply(self.position, scalar=scale_factor))
-        self.velocity.update_scale(scale_factor)
-        for disturbance in self.__disturbances:
-            disturbance.velocity().set_vector(multiply(disturbance.velocity(), scalar=scale_factor))
 
 
     def update_crashed_status(self):
@@ -135,11 +130,11 @@ class Satellite:
         self.__observed_satellites = satellites
 
 
-    def move(self, delta_time:float):
+    def move(self, delta_time: float):
         self.velocity.update_velocities(self.__disturbances)
         self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
 
-        #TODO: maybe use delta_time
+        # TODO: use delta_time
         self.position.add_to_x(self.velocity.value().x())
         self.position.add_to_y(self.velocity.value().y())
 
@@ -154,12 +149,11 @@ class Satellite:
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        #todo fix navigation duration
+        # todo fix navigation duration
         self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
         nav_x: float = self.velocity.navigation_velocity().x()
         nav_y: float = self.velocity.navigation_velocity().y()
 
-        # TODO scale navigation
         if pressed_left:
             self.velocity.set_navigation_velocity(Vector(-1, nav_y))
         if pressed_up:
@@ -187,7 +181,9 @@ class Satellite:
                     observed_satellite)
 
         cleared_collisions = {k: v for k, v in possible_collisions.items() if v is not None}
-        self.__possible_collisions = {k: v for k, v in sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
+        self.__possible_collisions = {k: v for k, v in
+                                      sorted(cleared_collisions.items(), key=lambda item: item[1].time())}
+
 
     def avoid_possible_collisions(self):
         # Test collision avoidance
@@ -215,7 +211,7 @@ class Satellite:
         left_turned_normalized_unit_vector: Vector = divide(left_tangent, left_tangent.magnitude())
         left_turned_normalized_vector: Vector = multiply(left_turned_normalized_unit_vector, shift)
         point2_left: tuple = (velocity.x() + left_turned_normalized_vector.x(),
-        velocity.y() + left_turned_normalized_vector.y())
+                              velocity.y() + left_turned_normalized_vector.y())
         left_trajectory = StraightLineEquation(left_turned_normalized_vector.get_as_tuple(), point2_left)
 
         # right turned
@@ -223,7 +219,7 @@ class Satellite:
         right_turned_normalized_unit_vector: Vector = divide(right_tangent, right_tangent.magnitude())
         right_turned_normalized_vector: Vector = multiply(right_turned_normalized_unit_vector, shift)
         point2_right: tuple = (velocity.x() + right_turned_normalized_vector.x(),
-        velocity.y() + right_turned_normalized_vector.y())
+                               velocity.y() + right_turned_normalized_vector.y())
         right_trajectory = StraightLineEquation(
             right_turned_normalized_vector.get_as_tuple(), point2_right)
 
@@ -231,9 +227,9 @@ class Satellite:
 
 
     def __analyse_given_object_system(self,
-            satellite_trajectories: list,
-            observed_trajectory: StraightLineEquation,
-            observed_object) -> Collision:
+                                      satellite_trajectories: list,
+                                      observed_trajectory: StraightLineEquation,
+                                      observed_object) -> Collision:
         """
         The given systems of two "moving" objects can be split up into 4 categories:
         1. both objects are moving
@@ -265,14 +261,14 @@ class Satellite:
             observed_object.radius(), observed_trajectory))
         if satellite_velocity == 0 and observed_velocity != 0:
             return self.__check_collision_with_non_moving_object(observed_trajectories, observed_object,
-                resting_satellite=True)
+                                                                 resting_satellite=True)
         if satellite_velocity != 0 and observed_velocity != 0:
             return self.__check_collision_with_moving_object(satellite_trajectories, observed_trajectories,
-                observed_object)
+                                                             observed_object)
 
 
     def __check_collision_with_non_moving_object(self, trajectories: list, other_object,
-            resting_satellite=False) -> Collision:
+                                                 resting_satellite=False) -> Collision:
         minimal_distance = self.radius() + other_object.radius()
         for trajectory in trajectories:
             if resting_satellite:
@@ -289,7 +285,7 @@ class Satellite:
 
 
     def __check_collision_with_moving_object(self, satellite_trajectories: list, observed_trajectories: list,
-            observed_object) -> Collision:
+                                             observed_object) -> Collision:
         lgs = LinearSystemOfEquations()
         riskiest_collision: tuple = None
         nearest_hit = 1000  # a big number (far in the future)
@@ -303,9 +299,9 @@ class Satellite:
                 else:
                     intersection: tuple = lgs.get_intersection(observed_trajectory, satellite_trajectory)
                     is_risky, t = self.__is_intersection_risky_and_when(intersection,
-                        satellite_trajectory,
-                        observed_trajectory,
-                        observed_object)
+                                                                        satellite_trajectory,
+                                                                        observed_trajectory,
+                                                                        observed_object)
                 if is_risky and t < nearest_hit:
                     nearest_hit = t
                     riskiest_collision = intersection
@@ -315,10 +311,10 @@ class Satellite:
 
 
     def __is_intersection_risky_and_when(self,
-            intersection: tuple,
-            satellite_trajectory: StraightLineEquation,
-            observed_trajectory: StraightLineEquation,
-            observed_object) -> tuple:
+                                         intersection: tuple,
+                                         satellite_trajectory: StraightLineEquation,
+                                         observed_trajectory: StraightLineEquation,
+                                         observed_object) -> tuple:
         if intersection == (float('inf'), float('inf')):
             # TODO figure out what happend here
             return False, None
@@ -327,7 +323,7 @@ class Satellite:
         satellite_at_observed_t: tuple = satellite_trajectory.calculate_new_point(observed_t)
         observed_satellite_at_satellite_t: tuple = observed_trajectory.calculate_new_point(satellite_t)
         distance = calculate_distance(tuple_to_vector(satellite_at_observed_t),
-            tuple_to_vector(observed_satellite_at_satellite_t))
+                                      tuple_to_vector(observed_satellite_at_satellite_t))
         t = min(satellite_t, observed_t)
         if distance <= (self.radius() + observed_object.radius()) and t >= 0:
             return True, t
@@ -335,7 +331,7 @@ class Satellite:
 
 
     def __avoid_collision_by_random_position(self):
-        self.navigate_to(random.randint(0,360))
+        self.navigate_to(random.randint(0, 360))
 
         # todo create own class for avoiding methods
 
@@ -358,6 +354,10 @@ class Satellite:
         pass
 
 
+    def get_type(self) -> int:
+        """Override in child classes"""
+        pass
+
 # =========================================================================== #
 #  SECTION: Satellite types A-D + SpaceJunk
 # =========================================================================== #
@@ -368,25 +368,39 @@ class SatelliteA(Satellite):
         super().__init__(position, mass=100, size=size)
 
 
+    def get_type(self) -> int:
+        return 1
+
+
 class SatelliteB(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=80, size=size)
+
+    def get_type(self) -> int:
+        return 2
 
 
 class SatelliteC(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=120, size=size)
 
+    def get_type(self) -> int:
+        return 3
 
 class SatelliteD(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=40, size=size)
 
+    def get_type(self) -> int:
+        return 4
 
 class SpaceJunk(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=10, size=size)
         self.update_crashed_status()
+
+    def get_type(self) -> int:
+        return 5
 
 
 # =========================================================================== #

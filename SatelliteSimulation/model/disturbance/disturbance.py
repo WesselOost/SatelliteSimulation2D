@@ -32,10 +32,9 @@ class Disturbance:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, scale_factor: float):
+    def __init__(self):
         # duration in frames
         self._duration: int = random.randrange(60, 120, 1)
-        self.__scale_factor: float = scale_factor
 
         # value vector in Pixel
         self._velocity: Velocity = Velocity(0, 0)
@@ -47,10 +46,6 @@ class Disturbance:
 
     def velocity(self) -> Velocity:
         return self._velocity
-
-
-    def scale_factor(self):
-        return self.__scale_factor
 
 
     def _set_velocity_trajectory(self, v_max: float):
@@ -74,20 +69,20 @@ class Disturbance:
 
 
 class Malfunction(Disturbance):
-    def __init__(self, scale_factor: float):
-        super().__init__(scale_factor)
-        self.velocity().set_vector(multiply(Vector(x=self._random_value(), y=self._random_value()), scale_factor))
-        self._set_velocity_trajectory(random.randint(1, 3) * scale_factor)
+    def __init__(self):
+        super().__init__()
+        self.velocity().set_vector(Vector(x=self._random_value(), y=self._random_value()))
+        self._set_velocity_trajectory(random.randint(1, 3))
 
 
 class SolarRadiationDisturbance(Disturbance):
-    def __init__(self, max_surface: float, scale_factor: float):
-        super().__init__(scale_factor)
+    def __init__(self, max_surface: float):
+        super().__init__()
         self.__max_surface = max_surface
         self.__strength = random.randint(50, 100)
 
-        velocity_x: float = self._random_value() * scale_factor
-        velocity_y: float = self._random_value() * scale_factor
+        velocity_x: float = self._random_value()
+        velocity_y: float = self._random_value()
         self._velocity.set_xy(velocity_x, velocity_y)
 
 
@@ -96,7 +91,7 @@ class SolarRadiationDisturbance(Disturbance):
         # velocity_x: float = self._velocity.x() * self.__add_radiation_pressure(surface)
         # velocity_y: float = self._velocity.y() * self.__add_radiation_pressure(surface)
         # self._velocity.set_xy(velocity_x, velocity_y)
-        self._set_velocity_trajectory(self.__radiation_pressure(surface) * self.scale_factor())
+        self._set_velocity_trajectory(self.__radiation_pressure(surface))
 
 
     def __radiation_pressure(self, surface: float) -> float:
@@ -104,15 +99,15 @@ class SolarRadiationDisturbance(Disturbance):
 
 
 class GravitationalDisturbance(Disturbance):
-    def __init__(self, max_mass: float, scale_factor: float):
-        super().__init__(scale_factor)
+    def __init__(self, max_mass: float):
+        super().__init__()
         self._max_mass = max_mass
         self._strength = random.randint(2, 4)
-        self._velocity.set_y(self._random_value() * self.scale_factor())
+        self._velocity.set_y(self._random_value())
 
 
     def update_trajectory(self, mass: float):
-        self._set_velocity_trajectory(self.__change_gravity(mass) * self.scale_factor())
+        self._set_velocity_trajectory(self.__change_gravity(mass))
 
 
     def __change_gravity(self, mass: float) -> float:
@@ -125,13 +120,13 @@ class GravitationalDisturbance(Disturbance):
 
 
 class MagneticDisturbance(GravitationalDisturbance):
-    def __init__(self, max_mass: float, scale_factor: float):
-        super().__init__(max_mass, scale_factor)
-        self._velocity.set_x(self._random_value() * self.scale_factor())
+    def __init__(self, max_mass: float):
+        super().__init__(max_mass)
+        self._velocity.set_x(self._random_value())
 
 
     def update_trajectory(self, mass: float):
-        self._set_velocity_trajectory(self.__magnetic_disturbance(mass) * self.scale_factor())
+        self._set_velocity_trajectory(self.__magnetic_disturbance(mass))
 
 
     def __magnetic_disturbance(self, mass: float) -> float:

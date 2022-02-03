@@ -33,24 +33,26 @@ class DisturbanceButtons:
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self, x: float, y: float, width: float, padding: float, font_size: float):
+    def __init__(self, x: float, y: float, width: float, height_padding: float, font_size: float):
         self.__x: float = x
         self.__y: float = y
         button = Button(x, y, width, font_size, button_text=DisturbanceType.MALFUNCTION.value)
         button_height: float = button.get_height()
 
         # TODO fix calculating y
-        height_padding: float = button_height + padding
+        self.__height_padding: float = button_height + height_padding
         self.__buttons = [
             button,
-            Button(x, y + height_padding, width, font_size,
+            Button(x, y + self.__height_padding, width, font_size,
                 button_text=DisturbanceType.SOLAR_RADIATION.value),
-            Button(x, y + height_padding * 2, width, font_size,
+            Button(x, y + self.__height_padding * 2, width, font_size,
                 button_text=DisturbanceType.MAGNETIC.value),
-            Button(x, y + height_padding * 3, width, font_size,
+            Button(x, y + self.__height_padding * 3, width, font_size,
                 button_text=DisturbanceType.GRAVITATIONAL.value)]
+
         self.__font_size = font_size
-        self.__height: float = y + height_padding * 3 + button_height
+        self.__height: float = y + self.__height_padding * 3 + button_height
+        self.__width = width
 
 
 
@@ -60,18 +62,28 @@ class DisturbanceButtons:
     def get_top_button(self) -> Button:
         return self.__buttons[-1]
 
-
+    @property
     def x(self) -> float:
         return self.__x
 
-
+    @property
     def y(self) -> float:
         return self.__y
 
-
+    @property
     def height(self) -> float:
         return self.__height
+    @property
+    def width(self) -> float:
+        return self.__width
 
+    @property
+    def font(self) -> float:
+        return self.__font_size
+
+    @property
+    def height_padding(self) -> float:
+        return self.__height_padding
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -80,11 +92,6 @@ class DisturbanceButtons:
     def draw(self, surface: pygame.Surface):
         for button in self.__buttons:
             button.draw(surface)
-
-
-    def on_size_changed(self, scale_factor):
-        for button in self.__buttons:
-            button.on_size_changed(scale_factor)
 
 
     # ----------------------------------------------------------------------- #

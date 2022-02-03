@@ -39,7 +39,6 @@ class Space:
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     def __init__(self, satellite_amount: int, border: SatelliteBorder):
-        self.__scale_factor: float = 1.0
         self.__border: SatelliteBorder = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
         self.__delta_time = 1
@@ -71,34 +70,26 @@ class Space:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
 
-    def update_border_and_satellite_scale(self, scale_factor):
-        self.__scale_factor = scale_factor
-        for satellite in self.__satellites:
-            satellite.update_scale(scale_factor)
-
-        self.__border.update_scale(scale_factor)
-
-
     def create_disturbance(self, disturbance_type: DisturbanceType):
 
         if disturbance_type == DisturbanceType.MALFUNCTION:
             satellite = random.choice([satellite for satellite in self.__satellites if not satellite.is_crashed()])
-            satellite.append_disturbance(Malfunction(self.__scale_factor))
+            satellite.append_disturbance(Malfunction())
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
             # TODO check max surface
             max_surface: float = (self.__border.height() // 10 * 1.2) ** 2
-            disturbance = SolarRadiationDisturbance(max_surface, self.__scale_factor)
+            disturbance = SolarRadiationDisturbance(max_surface)
             for satellite in self.__satellites:
                 self.append_disturbance_to_satellite(disturbance, satellite, satellite.surface())
             logging.info('sun burn')
         elif disturbance_type == DisturbanceType.GRAVITATIONAL:
-            disturbance = GravitationalDisturbance(max_mass=120, scale_factor=self.__scale_factor)
+            disturbance = GravitationalDisturbance(max_mass=120)
             for satellite in self.__satellites:
                 self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
             logging.info('damn gravity')
 
         elif disturbance_type == DisturbanceType.MAGNETIC:
-            disturbance = MagneticDisturbance(max_mass=120, scale_factor=self.__scale_factor)
+            disturbance = MagneticDisturbance(max_mass=120)
             for satellite in self.__satellites:
                 self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
             logging.info('pls help Iron Man')

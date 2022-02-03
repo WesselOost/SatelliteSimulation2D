@@ -37,12 +37,17 @@ class Button:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, x, y, width, font_size: float, button_text: str):
-        self.__state = "released"
-        self.__new_click_event = False
-        self.x = x
-        self.y = y
-        self.__font_size = font_size
+    def __init__(self, x: float, y: float, width: float, font_size: float, button_text: str):
+        # todo change to enum
+        self.__state: str = RELEASED
+        self.__new_click_event: bool= False
+        self.__reference_x: float = x
+        self.__reference_y: float = y
+        self.__reference_width: float = width
+        self.x: float = x
+        self.y: float = y
+        self.__font_size_reference: float = font_size
+        self.__font_size: float = font_size
 
         self.__init_button(button_text, font_size)
         self.set_width(width)
@@ -81,29 +86,6 @@ class Button:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-
-    def on_size_changed(self, scale_factor: float):
-        self.x *= scale_factor
-        self.__body.x = int(self.x)
-        self.y *= scale_factor
-        self.__body.y = int(self.y)
-        self.__body_height *= scale_factor
-        self.__body.height = int(self.__body_height)
-        self.__width *= scale_factor
-        self.__body.width = int(self.__width)
-
-        self.__bottom_border.x = int(self.x)
-        self.__bottom_border.y = int(self.__body.height + self.y)
-        self.__bottom_border.width = int(self.__width)
-        self.__bottom_border_height *= scale_factor
-        self.__bottom_border.height = int(self.__bottom_border_height)
-
-        self.__text_offset_x *= scale_factor
-        self.__text_offset_y *= scale_factor
-        self.__font_size = self.__font_size * scale_factor
-        self.__font = pygame.font.SysFont("Verdana", int(self.__font_size))
-        self.__text_surface = self.__font.render(self.__text, self.__anti_alias, LIGHT_GREY)
-
 
     def draw(self, surface: pygame.Surface):
         self.__draw_bottom_border(surface)

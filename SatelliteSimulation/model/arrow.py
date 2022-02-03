@@ -70,24 +70,24 @@ class Arrow:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def start_of_line(self) -> tuple:
-        return self.__start_of_line.get_as_tuple()
+    def start_of_line(self) -> Vector:
+        return self.__start_of_line
 
 
-    def end_of_line(self) -> tuple:
-        return self.__end_of_line.get_as_tuple()
+    def end_of_line(self) -> Vector:
+        return self.__end_of_line
 
 
-    def head_tip(self) -> tuple:
-        return self.__head_tip.get_as_tuple()
+    def head_tip(self) -> Vector:
+        return self.__head_tip
 
 
-    def head_left(self) -> tuple:
-        return self.__head_left.get_as_tuple()
+    def head_left(self) -> Vector:
+        return self.__head_left
 
 
-    def head_right(self) -> tuple:
-        return self.__head_right.get_as_tuple()
+    def head_right(self) -> Vector:
+        return self.__head_right
 
 
     def line_thickness(self) -> int:
