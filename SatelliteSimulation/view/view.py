@@ -14,11 +14,14 @@ is implemented here. The GUI is based on the python library "pygame".
 # =========================================================================== #
 import pygame
 
+from SatelliteSimulation.view.objects.border_view import BorderView
+from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
+from SatelliteSimulation.view.objects.earth import Earth
 from SatelliteSimulation.view.resources import Color
 from SatelliteSimulation.view.objects.arrow_view import ArrowView
 from SatelliteSimulation.view.resources.images import Images
 from SatelliteSimulation.view.navigation_handler import NavigationHandler
-from SatelliteSimulation.view.objects.view_references import ReferenceViews
+from SatelliteSimulation.view.objects.view_references import ViewStore
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from SatelliteSimulation.view.objects.satellite_view import SatelliteView
 
@@ -38,7 +41,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, controller, border_width: float, border_height: float, border_padding: float):
+    def __init__(self, controller, border_width: float, border_height: float, border_padding: float, button_data: list):
         pygame.init()
         pygame.display.set_caption("Satellite simulation")
         self.__ratio: float = border_height / border_width
@@ -62,14 +65,14 @@ class GUI:
         self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
 
         self.__controller = controller
-        self.__navigation_handler = NavigationHandler()
+        self.__navigation_handler: NavigationHandler = NavigationHandler()
 
-        self.__reference_views: ReferenceViews = ReferenceViews(border_width, border_height, border_padding)
-        self.__satellite_border = self.__reference_views.border_view(self.__scale_factor)
-        self.__disturbance_buttons = self.__reference_views.button_control_panel(self.__scale_factor)
-        self.__earth = self.__reference_views.earth(self.__scale_factor)
-        self.__satellite_mini_border = self.__reference_views.mini_border_view(self.__scale_factor)
-
+        self.__view_store: ViewStore = ViewStore(border_width, border_height, border_padding, button_data)
+        self.__satellite_border: BorderView = self.__view_store.border_view(self.__scale_factor)
+        self.__disturbance_buttons_control_panel_view: ButtonControlPanelView = self.__view_store.button_control_panel(
+            self.__scale_factor)
+        self.__earth: Earth = self.__view_store.earth(self.__scale_factor)
+        self.__satellite_mini_border: BorderView = self.__view_store.mini_border_view(self.__scale_factor)
 
         self.__clock = pygame.time.Clock()
 
@@ -79,7 +82,12 @@ class GUI:
     # ----------------------------------------------------------------------- #
 
     def get_satellite_border_scale(self) -> float:
-        return self.__scale_factor * self.__reference_views.get_satellite_border_percentage()
+        return self.__scale_factor * self.__view_store.get_satellite_border_percentage()
+
+
+    @property
+    def button_control_panel_view(self) -> ButtonControlPanelView:
+        return self.__disturbance_buttons_control_panel_view
 
 
     # ----------------------------------------------------------------------- #
@@ -95,7 +103,7 @@ class GUI:
         self.__satellite_border.draw(surface)
         self.__satellite_mini_border.draw(surface)
 
-        self.__disturbance_buttons.draw(surface)
+        self.__disturbance_buttons_control_panel_view.draw(surface)
 
         if satellite_observance_borders:
             for observance_border in satellite_observance_borders:
@@ -157,10 +165,10 @@ class GUI:
 
 
     def __scale_on_changed(self, scale_factor: float):
-        self.__satellite_border = self.__reference_views.border_view(self.__scale_factor)
-        self.__disturbance_buttons = self.__reference_views.button_control_panel(self.__scale_factor)
-        self.__earth = self.__reference_views.earth(self.__scale_factor)
-        self.__satellite_mini_border = self.__reference_views.mini_border_view(self.__scale_factor)
+        self.__satellite_border = self.__view_store.border_view(self.__scale_factor)
+        self.__disturbance_buttons_control_panel_view = self.__view_store.button_control_panel(self.__scale_factor)
+        self.__earth = self.__view_store.earth(self.__scale_factor)
+        self.__satellite_mini_border = self.__view_store.mini_border_view(self.__scale_factor)
 
 
     def __draw_satellite(self, satellite: SatelliteView):
@@ -194,9 +202,8 @@ class GUI:
 
 
     def calculate_button_states_and_handle_click_events(self):
-        self.__disturbance_buttons.calculate_state()
-        for click_event_text in self.__disturbance_buttons.get_new_click_events():
-            self.__controller.create_disturbance(click_event_text)
+        self.__disturbance_buttons_control_panel_view.calculate_state()
+        self.__disturbance_buttons_control_panel_view.handle_new_click_events()
 
 
     def handle_user_navigation(self):

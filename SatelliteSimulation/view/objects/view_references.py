@@ -20,7 +20,7 @@ Class Description
 import pygame
 
 from SatelliteSimulation.view.objects.border_view import BorderView
-from SatelliteSimulation.view.objects.button.button_control_panel import ButtonControlPanel
+from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
 from SatelliteSimulation.view.objects.earth import Earth
 
 BORDER_PERCENTAGE = 0.75
@@ -35,12 +35,12 @@ DEFAULT_BUTTON_OFFSET = 50
 # =========================================================================== #
 
 
-class ReferenceViews:
+class ViewStore:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, width: float, height: float, padding: float):
+    def __init__(self, width: float, height: float, padding: float, button_data: list):
         # create border view
         border_view_width: float = width * BORDER_PERCENTAGE
         border_view_height: float = height * BORDER_PERCENTAGE
@@ -49,17 +49,18 @@ class ReferenceViews:
         self.__border: BorderView = BorderView(0, 0, border_view_width, border_view_height, margin, border_padding,
                                                line_width=max(1, int(height * 0.004)))
 
-        # create button controls
+        # create button control
         border_as_rectangle: pygame.Rect = self.__border.get_border_rectangle()
         left_over_width: float = width - border_as_rectangle.width - border_as_rectangle.x
         button_width: float = left_over_width - (margin * 5)
         button_x: float = (width - left_over_width) + margin * 3
         button_y: float = border_as_rectangle.y + margin
-        self.__disturbance_buttons: ButtonControlPanel = ButtonControlPanel(button_x,
-                                                                            button_y,
-                                                                            button_width,
-                                                                            height_padding=margin,
-                                                                            font_size=button_width * 0.05)
+        self.__disturbance_buttons: ButtonControlPanelView = ButtonControlPanelView(button_x,
+                                                                                    button_y,
+                                                                                    button_width,
+                                                                                    height_padding=margin,
+                                                                                    font_size=button_width * 0.05,
+                                                                                    button_data= button_data)
 
         # create earth
         border_center_x: float = border_as_rectangle.center[0]
@@ -101,15 +102,15 @@ class ReferenceViews:
         return self.__scale_border_view(self.__mini_border, scale_factor)
 
 
-    def button_control_panel(self, scale_factor: float) -> ButtonControlPanel:
-        button_control_panel: ButtonControlPanel = self.__disturbance_buttons
+    def button_control_panel(self, scale_factor: float) -> ButtonControlPanelView:
+        button_control_panel: ButtonControlPanelView = self.__disturbance_buttons
         x: float = button_control_panel.x * scale_factor
         y: float = button_control_panel.y * scale_factor
         width: float = button_control_panel.width * scale_factor
         padding: float = button_control_panel.height_padding * scale_factor
         font_size: float = button_control_panel.font * scale_factor
 
-        return ButtonControlPanel(x, y, width, padding, font_size)
+        return ButtonControlPanelView(x, y, width, padding, font_size, button_control_panel.button_data)
 
 
     def earth(self, scale_factor: float) -> Earth:

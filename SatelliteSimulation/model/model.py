@@ -18,7 +18,7 @@ from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.collision_handling import *
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import *
-from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
 
 # =========================================================================== #

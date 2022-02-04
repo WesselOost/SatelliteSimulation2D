@@ -13,8 +13,7 @@ Disturbance Buttons for the UI
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
-from SatelliteSimulation.view.objects.button.pygame_button import Button
+from SatelliteSimulation.view.objects.button.pygame_button import Button, ToggleButton, ButtonType, ButtonState
 
 
 # =========================================================================== #
@@ -26,71 +25,85 @@ from SatelliteSimulation.view.objects.button.pygame_button import Button
 # =========================================================================== #
 
 
-class ButtonControlPanel:
+class ButtonControlPanelView:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self, x: float, y: float, width: float, height_padding: float, font_size: float):
+    def __init__(self, x: float, y: float, width: float, height_padding: float, font_size: float, button_data: list):
+        self.__button_data = button_data
         self.__x: float = x
         self.__y: float = y
-        button = Button(x, y, width, font_size, button_text=DisturbanceType.MALFUNCTION.value)
-        button_height: float = button.get_height()
+        self.__buttons: dict = {}
 
-        # TODO fix calculating y
+        # create button and toggle buttons
+        for data in button_data:
+            name: str = data.button_name
+            on_clicked_handler = data.on_clicked_handler
+            if data.button_type == ButtonType.TOGGLE_BUTTON:
+                self.__buttons[name] = ToggleButton(0, 0, width, font_size, name, on_clicked_handler)
+            else:
+                self.__buttons[name] = Button(0, 0, width, font_size, name, on_clicked_handler)
+
+        # use the first button to get the height of the button which is needed for spacing the buttons
+        first_button: Button = list(self.__buttons.values())[0]
+        button_height = first_button.get_height()
         self.__height_padding: float = button_height + height_padding
-        self.__buttons = [
-            button,
-            Button(x, y + self.__height_padding, width, font_size,
-                button_text=DisturbanceType.SOLAR_RADIATION.value),
-            Button(x, y + self.__height_padding * 2, width, font_size,
-                button_text=DisturbanceType.MAGNETIC.value),
-            Button(x, y + self.__height_padding * 3, width, font_size,
-                button_text=DisturbanceType.GRAVITATIONAL.value)]
+
+        # set position
+        for index, button_name in enumerate(self.__buttons):
+            self.__buttons[button_name].set_position(self.__x, self.__y * (index + 1) + height_padding * index)
 
         self.__font_size = font_size
-        self.__height: float = y + self.__height_padding * 3 + button_height
         self.__width = width
-
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    def get_top_button(self) -> Button:
-        return self.__buttons[-1]
 
     @property
     def x(self) -> float:
         return self.__x
 
+
     @property
     def y(self) -> float:
         return self.__y
 
-    @property
-    def height(self) -> float:
-        return self.__height
+
     @property
     def width(self) -> float:
         return self.__width
+
 
     @property
     def font(self) -> float:
         return self.__font_size
 
+
     @property
     def height_padding(self) -> float:
         return self.__height_padding
+
+
+    @property
+    def button_data(self) -> list:
+        return self.__button_data
+
+
+    def get_button(self, button_name: str) -> Button:
+        return self.__buttons[button_name]
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
 
     def draw(self, surface: pygame.Surface):
-        for button in self.__buttons:
-            button.draw(surface)
+        for button_name in self.__buttons:
+            self.__buttons[button_name].draw(surface)
 
 
     # ----------------------------------------------------------------------- #
@@ -98,16 +111,32 @@ class ButtonControlPanel:
     # ----------------------------------------------------------------------- #
 
     def calculate_state(self):
-        for button in self.__buttons:
-            button.calculate_state()
+        for button_name in self.__buttons:
+            self.__buttons[button_name].calculate_state()
 
 
-    def get_new_click_events(self) -> list:
-        click_events = []
-        for button in self.__buttons:
+    def handle_new_click_events(self):
+        for button_name in self.__buttons:
+            button = self.__buttons[button_name]
             if button.new_click_event():
-                click_events.append(DisturbanceType(button.get_text()))
-        return click_events
+                button.activate_click_handler()
+
+
+    def get_new_click_events(self):
+
+        for button_name in self.__buttons:
+            if self.__buttons[button_name].new_click_event():
+                self.__buttons[button_name].activate_click_handler()
+
+
+    def disable(self, button_names: list):
+        for button_name in button_names:
+            self.__buttons[button_name].disable()
+
+
+    def enable(self, button_names: list):
+        for button_name in button_names:
+            self.__buttons[button_name].enable()
 
 
 # =========================================================================== #

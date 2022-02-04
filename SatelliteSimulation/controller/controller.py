@@ -11,27 +11,24 @@ Controller of the satellite simulation.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+
 import os
 import sys
+
+sys.dont_write_bytecode = True
+sys.path.append(os.getcwd())
 
 from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
 from SatelliteSimulation.model.satellite.satellite import Satellite
-from SatelliteSimulation.view.resources import Color
 from SatelliteSimulation.view.objects.arrow_view import ArrowView
+from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
+from SatelliteSimulation.view.objects.button.button_data import ButtonData
+from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from SatelliteSimulation.view.objects.satellite_view import SatelliteView
-
-sys.dont_write_bytecode = True
-sys.path.append(os.getcwd())
-
-import os
-import sys
-
-sys.dont_write_bytecode = True
-sys.path.append(os.getcwd())
-
-from SatelliteSimulation.controller.shared.disturbance_type import DisturbanceType
+from SatelliteSimulation.view.resources import Color
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.model import Space
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.view.view import GUI
@@ -57,10 +54,32 @@ class Controller:
 
         self.space = Space(satellite_amount=15, border=self.__border)
 
+        button_data: list = [ButtonData(button_name=DisturbanceType.MALFUNCTION.value,
+                                        button_type=ButtonType.BUTTON,
+                                        on_click_handler=self.on_disturbance_clicked
+                                        ),
+                             ButtonData(button_name=DisturbanceType.SOLAR_RADIATION.value,
+                                        button_type=ButtonType.BUTTON,
+                                        on_click_handler=self.on_disturbance_clicked
+                                        ),
+                             ButtonData(button_name=DisturbanceType.GRAVITATIONAL.value,
+                                        button_type=ButtonType.BUTTON,
+                                        on_click_handler=self.on_disturbance_clicked
+                                        ),
+                             ButtonData(button_name=DisturbanceType.MAGNETIC.value,
+                                        button_type=ButtonType.BUTTON,
+                                        on_click_handler=self.on_disturbance_clicked
+                                        ),
+                             ButtonData(button_name=DisturbanceType.AUTOMATIC.value,
+                                        button_type=ButtonType.TOGGLE_BUTTON,
+                                        on_click_handler=self.on_auto_disturbance_clicked
+                                        )]
+
         self.gui = GUI(controller=self,
                        border_width=self.__border.width(),
                        border_height=self.__border.height(),
-                       border_padding=self.__border.padding())
+                       border_padding=self.__border.padding(),
+                       button_data=button_data)
 
         self.__run = True
         self.start_simulation_loop()
@@ -87,8 +106,22 @@ class Controller:
         self.__run = False
 
 
-    def create_disturbance(self, disturbanceType: DisturbanceType):
-        self.space.create_disturbance(disturbanceType)
+    def on_disturbance_clicked(self, disturbance_type_name: str):
+        self.space.create_disturbance(DisturbanceType(disturbance_type_name))
+
+
+    def on_auto_disturbance_clicked(self, is_selected: bool):
+        control_panel_view: ButtonControlPanelView = self.gui.button_control_panel_view
+        if is_selected:
+            control_panel_view.disable([DisturbanceType.MALFUNCTION.value,
+                                        DisturbanceType.SOLAR_RADIATION.value,
+                                        DisturbanceType.GRAVITATIONAL.value,
+                                        DisturbanceType.MAGNETIC.value])
+        else:
+            control_panel_view.enable([DisturbanceType.MALFUNCTION.value,
+                                       DisturbanceType.SOLAR_RADIATION.value,
+                                       DisturbanceType.GRAVITATIONAL.value,
+                                       DisturbanceType.MAGNETIC.value])
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
@@ -111,8 +144,8 @@ class Controller:
         arrows: list = [arrow_to_arrow_view(arrow, scale_factor, offset) for arrow in self.space.get_velocity_arrows()]
         satellite_views: list = [satellite_to_satellite_view(satellite, scale_factor, offset) for satellite in
                                  satellites]
-        satellite_borders: list = [satellite_to_observance_border_view(satellite, scale_factor, offset) for satellite in
-                                   satellites if not satellite.is_crashed()]
+        satellite_borders: list = [satellite_to_observance_border_view(satellite, scale_factor, offset)
+                                   for satellite in satellites if not satellite.is_crashed()]
 
         self.gui.update(satellite_views, arrows, satellite_borders)
 
@@ -153,13 +186,15 @@ def satellite_to_satellite_view(satellite: Satellite, scale_factor: float, offse
 def satellite_to_observance_border_view(satellite: Satellite, scale_factor: float,
                                         offset: float) -> SatelliteObservanceBorderView:
     color = Color.ORANGE if satellite.observed_satellites() else Color.GREY
+
     if satellite.possible_collisions():
         color = Color.RED
+
     line_thickness: int = max(1, int(SatelliteObservanceBorderView.DEFAULT_LINE_THICKNESS * scale_factor))
+    position = add(multiply(satellite.center(), scale_factor), Vector(offset, offset)).get_as_tuple()
 
     return SatelliteObservanceBorderView(color=color,
-                                         position=add(multiply(satellite.center(), scale_factor),
-                                                      Vector(offset, offset)).get_as_tuple(),
+                                         position=position,
                                          radius=(satellite.radius() + satellite.observance_radius()) * scale_factor,
                                          line_thickness=line_thickness)
 

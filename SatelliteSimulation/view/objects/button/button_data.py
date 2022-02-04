@@ -6,13 +6,13 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Disturbance types that can happen to satellites in space
+Class Description
 """
 
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from enum import Enum
+from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
 
 
 # =========================================================================== #
@@ -24,20 +24,33 @@ from enum import Enum
 # =========================================================================== #
 
 
-class DisturbanceType(Enum):
-    MALFUNCTION = "MALFUNCTION"
-    MAGNETIC = "MAGNETIC DISTURBANCE"
-    SOLAR_RADIATION = "SOLAR RADIATION DISTURBANCE"
-    GRAVITATIONAL = "GRAVITY GRADIENT DISTURBANCE"
+class ButtonData:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
+    def __init__(self, button_name: str, button_type: ButtonType, on_click_handler):
+        self.__button_name: str = button_name
+        self.__button_type: ButtonType = button_type
+        self.__on_clicked_handler = on_click_handler
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    @property
+    def button_name(self) -> str:
+        return self.__button_name
 
+
+    @property
+    def button_type(self) -> ButtonType:
+        return self.__button_type
+
+
+    @property
+    def on_clicked_handler(self):
+        return self.__on_clicked_handler
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
