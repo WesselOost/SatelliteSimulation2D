@@ -56,8 +56,4 @@ class DisturbanceType(Enum):
 
 
 if __name__ == '__main__':
-    l = list(DisturbanceType)
-
-    for a in l:
-        print(a)
     pass

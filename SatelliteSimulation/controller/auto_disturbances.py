@@ -86,7 +86,4 @@ class AutoDisturbances:
 
 
 if __name__ == '__main__':
-    auto = AutoDisturbances()
-    auto.start()
-    time.sleep(10)
-    auto.stop()
+    pass
