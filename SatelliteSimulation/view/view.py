@@ -46,11 +46,12 @@ class GUI:
         pygame.display.set_caption("Satellite simulation")
         self.__ratio: float = border_height / border_width
 
-        self.__minimum_surface_width = border_width / 4.5
-        self.__minimum_surface_height = border_height / 4.5
+        screen_width = pygame.display.Info().current_w
+        self.__minimum_surface_width = screen_width / 4.5
+        self.__minimum_surface_height = self.__minimum_surface_width * self.__ratio
 
         half_screen_size: tuple = self.create_correct_aspect_ratio_width_height(
-            pygame.display.Info().current_w // 2,
+            screen_width // 2,
             pygame.display.Info().current_h // 2)
 
         self.__surface: pygame.Surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
