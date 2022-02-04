@@ -68,10 +68,12 @@ class Space:
     # ----------------------------------------------------------------------- #
 
     def create_disturbance(self, disturbance_type: DisturbanceType):
-
         if disturbance_type == DisturbanceType.MALFUNCTION:
-            satellite = random.choice([satellite for satellite in self.__satellites if not satellite.is_crashed()])
-            satellite.append_disturbance(Malfunction())
+            not_crashed_satellites = [satellite for satellite in self.__satellites if not satellite.is_crashed()]
+            if not_crashed_satellites:
+                satellite = random.choice(not_crashed_satellites)
+                satellite.append_disturbance(Malfunction())
+                logging.info('malfunction')
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
             # TODO check max surface
             max_surface: float = (self.__border.height() // 10 * 1.2) ** 2

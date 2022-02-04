@@ -6,13 +6,19 @@
 # @Link    : link
 # @Version : 0.0.1
 """
-Disturbance types that can happen to satellites in space
+Class Description
 """
+
 
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from enum import Enum
+import logging
+import random
+import threading
+import time
+from numpy.random import choice
+from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 
 
 # =========================================================================== #
@@ -24,15 +30,16 @@ from enum import Enum
 # =========================================================================== #
 
 
-class DisturbanceType(Enum):
-    MALFUNCTION = "MALFUNCTION"
-    MAGNETIC = "MAGNETIC DISTURBANCE"
-    SOLAR_RADIATION = "SOLAR RADIATION DISTURBANCE"
-    GRAVITATIONAL = "GRAVITY GRADIENT DISTURBANCE"
+class AutoDisturbances:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
+    def __init__(self, controller):
+        self.__controller = controller
+        self.__stop_thread: bool = False
+        self.__thread: threading.Thread = threading.Thread()
+        self.__disturbanceTypes: list = list(DisturbanceType)
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -41,14 +48,37 @@ class DisturbanceType(Enum):
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
+    def start(self):
+        logging.info('start thread')
+        if not self.__thread.is_alive():
+            self.__stop_thread = False
+            self.__thread = threading.Thread(target=self.__run, args=(lambda: self.__stop_thread,))
+            self.__thread.daemon = True
+            self.__thread.start()
+
+
+    def stop(self):
+        if self.__thread.is_alive():
+            self.__stop_thread = True
+            logging.info('thread stopped')
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
 
+    def __run(self, stop):
+        while True:
+            self.__controller.on_disturbance_clicked(self.__get_random_disturbance().value)
+            time.sleep(random.uniform(0.1, 1.0))
+
+            if stop():
+                break
+
     # =========================================================================== #
     #  SECTION: Function definitions
     # =========================================================================== #
+    def __get_random_disturbance(self) -> DisturbanceType:
+        return choice(self.__disturbanceTypes, 1, p=[0.70, 0.10, 0.10, 0.10])[0]
 
     # =========================================================================== #
     #  SECTION: Main Body
@@ -56,8 +86,7 @@ class DisturbanceType(Enum):
 
 
 if __name__ == '__main__':
-    l = list(DisturbanceType)
-
-    for a in l:
-        print(a)
-    pass
+    auto = AutoDisturbances()
+    auto.start()
+    time.sleep(10)
+    auto.stop()

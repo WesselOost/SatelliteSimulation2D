@@ -15,9 +15,11 @@ Controller of the satellite simulation.
 import os
 import sys
 
+
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
+from SatelliteSimulation.controller.auto_disturbances import AutoDisturbances
 from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
 from SatelliteSimulation.model.satellite.satellite import Satellite
@@ -70,7 +72,7 @@ class Controller:
                                         button_type=ButtonType.BUTTON,
                                         on_click_handler=self.on_disturbance_clicked
                                         ),
-                             ButtonData(button_name=DisturbanceType.AUTOMATIC.value,
+                             ButtonData(button_name="AUTOMATIC RANDOM DISTURBANCES",
                                         button_type=ButtonType.TOGGLE_BUTTON,
                                         on_click_handler=self.on_auto_disturbance_clicked
                                         )]
@@ -80,6 +82,8 @@ class Controller:
                        border_height=self.__border.height(),
                        border_padding=self.__border.padding(),
                        button_data=button_data)
+
+        self.__auto_disturbance_thread: AutoDisturbances = AutoDisturbances(self)
 
         self.__run = True
         self.start_simulation_loop()
@@ -113,11 +117,13 @@ class Controller:
     def on_auto_disturbance_clicked(self, is_selected: bool):
         control_panel_view: ButtonControlPanelView = self.gui.button_control_panel_view
         if is_selected:
+            self.__auto_disturbance_thread.start()
             control_panel_view.disable([DisturbanceType.MALFUNCTION.value,
                                         DisturbanceType.SOLAR_RADIATION.value,
                                         DisturbanceType.GRAVITATIONAL.value,
                                         DisturbanceType.MAGNETIC.value])
         else:
+            self.__auto_disturbance_thread.stop()
             control_panel_view.enable([DisturbanceType.MALFUNCTION.value,
                                        DisturbanceType.SOLAR_RADIATION.value,
                                        DisturbanceType.GRAVITATIONAL.value,
