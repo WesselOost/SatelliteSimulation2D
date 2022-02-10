@@ -186,6 +186,7 @@ class Satellite(ABC):
                 collision = CollisionDetecter(min_distance, future_positions, satellite_trajectory)
                 if collision:
                     possible_collisions[observed_satellite] = collision
+        self.__possible_collisions = possible_collisions
 
     def avoid_possible_collisions(self):
         # Test collision avoidance
