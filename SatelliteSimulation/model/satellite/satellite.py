@@ -183,7 +183,8 @@ class Satellite(ABC):
                         new_position = add(future_positions[-1], self.velocity.dummy_update(i))
                         future_positions.append(new_position)
                     satellite_trajectory: Trajectory = Trajectory([p.get_as_tuple() for p in future_positions])
-                collision = CollisionDetecter(min_distance, future_positions, satellite_trajectory)
+                collision: Collision = CollisionDetecter(
+                    min_distance, observed_trajectory, satellite_trajectory)
                 if collision:
                     possible_collisions[observed_satellite] = collision
         self.__possible_collisions = possible_collisions

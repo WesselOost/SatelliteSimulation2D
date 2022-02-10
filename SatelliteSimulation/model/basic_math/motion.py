@@ -14,7 +14,7 @@ Short Introduction
 # =========================================================================== #
 import numpy as np
 
-from SatelliteSimulation.model.collision import Collision
+from SatelliteSimulation.model.colllision.collision import Collision
 
 
 # =========================================================================== #
