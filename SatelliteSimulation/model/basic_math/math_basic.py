@@ -105,7 +105,7 @@ class StraightLineEquation:
             t = v_x * (x - x_0) + v_y * (y - y_0) / squared_magnitude
             return t
         return None
-    
+
     def unit_normal_direction_vector(self)->Vector:
         unit_normal = self.direction_vector / self.direction_vector_magnitude()
         return Vector(unit_normal[0],unit_normal[1])
@@ -119,7 +119,7 @@ class LinearSystemOfEquations:
     def get_intersection(self, g1: StraightLineEquation, g2: StraightLineEquation) -> tuple:
         """
         The two 2D straight line equations are checked if there is a intersection point
-        
+
         Parameters
         ----------
         straightLineEquation1 : StraightLineEquation
@@ -130,7 +130,7 @@ class LinearSystemOfEquations:
         Returns
         -------
         tuple
-            intersection point, (inf,inf) if no or infinity intersections 
+            intersection point, (inf,inf) if no or infinity intersections
         """
         stack = np.vstack([g1.stack, g2.stack])
         homogeneous = np.hstack((stack, np.ones((4, 1))))
@@ -178,17 +178,14 @@ class LinearSystemOfEquations:
         # =========================================================================== #
 
 
-def vector_to_degrees(direction_vector: Vector) -> float:
+def vector_to_degree(direction_vector: Vector) -> float:
     angle = math.atan2(direction_vector.y(), direction_vector.x())
-    return math.degrees(angle)
+    return make_degree_positive(math.degrees(angle))
 
 
-def make_degrees_positive(degrees: float) -> float:
+def make_degree_positive(degrees: float) -> float:
     return (degrees + 360) % 360
 
-
-def inverse_degrees(degrees: float) -> float:
-    return make_degrees_positive(degrees + 180)
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #

@@ -49,14 +49,12 @@ class GUI:
         screen_width = pygame.display.Info().current_w
         self.__minimum_surface_width = screen_width / 4.5
         self.__minimum_surface_height = self.__minimum_surface_width * self.__ratio
-
         half_screen_size: tuple = self.create_correct_aspect_ratio_width_height(
             screen_width // 2,
             pygame.display.Info().current_h // 2)
 
         self.__surface: pygame.Surface = pygame.display.set_mode(half_screen_size, pygame.RESIZABLE)
         self.__surface.set_alpha(pygame.SRCALPHA)
-
         self.__initial_height: int = int(border_height)
 
         self.__scale_factor: float = self.__surface.get_height() / border_height
@@ -76,6 +74,7 @@ class GUI:
         self.__satellite_mini_border: BorderView = self.__view_store.mini_border_view(self.__scale_factor)
 
         self.__clock = pygame.time.Clock()
+
 
 
     # ----------------------------------------------------------------------- #

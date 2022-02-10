@@ -51,8 +51,7 @@ class SatelliteVelocityHandler:
 
 
     def set_navigation_velocity(self, velocity: Vector):
-        if velocity.magnitude() <= self.__max_navigation_velocity_magnitude:
-            self.__navigation_velocity.set_vector(velocity)
+        self.__navigation_velocity.set_vector(velocity)
 
 
     def disturbance_velocity(self) -> Velocity:

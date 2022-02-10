@@ -12,8 +12,9 @@ Class description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.basic_math.math_basic import make_degrees_positive, vector_to_degrees, inverse_degrees
-from SatelliteSimulation.model.basic_math.vector import Vector, subtract
+from hashlib import new
+from SatelliteSimulation.model.basic_math.math_basic import vector_to_degree
+from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_distance, multiply
 
 
 # =========================================================================== #
@@ -46,25 +47,14 @@ class CollisionAvoidanceHandler:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def calculate_degrees_avoiding_satellite_direction_by_90_degrees(self) -> float:
-        observed_satellite_towards_satellite: Vector = subtract(self.__satellite_center,
-                                                                self.__observed_satellite_center)
-
-        observed_satellite_direction_degrees: float = make_degrees_positive(
-            vector_to_degrees(self.__observed_satellite_direction))
-        inverted_observed_satellite_direction_degrees: float = inverse_degrees(observed_satellite_direction_degrees)
-        observed_s_towards_satellite_s_degrees: float = make_degrees_positive(
-            vector_to_degrees(observed_satellite_towards_satellite))
-        min_degrees = min(observed_satellite_direction_degrees, inverted_observed_satellite_direction_degrees)
-        max_degrees = max(observed_satellite_direction_degrees, inverted_observed_satellite_direction_degrees)
-
-        if min_degrees < observed_s_towards_satellite_s_degrees <= max_degrees:
-            result: float = min_degrees + 90
-        else:
-            result: float = min_degrees - 90
-
-        result = make_degrees_positive(result)
-        return result
-
+        avoidance_vector: Vector = self.__observed_satellite_direction.tangent()
+        initial_distance: float = calculate_distance(self.__satellite_center, self.__observed_satellite_center)
+        test_distance: float = calculate_distance(
+            add(self.__satellite_center, avoidance_vector.unit_normal()),
+            self.__observed_satellite_center)
+        if test_distance >= initial_distance:
+            return vector_to_degree(avoidance_vector)
+        return vector_to_degree(multiply(avoidance_vector, -1))
 
 # ----------------------------------------------------------------------- #
 #  SUBSECTION: Private Methods
@@ -77,7 +67,5 @@ class CollisionAvoidanceHandler:
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
-
 if __name__ == '__main__':
     pass

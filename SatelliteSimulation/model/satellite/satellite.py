@@ -13,15 +13,16 @@ a bunch of possible satellites and their abilities
 #  SECTION: Imports
 # =========================================================================== #
 import random
+import numpy as np
 from abc import ABC
-from SatelliteSimulation.model.basic_math.motion import CollisionDetecter, Trajectory
-
+from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter, Trajectory, direction_changed
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
 from SatelliteSimulation.model.basic_math.vector import *
 from SatelliteSimulation.model.colllision.collision_avoidance import CollisionAvoidanceHandler
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
 from SatelliteSimulation.model.colllision.collision import Collision
+
 
 
 # =========================================================================== #
@@ -43,8 +44,6 @@ class Satellite(ABC):
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     satellite_id = 0
-
-
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
         Satellite.satellite_id += 1
@@ -58,6 +57,7 @@ class Satellite(ABC):
         self.__observed_satellites: dict = observed_satellites
         self.__possible_collisions: dict = {}
         self.__disturbances: list = []
+        self.__previous_four_positions: list = [self.position] * 4
 
 
     # ----------------------------------------------------------------------- #
@@ -121,8 +121,8 @@ class Satellite(ABC):
             self.velocity.navigation_velocity().clear()
 
 
-    def update_observed_satellites(self, satellites: dict):
-        self.__observed_satellites = satellites
+    def update_observed_satellites(self, new_observed_satellites: dict):
+        self.__observed_satellites = new_observed_satellites
 
 
     def move(self, delta_time: float):
@@ -132,19 +132,17 @@ class Satellite(ABC):
         # TODO: use delta_time
         self.position.add_to_x(self.velocity.value().x())
         self.position.add_to_y(self.velocity.value().y())
+        self.__update_previous_four_position()
 
+    def navigate_to_in_degree(self, direction_in_degrees: int):
+        """
+                  north 90
+        west 180          east 0 (360)
+                 south 270
 
-    def update_arrow(self):
-        velocity = self.velocity.value()
-        if velocity.magnitude() != 0:
-            unit_normal_direction_vector: Vector = self.velocity.value().unit_normal()
-
-            start_vector: Vector = Vector(self.center().x() + self.radius() * unit_normal_direction_vector.x(),
-                self.center().y() + self.radius() * unit_normal_direction_vector.y())
-
-            self.velocity.update_velocity_arrow(start_vector)
-
-    def navigate_to(self, direction_in_degrees: int):
+        :param direction_in_degrees:
+        :return:
+        """
         angle_in_radians = np.math.radians(direction_in_degrees)
         max_nav_velocity = self.velocity.max_navigation_velocity()
         x = max_nav_velocity * np.math.cos(angle_in_radians)
@@ -167,56 +165,66 @@ class Satellite(ABC):
         if pressed_down:
             self.velocity.set_navigation_velocity(Vector(nav_x, 1))
 
-
-
     def update_possible_collisions(self):
-        possible_collisions: dict = dict()
+        possible_collisions: dict = {}
         for observed_satellite in self.__observed_satellites:
-            recored_positions: list = self.__observed_satellites[observed_satellite]
-            record_amount = len(recored_positions)
-            if record_amount >= 2:
-                min_distance = self.radius() + observed_satellite.radius()
-                observed_trajectory: Trajectory = Trajectory(recored_positions)
+            recorded_positions: list = self.__observed_satellites[observed_satellite]
+            if self.__list_lenght_valid_and_at_least_one_sat_moving(recorded_positions, 4):
+                record_amount = len(recorded_positions)
+                if direction_changed(recorded_positions):
+                    recorded_positions = recorded_positions[:-2]
+                    self.__observed_satellites[observed_satellite] = recorded_positions
+                    record_amount = 2
+                observed_trajectory: Trajectory = Trajectory(recorded_positions)
                 satellite_trajectory: Trajectory = Trajectory(
-                    [(0, 0)] * record_amount)
+                    [self.center().get_as_tuple()] * record_amount)
                 if self.velocity.value().magnitude() != 0:
-                    future_positions = [self.center()]
-                    for i in range(record_amount-1):
-                        new_position = add(future_positions[-1], self.velocity.dummy_update(i))
-                        future_positions.append(new_position)
-                    satellite_trajectory: Trajectory = Trajectory([p.get_as_tuple() for p in future_positions])
-                collision: Collision = CollisionDetecter(
-                    min_distance, observed_trajectory, satellite_trajectory)
+                    satellite_trajectory: Trajectory = Trajectory(
+                        [p.get_as_tuple() for p in self.__previous_four_positions[:min(record_amount, 4)]])
+                collision: Collision = FutureCollisionDetecter(
+                    self.radius(), observed_satellite.radius(),
+                    observed_trajectory, satellite_trajectory).is_collision_possible()
                 if collision:
                     possible_collisions[observed_satellite] = collision
-        self.__possible_collisions = possible_collisions
+        self.__possible_collisions = {k: v for k, v in
+                                      sorted(possible_collisions.items(), key=lambda item: item[1].time())}
 
     def avoid_possible_collisions(self):
         # Test collision avoidance
-        first_key = list(self.__possible_collisions)[0]
-        point_to_avoid: Vector = self.__possible_collisions[first_key].position()
-
-        # self.__avoid_observed_satellite_direction_by_90_degrees()
-        self.__avoid_collision_by_random_position()
+        observed_satellite = list(self.__possible_collisions)[0]
+        observed_trajectory: Trajectory = self.__possible_collisions[observed_satellite].trajectory
+        """self.__avoid_observed_satellite_direction_by_90_degrees(
+            observed_satellite_direction=observed_trajectory.get_direction_vector(),
+            observed_satellite_center=observed_trajectory.get_current_position())"""
+        #self.__avoid_collision_by_random_position()
+        self.__avoid_observed_satellite_direction_by_90_degrees(
+            observed_satellite_direction=observed_satellite.velocity.value(),
+            observed_satellite_center=observed_satellite.center())
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
-
+    def __update_previous_four_position(self):
+        self.__previous_four_positions.insert(0, self.center())
+        self.__previous_four_positions = self.__previous_four_positions[:4]
 
     def __avoid_collision_by_random_position(self):
-        self.navigate_to(random.randint(0, 360))
-
+        self.navigate_to_in_degree(random.randint(0, 360))
         # todo create own class for avoiding methods
-
         pass
+
+    def __list_lenght_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length = 4) -> bool:
+        list_lenght_is_valid: bool = len(positions) >= min_list_length
+        if not list_lenght_is_valid:
+            return False
+        return not (positions[-1] == positions[-2] and not self.velocity.value().magnitude())
 
 
     def __avoid_observed_satellite_direction_by_90_degrees(self, observed_satellite_direction: Vector,
                                                            observed_satellite_center: Vector):
         handler = CollisionAvoidanceHandler(self.center(), observed_satellite_center, observed_satellite_direction)
-        self.navigate_to(handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees())
+        self.navigate_to_in_degree(handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees())
 
 
     def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects(self):
@@ -292,3 +300,6 @@ class SpaceJunk(Satellite):
 
 if __name__ == '__main__':
     pass
+
+
+

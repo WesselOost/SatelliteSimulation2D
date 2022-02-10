@@ -179,12 +179,12 @@ class Space:
             obervance_dict = {
                 k: previous_observed_satellites[k] for k in observed_satellites if k in previous_observed_satellites}
             # update and adding new
-            for observed_satellite in previous_observed_satellites:
+            for observed_satellite in observed_satellites:
                 if observed_satellite in obervance_dict:
-                    obervance_dict[observed_satellites].append(
+                    obervance_dict[observed_satellite].append(
                         observed_satellite.center().get_as_tuple())
                 else:
-                    obervance_dict[observed_satellites] = [
+                    obervance_dict[observed_satellite] = [
                         observed_satellite.center().get_as_tuple()]
             satellite.update_observed_satellites(obervance_dict)
 

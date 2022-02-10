@@ -12,6 +12,7 @@ Collision object consisting out of the point and the time of collision
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+#from SatelliteSimulation.model.basic_math.motion import Trajectory
 from SatelliteSimulation.model.basic_math.vector import *
 
 
@@ -28,9 +29,10 @@ class Collision:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, point_of_crash: tuple, moment_of_crash: float):
+    def __init__(self, point_of_crash: tuple, moment_of_crash: float, trajectory):
         self.__x = point_of_crash[0]
         self.__y = point_of_crash[1]
+        self.__observed_trajectory = trajectory
         self.__moment_of_crash = moment_of_crash
 
 
@@ -43,6 +45,10 @@ class Collision:
 
     def time(self) -> float:
         return self.__moment_of_crash
+
+    @property
+    def trajectory(self):
+        return self.__observed_trajectory
 
 
     # ----------------------------------------------------------------------- #
