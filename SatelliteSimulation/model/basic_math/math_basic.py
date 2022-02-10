@@ -12,8 +12,6 @@ Basic math definitions and calculations.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import logging
-
 import numpy as np
 
 from SatelliteSimulation.model.basic_math.vector import *
@@ -179,9 +177,21 @@ class LinearSystemOfEquations:
         #  SECTION: Function definitions
         # =========================================================================== #
 
-        # =========================================================================== #
-        #  SECTION: Main Body
-        # =========================================================================== #
+
+def vector_to_degrees(direction_vector: Vector) -> float:
+    angle = math.atan2(direction_vector.y(), direction_vector.x())
+    return math.degrees(angle)
+
+
+def make_degrees_positive(degrees: float) -> float:
+    return (degrees + 360) % 360
+
+
+def inverse_degrees(degrees: float) -> float:
+    return make_degrees_positive(degrees + 180)
+    # =========================================================================== #
+    #  SECTION: Main Body
+    # =========================================================================== #
 
 
 if __name__ == '__main__':

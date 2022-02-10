@@ -12,15 +12,15 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-import logging
 import random
 from abc import ABC
 
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
 from SatelliteSimulation.model.basic_math.vector import *
+from SatelliteSimulation.model.colllision.collision_avoidance import CollisionAvoidanceHandler
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
-from SatelliteSimulation.model.collision import Collision
+from SatelliteSimulation.model.colllision.collision import Collision
 
 
 # =========================================================================== #
@@ -139,7 +139,15 @@ class Satellite(ABC):
         self.position.add_to_y(self.velocity.value().y())
 
 
-    def navigate_to(self, direction_in_degrees: int):
+    def navigate_to(self, direction_in_degrees: float):
+        """
+                  north 90
+        west 180          east 0 (360)
+                 south 270
+
+        :param direction_in_degrees:
+        :return:
+        """
         angle_in_radians = np.math.radians(direction_in_degrees)
         max_nav_velocity = self.velocity.max_navigation_velocity()
         x = max_nav_velocity * np.math.cos(angle_in_radians)
@@ -189,7 +197,8 @@ class Satellite(ABC):
         # Test collision avoidance
         first_key = list(self.__possible_collisions)[0]
         point_to_avoid: Vector = self.__possible_collisions[first_key].position()
-        # self.__avoid_collision_by_90_degrees_angle(point_to_avoid)
+
+        # self.__avoid_observed_satellite_direction_by_90_degrees()
         self.__avoid_collision_by_random_position()
 
 
@@ -338,8 +347,10 @@ class Satellite(ABC):
         pass
 
 
-    def __avoid_collision_by_90_degrees_angle(self, point_to_avoid: Vector):
-        pass
+    def __avoid_observed_satellite_direction_by_90_degrees(self, observed_satellite_direction: Vector,
+                                                           observed_satellite_center: Vector):
+        handler = CollisionAvoidanceHandler(self.center(), observed_satellite_center, observed_satellite_direction)
+        self.navigate_to(handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees())
 
 
     def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects(self):
