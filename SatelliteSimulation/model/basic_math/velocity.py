@@ -55,6 +55,13 @@ class Velocity(Vector):
             else:
                 self.set_vector(multiply(self.unit_normal(), self.__magnitude))
 
+    def dummy_update(self, moments_in_future: int) -> Vector:
+        if self.__v1 != 0 or self.__v2 != 0:
+            t = self.__t + moments_in_future
+            future_magnitude = self.__v1 * t ** 2 + self.__v2 * t
+            if t > 0 and future_magnitude <= 0:
+                return Vector(0, 0)
+            return multiply(self.unit_normal(), future_magnitude)
 
     def t(self):
         return self.__t

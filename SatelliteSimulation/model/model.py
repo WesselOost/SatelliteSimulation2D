@@ -6,7 +6,7 @@
 # @Version : 0.0.1
 """
 The model of the satellite simulation. All the data is stored in that class.
-The used velocities are assumed to be constant during the movement. 
+The used velocities are assumed to be constant during the movement.
 """
 
 # =========================================================================== #
@@ -176,11 +176,22 @@ class Space:
     def p1_further_from_border_than_p2(self, p1: float, p2: float, shift: float) -> bool:
         return (shift > 0 and p1 > p2) or (shift < 0 and p1 < p2)
 
-
     def update_satellite_observance(self):
         for satellite in self.__satellites:
-            satellite.update_observed_satellites(self.__get_observed_satellites(satellite))
-
+            observed_satellites = self.__get_observed_satellites(satellite)
+            previous_observed_satellites = satellite.observed_satellites()
+            # clean old observance
+            obervance_dict = {
+                k: previous_observed_satellites[k] for k in observed_satellites if k in previous_observed_satellites}
+            # update and adding new
+            for observed_satellite in previous_observed_satellites:
+                if observed_satellite in obervance_dict:
+                    obervance_dict[observed_satellites].append(
+                        observed_satellite.center().get_as_tuple())
+                else:
+                    obervance_dict[observed_satellites] = [
+                        observed_satellite.center().get_as_tuple()]
+            satellite.update_observed_satellites(obervance_dict)
 
     def avoid_possible_future_collisions(self):
         for satellite in self.__satellites:
@@ -230,16 +241,13 @@ class Space:
             return SpaceJunk(position, math.ceil(default_size * 0.2))
 
 
-    def __get_observed_satellites(self, observing_satellite: Satellite) -> dict:
-        observed_satellites = {}
+    def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
+        observed_satellites = []
         for satellite in self.__satellites:
             if satellite is not observing_satellite:
                 distance = calculate_distance(satellite.center(), observing_satellite.center())
                 if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius():
-                    observed_satellites[satellite] = satellite.center().get_as_tuple()
-                else:
-                    # remove unobserved satellite from dict
-                    observed_satellites.pop(satellite, None)
+                    observed_satellites.append(satellite)
         return observed_satellites
 
 
@@ -298,7 +306,7 @@ class Space:
 
 
 # =========================================================================== #
-#  SECTION: Main Body                                                         
+#  SECTION: Main Body
 # =========================================================================== #
 
 if __name__ == '__main__':

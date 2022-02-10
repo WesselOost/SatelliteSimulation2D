@@ -9,7 +9,7 @@ Main module for the satellite simulation. Execute this to start the program.
 """
 
 # =========================================================================== #
-#  SECTION: Imports                                                           
+#  SECTION: Imports
 # =========================================================================== #
 import logging
 
@@ -24,14 +24,14 @@ from controller.controller import Controller
 # =========================================================================== #
 
 # =========================================================================== #
-#  SECTION: Function definitions  
+#  SECTION: Function definitions
 # =========================================================================== #
 def main():
     Controller()
 
 
 # =========================================================================== #
-#  SECTION: Main Body                                                         
+#  SECTION: Main Body
 # =========================================================================== #
 if __name__ == '__main__':
     # level = logging.INFO
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     format = '[%(levelname)s] %(asctime)s - %(message)s'
     logging.basicConfig(level=level, format=format)
     main()
-    
+
