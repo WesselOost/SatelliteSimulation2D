@@ -150,7 +150,6 @@ class Satellite:
 
             self.velocity.update_velocity_arrow(start_vector)
 
-
     def navigate_to(self, direction_in_degrees: int):
         angle_in_radians = np.math.radians(direction_in_degrees)
         max_nav_velocity = self.velocity.max_navigation_velocity()
@@ -196,6 +195,7 @@ class Satellite:
                 collision = CollisionDetecter(min_distance, future_positions, satellite_trajectory)
                 if collision:
                     possible_collisions[observed_satellite] = collision
+        self.__possible_collisions = possible_collisions
 
     def avoid_possible_collisions(self):
         # Test collision avoidance
