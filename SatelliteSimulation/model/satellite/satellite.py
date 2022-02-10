@@ -134,15 +134,17 @@ class Satellite(ABC):
         self.position.add_to_y(self.velocity.value().y())
 
 
-    def navigate_to(self, direction_in_degrees: float):
-        """
-                  north 90
-        west 180          east 0 (360)
-                 south 270
+    def update_arrow(self):
+        velocity = self.velocity.value()
+        if velocity.magnitude() != 0:
+            unit_normal_direction_vector: Vector = self.velocity.value().unit_normal()
 
-        :param direction_in_degrees:
-        :return:
-        """
+            start_vector: Vector = Vector(self.center().x() + self.radius() * unit_normal_direction_vector.x(),
+                self.center().y() + self.radius() * unit_normal_direction_vector.y())
+
+            self.velocity.update_velocity_arrow(start_vector)
+
+    def navigate_to(self, direction_in_degrees: int):
         angle_in_radians = np.math.radians(direction_in_degrees)
         max_nav_velocity = self.velocity.max_navigation_velocity()
         x = max_nav_velocity * np.math.cos(angle_in_radians)
