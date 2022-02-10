@@ -12,6 +12,7 @@ a bunch of possible satellites and their abilities
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import logging
 import random
 from SatelliteSimulation.model.basic_math.motion import CollisionDetecter, Trajectory
 
@@ -99,6 +100,8 @@ class Satellite:
     def append_disturbance(self, disturbance: Disturbance):
         self.__disturbances.append(disturbance)
 
+    def get_id(self) -> int:
+        return self.satellite_id
 
 
     # ----------------------------------------------------------------------- #
@@ -121,7 +124,7 @@ class Satellite:
     def update_crashed_status(self):
         if not self.__is_crashed:
             self.__is_crashed = True
-
+            self.velocity.navigation_velocity().clear()
 
 
     def update_observed_satellites(self, satellites: dict):
@@ -132,8 +135,9 @@ class Satellite:
         self.velocity.update_velocities(self.__disturbances)
         self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
         self.update_arrow()
-        self.position.add_to_x(self.velocity.value().x() * delta_time)
-        self.position.add_to_y(self.velocity.value().y() * delta_time)
+        #TODO: maybe use delta_time
+        self.position.add_to_x(self.velocity.value().x())
+        self.position.add_to_y(self.velocity.value().y())
 
 
     def update_arrow(self):

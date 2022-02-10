@@ -200,7 +200,7 @@ class Space:
 
                 if satellite.possible_collisions():
                     for possible_collision in satellite.possible_collisions():
-                        logging.debug(possible_collision)
+                        # logging.debug(possible_collision)
                         satellite.avoid_possible_collisions()
 
 
@@ -290,7 +290,8 @@ class Space:
             new_y = border.bottom() - satellite_size
 
         satellite.position.set_y(new_y)
-        satellite.velocity.clear_navigation_and_disturbance_velocity()
+        satellite.velocity.navigation_velocity().clear()
+        satellite.velocity.disturbance_velocity().clear()
         satellite.velocity.collision_velocity().clear()
 
         return new_x - satellite_x, new_y - satellite_y

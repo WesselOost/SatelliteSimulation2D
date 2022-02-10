@@ -101,11 +101,6 @@ class SatelliteVelocityHandler:
         self.__disturbance_velocity.update_scale(scale_factor)
         self.__velocity_arrow.update_screen_scale(scale_factor)
 
-
-    def clear_navigation_and_disturbance_velocity(self):
-        self.__disturbance_velocity.clear()
-        self.__navigation_velocity.clear()
-
 # ----------------------------------------------------------------------- #
 #  SUBSECTION: Private Methods
 # ----------------------------------------------------------------------- #
