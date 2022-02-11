@@ -15,7 +15,7 @@ The used velocities are assumed to be constant during the movement.
 import os
 
 from SatelliteSimulation.model.arrow import Arrow
-from SatelliteSimulation.model.colllision.collision_handling import *
+from SatelliteSimulation.model.collision.collision_handling import *
 from SatelliteSimulation.model.satellite_border import SatelliteBorder
 from SatelliteSimulation.model.disturbance.disturbance import *
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
@@ -25,7 +25,7 @@ from SatelliteSimulation.model.satellite.satellite import *
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
-SATELLITE_TYPE_AMOUNT = 5
+SATELLITE_TYPE_AMOUNT = 4
 
 
 # =========================================================================== #
@@ -181,8 +181,9 @@ class Space:
             # update and adding new
             for observed_satellite in observed_satellites:
                 if observed_satellite in obervance_dict:
-                    obervance_dict[observed_satellite].append(
-                        observed_satellite.center().get_as_tuple())
+                    obervance_dict[observed_satellite].insert(0, observed_satellite.center().get_as_tuple())
+                    limit = min(len(obervance_dict[observed_satellite]), 4)
+                    obervance_dict[observed_satellite] = obervance_dict[observed_satellite][:limit]
                 else:
                     obervance_dict[observed_satellite] = [
                         observed_satellite.center().get_as_tuple()]

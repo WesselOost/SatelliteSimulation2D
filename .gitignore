@@ -10,13 +10,13 @@ SatelliteSimulation/model/basic_math/__pycache__/motion.cpython-36.pyc
 .gitignore
 SatelliteSimulation/model/basic_math/__pycache__/motion.cpython-39.pyc
 SatelliteSimulation/model/basic_math/__pycache__/vector.cpython-36.pyc
-SatelliteSimulation/model/colllision/__pycache__/collision.cpython-36.pyc
+SatelliteSimulation/model/collision/__pycache__/collision.cpython-36.pyc
 SatelliteSimulation/__pycache__/test_collision_avoidance.cpython-36.pyc
 .vscode/settings.json
 SatelliteSimulation/model/__pycache__/arrow.cpython-36.pyc
 SatelliteSimulation/model/basic_math/__pycache__/math_basic.cpython-36.pyc
 SatelliteSimulation/model/basic_math/__pycache__/velocity.cpython-36.pyc
-SatelliteSimulation/model/colllision/__pycache__/collision_avoidance.cpython-36.pyc
+SatelliteSimulation/model/collision/__pycache__/collision_avoidance.cpython-36.pyc
 SatelliteSimulation/model/disturbance/__pycache__/disturbance.cpython-36.pyc
 SatelliteSimulation/model/satellite/__pycache__/satellite_velocity_handler.cpython-36.pyc
 SatelliteSimulation/view/__pycache__/navigation_handler.cpython-36.pyc

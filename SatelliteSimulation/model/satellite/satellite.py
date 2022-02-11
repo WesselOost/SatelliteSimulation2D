@@ -19,9 +19,9 @@ from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter,
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
 from SatelliteSimulation.model.basic_math.vector import *
-from SatelliteSimulation.model.colllision.collision_avoidance import CollisionAvoidanceHandler
+from SatelliteSimulation.model.collision.collision_avoidance import CollisionAvoidanceHandler
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
-from SatelliteSimulation.model.colllision.collision import Collision
+from SatelliteSimulation.model.collision.collision import Collision
 
 
 
@@ -169,18 +169,21 @@ class Satellite(ABC):
         possible_collisions: dict = {}
         for observed_satellite in self.__observed_satellites:
             recorded_positions: list = self.__observed_satellites[observed_satellite]
-            if self.__list_lenght_valid_and_at_least_one_sat_moving(recorded_positions, 4):
+            if self.__list_length_valid_and_at_least_one_sat_moving(recorded_positions, 2):
                 record_amount = len(recorded_positions)
+
                 if direction_changed(recorded_positions):
-                    recorded_positions = recorded_positions[:-2]
+                    recorded_positions = recorded_positions[-2:]
                     self.__observed_satellites[observed_satellite] = recorded_positions
                     record_amount = 2
+                recorded_positions.reverse()
                 observed_trajectory: Trajectory = Trajectory(recorded_positions)
                 satellite_trajectory: Trajectory = Trajectory(
                     [self.center().get_as_tuple()] * record_amount)
                 if self.velocity.value().magnitude() != 0:
-                    satellite_trajectory: Trajectory = Trajectory(
-                        [p.get_as_tuple() for p in self.__previous_four_positions[:min(record_amount, 4)]])
+                    previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions[:min(record_amount, 4)]]
+                    previous_positions.reverse()
+                    satellite_trajectory: Trajectory = Trajectory(previous_positions)
                 collision: Collision = FutureCollisionDetecter(
                     self.radius(), observed_satellite.radius(),
                     observed_trajectory, satellite_trajectory).is_collision_possible()
@@ -214,10 +217,11 @@ class Satellite(ABC):
         # todo create own class for avoiding methods
         pass
 
-    def __list_lenght_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length = 4) -> bool:
-        list_lenght_is_valid: bool = len(positions) >= min_list_length
-        if not list_lenght_is_valid:
+    def __list_length_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length = 4) -> bool:
+        list_length_is_valid: bool = len(positions) >= max(2, min_list_length)
+        if not list_length_is_valid:
             return False
+        # if none are moving
         return not (positions[-1] == positions[-2] and not self.velocity.value().magnitude())
 
 

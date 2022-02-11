@@ -69,7 +69,7 @@ class AutoDisturbances:
     def __run(self, stop):
         while True:
             self.__controller.on_disturbance_clicked(self.__get_random_disturbance().value)
-            time.sleep(random.uniform(0.1, 1.0))
+            time.sleep(random.uniform(0.3, 1.3))
 
             if stop():
                 break

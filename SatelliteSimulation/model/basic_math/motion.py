@@ -15,7 +15,7 @@ import numpy as np
 from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
 from SatelliteSimulation.model.basic_math.vector import Vector
 
-from SatelliteSimulation.model.colllision.collision import Collision
+from SatelliteSimulation.model.collision.collision import Collision
 
 
 # =========================================================================== #

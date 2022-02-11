@@ -15,7 +15,7 @@ Test class for the CollisionAvoidanceHandler.
 from unittest import TestCase
 
 from SatelliteSimulation.model.basic_math.vector import Vector
-from SatelliteSimulation.model.colllision.collision_avoidance import CollisionAvoidanceHandler
+from SatelliteSimulation.model.collision.collision_avoidance import CollisionAvoidanceHandler
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
