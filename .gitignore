@@ -7,7 +7,6 @@ SatelliteSimulation/view/__pycache__/satellite_border.cpython-36.pyc
 SatelliteSimulation/view/__pycache__/view.cpython-36.pyc
 SatelliteSimulation/controller/__pycache__/controller.cpython-38.pyc
 SatelliteSimulation/model/basic_math/__pycache__/motion.cpython-36.pyc
-.gitignore
 SatelliteSimulation/model/basic_math/__pycache__/motion.cpython-39.pyc
 SatelliteSimulation/model/basic_math/__pycache__/vector.cpython-36.pyc
 SatelliteSimulation/model/collision/__pycache__/collision.cpython-36.pyc
@@ -30,3 +29,6 @@ SatelliteSimulation/view/objects/button/__pycache__/button_control_panel_view.cp
 SatelliteSimulation/view/objects/button/__pycache__/pygame_button.cpython-36.pyc
 SatelliteSimulation/view/resources/__pycache__/Color.cpython-36.pyc
 SatelliteSimulation/view/resources/__pycache__/images.cpython-36.pyc
+SatelliteSimulation/model/colllision/__pycache__/collision_avoidance.cpython-36.pyc
+SatelliteSimulation/model/colllision/__pycache__/collision.cpython-36.pyc
+SatelliteSimulation/model/satellite/satellite.py

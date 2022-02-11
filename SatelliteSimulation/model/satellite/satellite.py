@@ -169,19 +169,16 @@ class Satellite(ABC):
         possible_collisions: dict = {}
         for observed_satellite in self.__observed_satellites:
             recorded_positions: list = self.__observed_satellites[observed_satellite]
-            if self.__list_length_valid_and_at_least_one_sat_moving(recorded_positions, 2):
-                record_amount = len(recorded_positions)
-
+            if self.__list_length_valid_and_at_least_one_sat_moving(recorded_positions, 4):
                 if direction_changed(recorded_positions):
                     recorded_positions = recorded_positions[-2:]
                     self.__observed_satellites[observed_satellite] = recorded_positions
-                    record_amount = 2
                 recorded_positions.reverse()
                 observed_trajectory: Trajectory = Trajectory(recorded_positions)
                 satellite_trajectory: Trajectory = Trajectory(
-                    [self.center().get_as_tuple()] * record_amount)
+                    [self.center().get_as_tuple()] * 4)
                 if self.velocity.value().magnitude() != 0:
-                    previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions[:min(record_amount, 4)]]
+                    previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions]
                     previous_positions.reverse()
                     satellite_trajectory: Trajectory = Trajectory(previous_positions)
                 collision: Collision = FutureCollisionDetecter(
@@ -196,13 +193,13 @@ class Satellite(ABC):
         # Test collision avoidance
         observed_satellite = list(self.__possible_collisions)[0]
         observed_trajectory: Trajectory = self.__possible_collisions[observed_satellite].trajectory
-        """self.__avoid_observed_satellite_direction_by_90_degrees(
-            observed_satellite_direction=observed_trajectory.get_direction_vector(),
-            observed_satellite_center=observed_trajectory.get_current_position())"""
-        #self.__avoid_collision_by_random_position()
         self.__avoid_observed_satellite_direction_by_90_degrees(
+            observed_satellite_direction=observed_trajectory.get_direction_vector(),
+            observed_satellite_center=observed_trajectory.get_current_position())
+        #self.__avoid_collision_by_random_position()
+        """self.__avoid_observed_satellite_direction_by_90_degrees(
             observed_satellite_direction=observed_satellite.velocity.value(),
-            observed_satellite_center=observed_satellite.center())
+            observed_satellite_center=observed_satellite.center())"""
 
 
     # ----------------------------------------------------------------------- #

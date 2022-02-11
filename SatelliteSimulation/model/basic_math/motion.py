@@ -13,7 +13,7 @@
 from json import detect_encoding
 import numpy as np
 from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
-from SatelliteSimulation.model.basic_math.vector import Vector
+from SatelliteSimulation.model.basic_math.vector import Vector, calculate_distance, multiply
 
 from SatelliteSimulation.model.collision.collision import Collision
 
@@ -37,9 +37,9 @@ class Trajectory:
     # ----------------------------------------------------------------------- #
     def __init__(self, points: list):
         self.points: list = [np.array(point) for point in points]
-        self.direction_vector: np.array = self.points[1] - self.points[0]
+        self.direction_vector: np.array = None
         self.type: int = 1
-        self.support_vector: np.array = self.points[0]
+        self.support_vector: np.array = self.points[-1]
         self.velocity: np.array = None
         self.acceleration: np.array = None
         self.jerk = None
@@ -56,6 +56,9 @@ class Trajectory:
         current_position = self.points[-1]
         return Vector(current_position[0], current_position[1])
 
+    def calculate_point_one_trajectory(self, t: float) -> np.array:
+        return self.jerk / 3 * t**3 + self.acceleration / 2 * t**2 + self.velocity * t + self.support_vector
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
@@ -64,21 +67,33 @@ class Trajectory:
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
     def _set_basic_features(self):
-
+        if len(self.points) == 1:
+            self.type = 1
+            self.velocity = np.zeros(2)
+            self.acceleration = np.zeros(2)
+            self.jerk = np.zeros(2)
         if len(self.points) == 2:
             self.type = 2
-            self.velocity = self.direction_vector
+            self.velocity = self.points[1] - self.points[0]
+            self.acceleration = np.zeros(2)
+            self.jerk = np.zeros(2)
         elif len(self.points) == 3:
             self.type = 3
-            self.velocity = self.direction_vector
-            self.acceleration = self.points[2] - self.points[1] - self.velocity
+            self.velocity = self.points[1] - self.points[0]
+            velocity2: np.array = self.points[2] - self.points[1]
+            self.acceleration = velocity2 - self.velocity
+            self.jerk = np.zeros(2)
         elif len(self.points) >= 4:
             self.type = 4
-            self.velocity = self.points[-3] - self.points[-4]
-            self.acceleration = self.points[-2] - self.points[-3] - self.velocity
-            self.jerk = self.points[-1] - self.points[-2] - self.acceleration
+            self.velocity = self.points[1] - self.points[0]
+            velocity2: np.array = self.points[2] - self.points[1]
+            velocity3: np.array = self.points[3] - self.points[2]
+            self.acceleration =  velocity2 - self.velocity
+            acceleration2: np.array = velocity3 - velocity2
+            self.jerk = acceleration2 - self.acceleration
         else:
             pass
+        self.direction_vector = self.velocity
 
 
 class FutureCollisionDetecter:
@@ -105,18 +120,8 @@ class FutureCollisionDetecter:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def is_collision_possible(self) -> Collision:
-        type1 = self._trajectory1.type
-        type2 = self._trajectory2.type
-        if type1 != type2:
-            print(f"type error: {type1}!={type2}")
-            return
-        if type1 == 2:
-            return self._solve_distance_equation_for_two()
-        if type1 == 3:
-            return self._solve_distance_equation_for_three()
-        if type1 == 4:
-            return self._solve_distance_equation_for_four()
-        return None
+        return self._solve_distance_equation_for_four()
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
@@ -130,7 +135,7 @@ class FutureCollisionDetecter:
 
     def _get_point_of_crash(self, point1: tuple, point2: tuple) -> tuple:
         radial_vector: Vector = StraightLineEquation(
-            point1, point2).calculate_radial_vector(self.radius1)
+            point2, point1).get_point_in_distance(self.radius1)
         return radial_vector.get_as_tuple()
 
     def _solve_distance_equation_for_two(self) -> Collision:
@@ -184,7 +189,7 @@ class FutureCollisionDetecter:
         coeff_5 = 2 * (v_x * p_x + v_y * p_y)
         coeff_6 = p_x**2 + p_y**2 - self._min_distance**2
 
-        distance_equation = np.array([coeff_1, coeff_2, coeff_3, coeff_4, coeff_5, coeff_6])
+        distance_equation = np.array([coeff_1, coeff_2, coeff_3 + coeff_4, coeff_5, coeff_6])
         roots = np.roots(distance_equation)
         critical_moments = [
             z.real for z in roots if z.imag == 0 and z.real >= 0]
@@ -230,8 +235,11 @@ class FutureCollisionDetecter:
         coeff_10 = p_x**2 + p_y**2 - self._min_distance**2
 
         distance_equation = np.array(
-            [coeff_1, coeff_2, coeff_3, coeff_4, coeff_5,
-             coeff_6, coeff_7, coeff_8, coeff_9, coeff_10])
+            [coeff_1, coeff_2,
+             coeff_3 + coeff_4,
+             coeff_5 + coeff_6,
+             coeff_7 + coeff_8,
+             coeff_9, coeff_10])
         roots = np.roots(distance_equation)
         critical_moments = [z.real for z in roots if z.imag == 0 and z.real >= 0]
         if critical_moments:
@@ -244,7 +252,6 @@ class FutureCollisionDetecter:
                 (x1_crash, y1_crash), (x2_crash, y2_crash))
             return Collision(point_of_crash, t, self._trajectory2)
         return None
-
 
 
 # =========================================================================== #
@@ -271,9 +278,21 @@ def direction_changed(points: list) -> bool:
 # =========================================================================== #
 
 if __name__ == '__main__':
+    tray1: Trajectory = Trajectory([(1756.5, 74.5)]*4)
+    tray2: Trajectory= Trajectory([(0,0)]*4)
+    tray2.support_vector = np.array((1644.3000000000002, 195.46))
+    tray2.velocity = np.array((0, -3.9099999999999966))
+    tray2.jerk = np.array((0, 0.020000000000010232))
+    tray2.acceleration = np.array((0, -0.05000000000001137))
+    collision = FutureCollisionDetecter(32.5, 32.5, tray2, tray1).is_collision_possible()
+    if collision:
+        new_pos_of_1 = tray1.calculate_point_one_trajectory(collision.time())
+        new_pos_of_2 = tray2.calculate_point_one_trajectory(collision.time())
+        print(collision.position(), collision.time())
+        print(calculate_distance(collision.position(), Vector(new_pos_of_2[0], new_pos_of_2[1])))
+        print(calculate_distance(collision.position(),
+              Vector(new_pos_of_1[0], new_pos_of_1[1])))
+    else:
+        print(None)
     pass
-    tray1 = Trajectory([(1,1),(2,2)] + [(3, 3)]*2)
-    tray2 = Trajectory([(0, 0)]*4)
-    print(FutureCollisionDetecter(1, 1, tray1, tray2).is_collision_possible().time())
-
 
