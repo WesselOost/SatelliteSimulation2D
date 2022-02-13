@@ -43,7 +43,9 @@ class Trajectory:
         self.velocity: np.array = None
         self.acceleration: np.array = None
         self.jerk = None
+        self.motion_duration: float = 1E5 #  value faaaar in the future
         self._set_basic_features()
+        self._set_motion_duration()
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
@@ -95,6 +97,27 @@ class Trajectory:
             pass
         self.direction_vector = self.velocity
 
+    def _set_motion_duration(self):
+        j_x, j_y = self.jerk
+        a_x, a_y = self.acceleration
+        v_x0, v_y0 = self.velocity
+
+        coeff_1 = (j_x**2 + j_y**2) / 4
+        coeff_2 = j_x * a_x + j_y * a_y
+        coeff_3 = j_x * v_x0 + j_y * v_y0
+        coeff_4 = a_x**2 + a_y**2
+        coeff_5 = 2 * (a_x * v_x0 + a_y * v_y0)
+        coeff_6 = v_x0**2 + v_y0**2
+
+        velocity_equation = np.array([coeff_1, coeff_2,
+                                      coeff_3 + coeff_4,
+                                      coeff_5, coeff_6])
+        roots = np.roots(velocity_equation)
+        rational_roots_from_zero = [z.real for z in roots if z.imag == 0 and z.real >= 0]
+        if len(rational_roots_from_zero) == 2 and rational_roots_from_zero[0].real == 0:
+            self.motion_duration = rational_roots_from_zero[1]
+
+
 
 class FutureCollisionDetecter:
     # ----------------------------------------------------------------------- #
@@ -110,6 +133,8 @@ class FutureCollisionDetecter:
         self._trajectory1 = trajectory1
         self._trajectory2 = trajectory2
         self._min_distance = self.radius1 + self.radius2
+        self._end_of_motions = self._trajectory1.motion_duration + \
+            self._trajectory2.motion_duration
 
 
     # ----------------------------------------------------------------------- #
@@ -155,7 +180,7 @@ class FutureCollisionDetecter:
 
         distance_equation = np.array([coeff_1, coeff_2, coeff_3])
         roots = np.roots(distance_equation)
-        critical_moments = [z.real for z in roots if z.imag == 0 and z.real > 0]
+        critical_moments = [z.real for z in roots if z.imag == 0 and 0 <= z.real <= self._end_of_motions]
         if critical_moments:
             t = min(critical_moments)
             x1_crash = v_x1 * t + p_x1
@@ -192,7 +217,7 @@ class FutureCollisionDetecter:
         distance_equation = np.array([coeff_1, coeff_2, coeff_3 + coeff_4, coeff_5, coeff_6])
         roots = np.roots(distance_equation)
         critical_moments = [
-            z.real for z in roots if z.imag == 0 and z.real >= 0]
+            z.real for z in roots if z.imag == 0 and 0 <= z.real <= self._end_of_motions]
         if critical_moments:
             t = min(critical_moments)
             x1_crash = a_x1 / 2 * t**2 + v_x1 * t + p_x1
@@ -241,7 +266,8 @@ class FutureCollisionDetecter:
              coeff_7 + coeff_8,
              coeff_9, coeff_10])
         roots = np.roots(distance_equation)
-        critical_moments = [z.real for z in roots if z.imag == 0 and z.real >= 0]
+        critical_moments = [z.real for z in roots if z.imag ==
+                            0 and 0 < z.real <= self._end_of_motions]
         if critical_moments:
             t = min(critical_moments)
             x1_crash = j_x1 / 3 * t ** 3 + a_x1 / 2 * t**2 + v_x1 * t + p_x1
@@ -278,7 +304,7 @@ def direction_changed(points: list) -> bool:
 # =========================================================================== #
 
 if __name__ == '__main__':
-    tray1: Trajectory = Trajectory([(1756.5, 74.5)]*4)
+    """tray1: Trajectory = Trajectory([(1756.5, 74.5)]*4)
     tray2: Trajectory= Trajectory([(0,0)]*4)
     tray2.support_vector = np.array((1644.3000000000002, 195.46))
     tray2.velocity = np.array((0, -3.9099999999999966))
@@ -293,6 +319,6 @@ if __name__ == '__main__':
         print(calculate_distance(collision.position(),
               Vector(new_pos_of_1[0], new_pos_of_1[1])))
     else:
-        print(None)
+        print(None)"""
     pass
 
