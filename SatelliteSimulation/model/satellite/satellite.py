@@ -16,13 +16,12 @@ import random
 import numpy as np
 from abc import ABC
 from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter, Trajectory, direction_changed
+from SatelliteSimulation.model.collision.collision_avoidance import calculate_degrees_which_avoids_object_by_90_degrees
 from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.basic_math.math_basic import *
 from SatelliteSimulation.model.basic_math.vector import *
-from SatelliteSimulation.model.collision.collision_avoidance import CollisionAvoidanceHandler
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
 from SatelliteSimulation.model.collision.collision import Collision
-
 
 
 # =========================================================================== #
@@ -44,6 +43,8 @@ class Satellite(ABC):
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
     satellite_id = 0
+
+
     def __init__(self, position: Vector, mass: float, size: int, observed_satellites: dict = {}):
         self.position: Vector = position
         Satellite.satellite_id += 1
@@ -134,6 +135,7 @@ class Satellite(ABC):
         self.position.add_to_y(self.velocity.value().y())
         self.__update_previous_four_position()
 
+
     def navigate_to_in_degree(self, direction_in_degrees: int):
         """
                   north 90
@@ -150,6 +152,7 @@ class Satellite(ABC):
         self.velocity.set_navigation_velocity(Vector(x, y))
         self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
 
+
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         # todo fix navigation duration
         self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
@@ -164,6 +167,7 @@ class Satellite(ABC):
             self.velocity.set_navigation_velocity(Vector(1, nav_y))
         if pressed_down:
             self.velocity.set_navigation_velocity(Vector(nav_x, 1))
+
 
     def update_possible_collisions(self):
         possible_collisions: dict = {}
@@ -189,6 +193,7 @@ class Satellite(ABC):
         self.__possible_collisions = {k: v for k, v in
                                       sorted(possible_collisions.items(), key=lambda item: item[1].time())}
 
+
     def avoid_possible_collisions(self):
         # Test collision avoidance
         observed_satellite = list(self.__possible_collisions)[0]
@@ -196,10 +201,7 @@ class Satellite(ABC):
         self.__avoid_observed_satellite_direction_by_90_degrees(
             observed_satellite_direction=observed_trajectory.get_direction_vector(),
             observed_satellite_center=observed_trajectory.get_current_position())
-        #self.__avoid_collision_by_random_position()
-        """self.__avoid_observed_satellite_direction_by_90_degrees(
-            observed_satellite_direction=observed_satellite.velocity.value(),
-            observed_satellite_center=observed_satellite.center())"""
+        # self.__avoid_collision_by_random_position()
 
 
     # ----------------------------------------------------------------------- #
@@ -209,12 +211,14 @@ class Satellite(ABC):
         self.__previous_four_positions.insert(0, self.center())
         self.__previous_four_positions = self.__previous_four_positions[:4]
 
+
     def __avoid_collision_by_random_position(self):
         self.navigate_to_in_degree(random.randint(0, 360))
         # todo create own class for avoiding methods
         pass
 
-    def __list_length_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length = 4) -> bool:
+
+    def __list_length_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length=4) -> bool:
         list_length_is_valid: bool = len(positions) >= max(2, min_list_length)
         if not list_length_is_valid:
             return False
@@ -222,27 +226,20 @@ class Satellite(ABC):
         return not (positions[-1] == positions[-2] and not self.velocity.value().magnitude())
 
 
-    def __avoid_observed_satellite_direction_by_90_degrees(self, observed_satellite_direction: Vector,
+    def __avoid_observed_satellite_direction_by_90_degrees(self,
+                                                           observed_satellite_direction: Vector,
                                                            observed_satellite_center: Vector):
-        handler = CollisionAvoidanceHandler(self.center(), observed_satellite_center, observed_satellite_direction)
-        self.navigate_to_in_degree(handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees())
 
-
-    def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects(self):
-        pass
-
-
-    def __avoid_collision_by_increasing_distance_relative_to_all_observed_objects_weighted(self):
-        pass
-
-
-    def __avoid_collision_by_inverting_direction(self):
-        pass
+        self.navigate_to_in_degree(calculate_degrees_which_avoids_object_by_90_degrees(observed_satellite_center,
+                                                                                       observed_satellite_direction,
+                                                                                       self.center(),
+                                                                                       self.velocity.value()))
 
 
     def get_type(self) -> int:
         """Override in child classes"""
         pass
+
 
 # =========================================================================== #
 #  SECTION: Satellite types A-D + SpaceJunk
@@ -262,6 +259,7 @@ class SatelliteB(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=80, size=size)
 
+
     def get_type(self) -> int:
         return 2
 
@@ -270,20 +268,25 @@ class SatelliteC(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=120, size=size)
 
+
     def get_type(self) -> int:
         return 3
+
 
 class SatelliteD(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=40, size=size)
 
+
     def get_type(self) -> int:
         return 4
+
 
 class SpaceJunk(Satellite):
     def __init__(self, position: Vector, size: int):
         super().__init__(position, mass=10, size=size)
         self.update_crashed_status()
+
 
     def get_type(self) -> int:
         return 5
@@ -301,6 +304,3 @@ class SpaceJunk(Satellite):
 
 if __name__ == '__main__':
     pass
-
-
-

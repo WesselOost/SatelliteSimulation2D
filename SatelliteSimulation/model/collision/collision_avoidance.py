@@ -12,7 +12,6 @@ Class description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from hashlib import new
 from SatelliteSimulation.model.basic_math.math_basic import vector_to_degree
 from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_distance, multiply
 
@@ -26,35 +25,18 @@ from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_d
 # =========================================================================== #
 
 
-class CollisionAvoidanceHandler:
-
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Constructor
-    # ----------------------------------------------------------------------- #
-    def __init__(self, satellite_center: Vector,
-                 observed_satellite_center: Vector,
-                 observed_satellite_direction: Vector):
-        self.__satellite_center = satellite_center
-        self.__observed_satellite_center = observed_satellite_center
-        self.__observed_satellite_direction = observed_satellite_direction
+# ----------------------------------------------------------------------- #
+#  SUBSECTION: Constructor
+# ----------------------------------------------------------------------- #
 
 
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Getter/Setter
-    # ----------------------------------------------------------------------- #
+# ----------------------------------------------------------------------- #
+#  SUBSECTION: Getter/Setter
+# ----------------------------------------------------------------------- #
 
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Public Methods
-    # ----------------------------------------------------------------------- #
-    def calculate_degrees_avoiding_satellite_direction_by_90_degrees(self) -> float:
-        avoidance_vector: Vector = self.__observed_satellite_direction.tangent()
-        initial_distance: float = calculate_distance(self.__satellite_center, self.__observed_satellite_center)
-        test_distance: float = calculate_distance(
-            add(self.__satellite_center, avoidance_vector.unit_normal()),
-            self.__observed_satellite_center)
-        if test_distance >= initial_distance:
-            return vector_to_degree(avoidance_vector)
-        return vector_to_degree(multiply(avoidance_vector, -1))
+# ----------------------------------------------------------------------- #
+#  SUBSECTION: Public Methods
+# ----------------------------------------------------------------------- #
 
 # ----------------------------------------------------------------------- #
 #  SUBSECTION: Private Methods
@@ -63,6 +45,28 @@ class CollisionAvoidanceHandler:
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
+def calculate_degrees_which_avoids_object_by_90_degrees(observed_object_direction: Vector,
+                                                        observed_object_center: Vector,
+                                                        satellite_direction: Vector,
+                                                        satellite_center: Vector):
+    if observed_object_direction.magnitude():
+        avoidance_direction: Vector = observed_object_direction.tangent()
+    else:
+        avoidance_direction: Vector = satellite_direction.tangent()
+
+    initial_distance: float = calculate_distance(vector1=satellite_center,
+                                                 vector2=observed_object_center)
+
+    temp_new_satellite_position: Vector = add(vector1=satellite_center,
+                                              vector2=avoidance_direction.unit_normal())
+
+    test_distance: float = calculate_distance(vector1=temp_new_satellite_position,
+                                              vector2=observed_object_center)
+
+    if test_distance >= initial_distance:
+        return vector_to_degree(direction_vector=avoidance_direction)
+    return vector_to_degree(direction_vector=multiply(vector=avoidance_direction, scalar=-1))
+
 
 # =========================================================================== #
 #  SECTION: Main Body

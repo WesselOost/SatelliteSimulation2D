@@ -15,7 +15,9 @@ Test class for the CollisionAvoidanceHandler.
 from unittest import TestCase
 
 from SatelliteSimulation.model.basic_math.vector import Vector
-from SatelliteSimulation.model.collision.collision_avoidance import CollisionAvoidanceHandler
+from SatelliteSimulation.model.collision.collision_avoidance import calculate_degrees_which_avoids_object_by_90_degrees
+
+
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
@@ -34,7 +36,6 @@ class TestCollisionAvoidanceHandler(TestCase):
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
@@ -64,6 +65,7 @@ class TestCollisionAvoidanceHandler(TestCase):
         self.direction_90 = Vector(0, 1)
         self.direction_180 = Vector(-1, 0)
         self.direction_270 = Vector(0, -1)
+        self.no_direction = Vector(0, 0)
 
 
     def test_avoiding_by_90_degrees_when_direction_270_and_observed_satellite_is_top_right(self):
@@ -76,10 +78,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 180
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p1,
-                                            observed_satellite_center=self.p2,
-                                            observed_satellite_direction=self.direction_270)
-        self.assertAlmostEqual(180, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p1,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p2,
+                                                                                observed_object_direction=self.direction_270)
+        self.assertAlmostEqual(180, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_270_and_observed_satellite_is_top_left(self):
@@ -92,10 +95,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 0
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p3,
-                                            observed_satellite_center=self.p4,
-                                            observed_satellite_direction=self.direction_270)
-        self.assertAlmostEqual(0, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p3,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p4,
+                                                                                observed_object_direction=self.direction_270)
+        self.assertAlmostEqual(0, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_270_and_observed_satellite_is_bottom_left(self):
@@ -108,10 +112,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 0
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p5,
-                                            observed_satellite_center=self.p6,
-                                            observed_satellite_direction=self.direction_270)
-        self.assertAlmostEqual(0, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p5,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p6,
+                                                                                observed_object_direction=self.direction_270)
+        self.assertAlmostEqual(0, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_270_and_observed_satellite_is_bottom_right(self):
@@ -124,10 +129,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 180
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p7,
-                                            observed_satellite_center=self.p8,
-                                            observed_satellite_direction=self.direction_270)
-        self.assertAlmostEqual(180, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p7,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p8,
+                                                                                observed_object_direction=self.direction_270)
+        self.assertAlmostEqual(180, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_180_and_observed_satellite_is_top_right(self):
@@ -140,10 +146,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 270
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p1,
-                                            observed_satellite_center=self.p2,
-                                            observed_satellite_direction=self.direction_180)
-        self.assertAlmostEqual(270, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p1,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p2,
+                                                                                observed_object_direction=self.direction_180)
+        self.assertAlmostEqual(270, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_180_and_observed_satellite_is_top_left(self):
@@ -156,10 +163,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 270
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p3,
-                                            observed_satellite_center=self.p4,
-                                            observed_satellite_direction=self.direction_180)
-        self.assertAlmostEqual(270, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p3,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p4,
+                                                                                observed_object_direction=self.direction_180)
+        self.assertAlmostEqual(270, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_180_and_observed_satellite_is_bottom_left(self):
@@ -172,10 +180,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 90
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p5,
-                                            observed_satellite_center=self.p6,
-                                            observed_satellite_direction=self.direction_180)
-        self.assertAlmostEqual(90, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p5,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p6,
+                                                                                observed_object_direction=self.direction_180)
+        self.assertAlmostEqual(90, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_180_and_observed_satellite_is_bottom_right(self):
@@ -188,10 +197,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 90
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p7,
-                                            observed_satellite_center=self.p8,
-                                            observed_satellite_direction=self.direction_180)
-        self.assertAlmostEqual(90, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p7,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p8,
+                                                                                observed_object_direction=self.direction_180)
+        self.assertAlmostEqual(90, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_90_and_observed_satellite_is_top_right(self):
@@ -204,10 +214,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 180
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p1,
-                                            observed_satellite_center=self.p2,
-                                            observed_satellite_direction=self.direction_90)
-        self.assertAlmostEqual(180, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p1,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p2,
+                                                                                observed_object_direction=self.direction_90)
+        self.assertAlmostEqual(180, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_90_and_observed_satellite_is_top_left(self):
@@ -220,10 +231,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 0
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p3,
-                                            observed_satellite_center=self.p4,
-                                            observed_satellite_direction=self.direction_90)
-        self.assertAlmostEqual(0, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p3,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p4,
+                                                                                observed_object_direction=self.direction_90)
+        self.assertAlmostEqual(0, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_90_and_observed_satellite_is_bottom_left(self):
@@ -236,10 +248,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 0
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p5,
-                                            observed_satellite_center=self.p6,
-                                            observed_satellite_direction=self.direction_90)
-        self.assertAlmostEqual(0, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p5,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p6,
+                                                                                observed_object_direction=self.direction_90)
+        self.assertAlmostEqual(0, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_90_and_observed_satellite_is_bottom_right(self):
@@ -252,10 +265,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 180
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p7,
-                                            observed_satellite_center=self.p8,
-                                            observed_satellite_direction=self.direction_90)
-        self.assertAlmostEqual(180, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p7,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p8,
+                                                                                observed_object_direction=self.direction_90)
+        self.assertAlmostEqual(180, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_0_and_observed_satellite_is_top_right(self):
@@ -268,10 +282,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 270
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p1,
-                                            observed_satellite_center=self.p2,
-                                            observed_satellite_direction=self.direction_0)
-        self.assertAlmostEqual(270, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p1,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p2,
+                                                                                observed_object_direction=self.direction_0)
+        self.assertAlmostEqual(270, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_0_and_observed_satellite_is_top_left(self):
@@ -284,10 +299,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 270
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p3,
-                                            observed_satellite_center=self.p4,
-                                            observed_satellite_direction=self.direction_0)
-        self.assertAlmostEqual(270, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p3,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p4,
+                                                                                observed_object_direction=self.direction_0)
+        self.assertAlmostEqual(270, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_0_and_observed_satellite_is_bottom_left(self):
@@ -300,10 +316,11 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 90
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p5,
-                                            observed_satellite_center=self.p6,
-                                            observed_satellite_direction=self.direction_0)
-        self.assertAlmostEqual(90, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p5,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p6,
+                                                                                observed_object_direction=self.direction_0)
+        self.assertAlmostEqual(90, avoidance_degrees, places=2)
 
 
     def test_avoiding_by_90_degrees_when_direction_0_and_observed_satellite_is_bottom_right(self):
@@ -316,10 +333,30 @@ class TestCollisionAvoidanceHandler(TestCase):
         THEN:
         the resulting degrees should be 90
         """
-        handler = CollisionAvoidanceHandler(satellite_center=self.p7,
-                                            observed_satellite_center=self.p8,
-                                            observed_satellite_direction=self.direction_0)
-        self.assertAlmostEqual(90, handler.calculate_degrees_avoiding_satellite_direction_by_90_degrees(), places=2)
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p7,
+                                                                                satellite_direction=self.no_direction,
+                                                                                observed_object_center=self.p8,
+                                                                                observed_object_direction=self.direction_0)
+
+        self.assertAlmostEqual(90, avoidance_degrees, places=2)
+
+
+    def test_avoiding_by_90_degrees_when_no_direction_and_observed_satellite_is_top_right(self):
+        """
+        GIVEN:
+        observed satellite centre is ABOVE and to the RIGHT of the satellites centre
+        and the observed satellite is not moving
+        and the own direction is 45 degrees
+        WHEN:
+        the direction should be avoided by 90 degrees away from the observed satellite
+        THEN:
+        the resulting degrees should be 135
+        """
+        avoidance_degrees = calculate_degrees_which_avoids_object_by_90_degrees(satellite_center=self.p1,
+                                                                                satellite_direction=Vector(1, 1),
+                                                                                observed_object_center=self.p2,
+                                                                                observed_object_direction=self.no_direction)
+        self.assertAlmostEqual(135, avoidance_degrees, places=2)
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
