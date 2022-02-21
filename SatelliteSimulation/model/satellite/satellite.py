@@ -13,15 +13,16 @@ a bunch of possible satellites and their abilities
 #  SECTION: Imports
 # =========================================================================== #
 import random
-import numpy as np
 from abc import ABC
-from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter, Trajectory, direction_changed
-from SatelliteSimulation.model.collision.collision_avoidance import calculate_degrees_which_avoids_object_by_90_degrees
-from SatelliteSimulation.model.disturbance.disturbance import Disturbance
+
 from SatelliteSimulation.model.basic_math.math_basic import *
+from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter, Trajectory, direction_changed
 from SatelliteSimulation.model.basic_math.vector import *
+from SatelliteSimulation.model.collision.future_collision_data import FutureCollisionData
+from SatelliteSimulation.model.collision.collision_avoidance_handler import \
+    calculate_degrees_which_avoids_object_by_90_degrees
+from SatelliteSimulation.model.disturbance.disturbance import Disturbance
 from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
-from SatelliteSimulation.model.collision.collision import Collision
 
 
 # =========================================================================== #
@@ -49,8 +50,7 @@ class Satellite(ABC):
         self.position: Vector = position
         Satellite.satellite_id += 1
         self.satellite_id = Satellite.satellite_id
-        # TODO define max nav value with mass
-        self.velocity: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=4)
+        self.velocity_handler: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=4)
         self.__is_crashed: bool = False
         self.__observance_radius: int = 100
         self.__mass = mass
@@ -113,26 +113,25 @@ class Satellite(ABC):
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def __str__(self):
-        return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity.value()}, radius={self.radius()}'
+        return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity_handler.value()}, radius={self.radius()}'
 
 
     def update_crashed_status(self):
         if not self.__is_crashed:
             self.__is_crashed = True
-            self.velocity.navigation_velocity().clear()
+            self.velocity_handler.navigation_velocity().clear()
 
 
     def update_observed_satellites(self, new_observed_satellites: dict):
         self.__observed_satellites = new_observed_satellites
 
 
-    def move(self, delta_time: float):
-        self.velocity.update_velocities(self.__disturbances)
+    def move(self):
+        self.velocity_handler.update_velocities(self.__disturbances)
         self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
 
-        # TODO: use delta_time
-        self.position.add_to_x(self.velocity.value().x())
-        self.position.add_to_y(self.velocity.value().y())
+        self.position.add_to_x(self.velocity_handler.value().x())
+        self.position.add_to_y(self.velocity_handler.value().y())
         self.__update_previous_four_position()
 
 
@@ -146,27 +145,27 @@ class Satellite(ABC):
         :return:
         """
         angle_in_radians = np.math.radians(direction_in_degrees)
-        max_nav_velocity = self.velocity.max_navigation_velocity()
+        max_nav_velocity = self.velocity_handler.max_navigation_velocity()
         x = max_nav_velocity * np.math.cos(angle_in_radians)
         y = max_nav_velocity * np.math.sin(angle_in_radians)
-        self.velocity.set_navigation_velocity(Vector(x, y))
-        self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
+        self.velocity_handler.set_navigation_velocity(Vector(x, y))
+        self.velocity_handler.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity_handler.max_navigation_velocity(), 20)
 
 
     def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         # todo fix navigation duration
-        self.velocity.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity.max_navigation_velocity(), 20)
-        nav_x: float = self.velocity.navigation_velocity().x()
-        nav_y: float = self.velocity.navigation_velocity().y()
+        self.velocity_handler.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity_handler.max_navigation_velocity(), 20)
+        nav_x: float = self.velocity_handler.navigation_velocity().x()
+        nav_y: float = self.velocity_handler.navigation_velocity().y()
 
         if pressed_left:
-            self.velocity.set_navigation_velocity(Vector(-1, nav_y))
+            self.velocity_handler.set_navigation_velocity(Vector(-1, nav_y))
         if pressed_up:
-            self.velocity.set_navigation_velocity(Vector(nav_x, -1))
+            self.velocity_handler.set_navigation_velocity(Vector(nav_x, -1))
         if pressed_right:
-            self.velocity.set_navigation_velocity(Vector(1, nav_y))
+            self.velocity_handler.set_navigation_velocity(Vector(1, nav_y))
         if pressed_down:
-            self.velocity.set_navigation_velocity(Vector(nav_x, 1))
+            self.velocity_handler.set_navigation_velocity(Vector(nav_x, 1))
 
 
     def update_possible_collisions(self):
@@ -181,11 +180,11 @@ class Satellite(ABC):
                 observed_trajectory: Trajectory = Trajectory(recorded_positions)
                 satellite_trajectory: Trajectory = Trajectory(
                     [self.center().get_as_tuple()] * 4)
-                if self.velocity.value().magnitude() != 0:
+                if self.velocity_handler.value().magnitude() != 0:
                     previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions]
                     previous_positions.reverse()
                     satellite_trajectory: Trajectory = Trajectory(previous_positions)
-                collision: Collision = FutureCollisionDetecter(
+                collision: FutureCollisionData = FutureCollisionDetecter(
                     self.radius(), observed_satellite.radius(),
                     observed_trajectory, satellite_trajectory).is_collision_possible()
                 if collision:
@@ -195,7 +194,6 @@ class Satellite(ABC):
 
 
     def avoid_possible_collisions(self):
-        # Test collision avoidance
         observed_satellite = list(self.__possible_collisions)[0]
         observed_trajectory: Trajectory = self.__possible_collisions[observed_satellite].trajectory
         self.__avoid_observed_satellite_direction_by_90_degrees(
@@ -223,7 +221,7 @@ class Satellite(ABC):
         if not list_length_is_valid:
             return False
         # if none are moving
-        return not (positions[-1] == positions[-2] and not self.velocity.value().magnitude())
+        return not (positions[-1] == positions[-2] and not self.velocity_handler.value().magnitude())
 
 
     def __avoid_observed_satellite_direction_by_90_degrees(self,
@@ -233,7 +231,7 @@ class Satellite(ABC):
         self.navigate_to_in_degree(calculate_degrees_which_avoids_object_by_90_degrees(observed_satellite_center,
                                                                                        observed_satellite_direction,
                                                                                        self.center(),
-                                                                                       self.velocity.value()))
+                                                                                       self.velocity_handler.value()))
 
 
     def get_type(self) -> int:

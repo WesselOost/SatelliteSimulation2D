@@ -12,14 +12,13 @@ Class description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import *
 from SatelliteSimulation.model.basic_math.velocity import Velocity
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
-
 
 
 # =========================================================================== #
@@ -74,8 +73,6 @@ class SatelliteVelocityHandler:
         for disturbance in disturbances:
             disturbance.velocity().update()
             self.__disturbance_velocity.add_vector(disturbance.velocity())
-        # if self.__disturbance_velocity.magnitude() > 0:
-        #     logging.debug(f'disturbance magnitude {self.disturbance_velocity().magnitude()}')
 
         self.__navigation_velocity.update()
         self.__collision_velocity.update()

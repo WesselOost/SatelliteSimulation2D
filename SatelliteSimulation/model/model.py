@@ -12,11 +12,14 @@ The used velocities are assumed to be constant during the movement.
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import copy
+import logging
 import os
 
 from SatelliteSimulation.model.arrow import Arrow
-from SatelliteSimulation.model.collision.collision_handling import *
-from SatelliteSimulation.model.satellite_border import SatelliteBorder
+from SatelliteSimulation.model.collision.collision_handler import check_and_handle_satellite_collisions, \
+    satellites_overlap
+from SatelliteSimulation.model.border import Border
 from SatelliteSimulation.model.disturbance.disturbance import *
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
@@ -35,8 +38,8 @@ class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, satellite_amount: int, border: SatelliteBorder):
-        self.__border: SatelliteBorder = border
+    def __init__(self, satellite_amount: int, border: Border):
+        self.__border: Border = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
         self.__delta_time = 1
 
@@ -51,7 +54,7 @@ class Space:
         return self.__satellites
 
 
-    def get_border(self) -> SatelliteBorder:
+    def get_border(self) -> Border:
         return self.__border
 
 
@@ -102,11 +105,11 @@ class Space:
 
     def move_satellites(self):
         for satellite in self.__satellites:
-            satellite.move(self.__delta_time)
+            satellite.move()
 
 
     def get_velocity_arrows(self) -> list:
-        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites if satellite.velocity.value().magnitude() != 0]))
+        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites if satellite.velocity_handler.value().magnitude() != 0]))
 
 
     def check_and_handle_collisions(self):
@@ -218,7 +221,7 @@ class Space:
 
 
     def __create_random_satellite(self) -> Satellite:
-        border: SatelliteBorder = self.__border
+        border: Border = self.__border
         default_size: float = border.height() // 10
         satellite_type: int = random.randint(1, SATELLITE_TYPE_AMOUNT)
         x = random.randrange(int(border.left()), int(border.right()), 1)
@@ -260,7 +263,7 @@ class Space:
 
 
     def __handle_border_overlap(self, satellite: Satellite) -> tuple:
-        border: SatelliteBorder = self.__border
+        border: Border = self.__border
         satellite_x = satellite.position.x()
         satellite_size = satellite.size()
         satellite_right_edge = satellite_x + satellite_size
@@ -286,9 +289,9 @@ class Space:
             new_y = border.bottom() - satellite_size
 
         satellite.position.set_y(new_y)
-        satellite.velocity.navigation_velocity().clear()
-        satellite.velocity.disturbance_velocity().clear()
-        satellite.velocity.collision_velocity().clear()
+        satellite.velocity_handler.navigation_velocity().clear()
+        satellite.velocity_handler.disturbance_velocity().clear()
+        satellite.velocity_handler.collision_velocity().clear()
 
         return new_x - satellite_x, new_y - satellite_y
 
@@ -303,8 +306,8 @@ class Space:
 
 
 def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
-    magnitude: float = satellite.velocity.value().magnitude()
-    unit_normal: Vector = satellite.velocity.value().unit_normal()
+    magnitude: float = satellite.velocity_handler.value().magnitude()
+    unit_normal: Vector = satellite.velocity_handler.value().unit_normal()
     radius: float = satellite.radius()
     center: Vector = satellite.center()
 

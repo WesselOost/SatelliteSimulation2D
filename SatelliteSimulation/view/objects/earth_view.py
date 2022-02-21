@@ -23,7 +23,7 @@ from SatelliteSimulation.view.resources.images import Images
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
-class Earth:
+class EarthView:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor

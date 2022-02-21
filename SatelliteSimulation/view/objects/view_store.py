@@ -21,7 +21,7 @@ import pygame
 
 from SatelliteSimulation.view.objects.border_view import BorderView
 from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.earth import Earth
+from SatelliteSimulation.view.objects.earth_view import EarthView
 
 BORDER_PERCENTAGE = 0.75
 MARGIN_PERCENTAGE = 0.01
@@ -67,7 +67,7 @@ class ViewStore:
         left_over_height: float = height - border_as_rectangle.height - border_as_rectangle.y
         earth_size: float = left_over_height
         dotted_circle_padding: float = (left_over_height - (earth_size / 2)) * .5
-        self.__earth: Earth = Earth(border_center_x, height, earth_size, dotted_circle_padding)
+        self.__earth: EarthView = EarthView(border_center_x, height, earth_size, dotted_circle_padding)
 
         # create mini border
         mini_border_width = border_as_rectangle.width * MINI_BORDER_SCALE
@@ -113,13 +113,13 @@ class ViewStore:
         return ButtonControlPanelView(x, y, width, padding, font_size, button_control_panel.button_data)
 
 
-    def earth(self, scale_factor: float) -> Earth:
-        earth: Earth = self.__earth
+    def earth(self, scale_factor: float) -> EarthView:
+        earth: EarthView = self.__earth
         center_x: float = earth.center_x * scale_factor
         surface_height: float = earth.surface_height * scale_factor
         earth_size: float = earth.earth_size * scale_factor
         dotted_circle_padding: float = earth.dotted_circle_padding * scale_factor
-        return Earth(center_x, surface_height, earth_size, dotted_circle_padding)
+        return EarthView(center_x, surface_height, earth_size, dotted_circle_padding)
 
 
     # ----------------------------------------------------------------------- #

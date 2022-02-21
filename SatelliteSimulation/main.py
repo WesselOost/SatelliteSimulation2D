@@ -13,7 +13,7 @@ Main module for the satellite simulation. Execute this to start the program.
 # =========================================================================== #
 import logging
 
-from controller.controller import Controller
+from SatelliteSimulation.presenter.presenter import Presenter
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -27,7 +27,7 @@ from controller.controller import Controller
 #  SECTION: Function definitions
 # =========================================================================== #
 def main():
-    Controller()
+    Presenter()
 
 
 # =========================================================================== #

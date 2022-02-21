@@ -15,7 +15,7 @@ import numpy as np
 from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
 from SatelliteSimulation.model.basic_math.vector import Vector, calculate_distance, multiply
 
-from SatelliteSimulation.model.collision.collision import Collision
+from SatelliteSimulation.model.collision.future_collision_data import FutureCollisionData
 
 
 # =========================================================================== #
@@ -144,7 +144,7 @@ class FutureCollisionDetecter:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
-    def is_collision_possible(self) -> Collision:
+    def is_collision_possible(self) -> FutureCollisionData:
         return self._solve_distance_equation_for_four()
 
     # ----------------------------------------------------------------------- #
@@ -163,7 +163,7 @@ class FutureCollisionDetecter:
             point2, point1).get_point_in_distance(self.radius1)
         return radial_vector.get_as_tuple()
 
-    def _solve_distance_equation_for_two(self) -> Collision:
+    def _solve_distance_equation_for_two(self) -> FutureCollisionData:
         v_x1, v_y1 = self._trajectory1.velocity
         v_x2, v_y2 = self._trajectory2.velocity
         p_x1, p_y1 = self._trajectory1.support_vector
@@ -189,10 +189,10 @@ class FutureCollisionDetecter:
             y2_crash = v_y2 * t + p_y2
             point_of_crash = self._get_point_of_crash(
                 (x1_crash, y1_crash), (x2_crash, y2_crash))
-            return Collision(point_of_crash, t, self._trajectory2)
+            return FutureCollisionData(point_of_crash, t, self._trajectory2)
         return None
 
-    def _solve_distance_equation_for_three(self) -> Collision:
+    def _solve_distance_equation_for_three(self) -> FutureCollisionData:
         a_x1, a_y1 = self._trajectory1.acceleration
         a_x2, a_y2 = self._trajectory2.acceleration
         v_x1, v_y1 = self._trajectory1.velocity
@@ -226,10 +226,10 @@ class FutureCollisionDetecter:
             y2_crash = a_y2 / 2 * t**2 + v_y2 * t + p_y2
             point_of_crash = self._get_point_of_crash(
                 (x1_crash, y1_crash), (x2_crash, y2_crash))
-            return Collision(point_of_crash, t, self._trajectory2)
+            return FutureCollisionData(point_of_crash, t, self._trajectory2)
         return None
 
-    def _solve_distance_equation_for_four(self) -> Collision:
+    def _solve_distance_equation_for_four(self) -> FutureCollisionData:
         j_x1, j_y1 = self._trajectory1.jerk
         j_x2, j_y2 = self._trajectory2.jerk
         a_x1, a_y1 = self._trajectory1.acceleration
@@ -276,7 +276,7 @@ class FutureCollisionDetecter:
             y2_crash = j_y2 / 3 * t ** 3 + a_y2 / 2 * t**2 + v_y2 * t + p_y2
             point_of_crash = self._get_point_of_crash(
                 (x1_crash, y1_crash), (x2_crash, y2_crash))
-            return Collision(point_of_crash, t, self._trajectory2)
+            return FutureCollisionData(point_of_crash, t, self._trajectory2)
         return None
 
 

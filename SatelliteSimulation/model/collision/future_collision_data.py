@@ -12,7 +12,6 @@ Collision object consisting out of the point and the time of collision
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-#from SatelliteSimulation.model.basic_math.motion import Trajectory
 from SatelliteSimulation.model.basic_math.vector import *
 
 
@@ -25,7 +24,7 @@ from SatelliteSimulation.model.basic_math.vector import *
 # =========================================================================== #
 
 
-class Collision:
+class FutureCollisionData:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #

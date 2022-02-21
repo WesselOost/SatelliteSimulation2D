@@ -15,11 +15,10 @@ Controller of the satellite simulation.
 import os
 import sys
 
-
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
-from SatelliteSimulation.controller.auto_disturbances import AutoDisturbances
+from SatelliteSimulation.presenter.auto_disturbances import AutoDisturbances
 from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
 from SatelliteSimulation.model.satellite.satellite import Satellite
@@ -32,7 +31,7 @@ from SatelliteSimulation.view.objects.satellite_view import SatelliteView
 from SatelliteSimulation.view.resources import Color
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.model import Space
-from SatelliteSimulation.model.satellite_border import SatelliteBorder
+from SatelliteSimulation.model.border import Border
 from SatelliteSimulation.view.view import GUI
 
 
@@ -45,14 +44,14 @@ from SatelliteSimulation.view.view import GUI
 # =========================================================================== #
 
 
-class Controller:
+class Presenter:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
     def __init__(self):
-        self.__border: SatelliteBorder = SatelliteBorder(x=0, y=0, width=1920, height=1080, padding=30)
+        self.__border: Border = Border(x=0, y=0, width=1920, height=1080, padding=30)
 
         self.space = Space(satellite_amount=15, border=self.__border)
 
@@ -96,6 +95,8 @@ class Controller:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
+
+
     def start_simulation_loop(self):
         while self.__run:
             self.set_delta_time(self.gui.calculate_delta_time())

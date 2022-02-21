@@ -12,7 +12,7 @@ Class description
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.basic_math.vector import Vector, divide, multiply
+from SatelliteSimulation.model.basic_math.vector import Vector, multiply
 import numpy as np
 
 

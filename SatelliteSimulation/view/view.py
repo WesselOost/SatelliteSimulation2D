@@ -16,12 +16,12 @@ import pygame
 
 from SatelliteSimulation.view.objects.border_view import BorderView
 from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.earth import Earth
+from SatelliteSimulation.view.objects.earth_view import EarthView
 from SatelliteSimulation.view.resources import Color
 from SatelliteSimulation.view.objects.arrow_view import ArrowView
 from SatelliteSimulation.view.resources.images import Images
 from SatelliteSimulation.view.navigation_handler import NavigationHandler
-from SatelliteSimulation.view.objects.view_references import ViewStore
+from SatelliteSimulation.view.objects.view_store import ViewStore
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from SatelliteSimulation.view.objects.satellite_view import SatelliteView
 
@@ -70,7 +70,7 @@ class GUI:
         self.__satellite_border: BorderView = self.__view_store.border_view(self.__scale_factor)
         self.__disturbance_buttons_control_panel_view: ButtonControlPanelView = self.__view_store.button_control_panel(
             self.__scale_factor)
-        self.__earth: Earth = self.__view_store.earth(self.__scale_factor)
+        self.__earth: EarthView = self.__view_store.earth(self.__scale_factor)
         self.__satellite_mini_border: BorderView = self.__view_store.mini_border_view(self.__scale_factor)
 
         self.__clock = pygame.time.Clock()
@@ -140,8 +140,7 @@ class GUI:
         satellite_mini_border = self.__satellite_mini_border.get_border_rectangle()
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
-        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright,
-                           3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topright, satellite_mini_border.topright, 3)
 
 

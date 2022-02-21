@@ -25,7 +25,7 @@ from SatelliteSimulation.model.basic_math.vector import Vector
 # =========================================================================== #
 
 
-class SatelliteBorder:
+class Border:
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor

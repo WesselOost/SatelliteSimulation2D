@@ -15,7 +15,7 @@ Test class for the CollisionAvoidanceHandler.
 from unittest import TestCase
 
 from SatelliteSimulation.model.basic_math.vector import Vector
-from SatelliteSimulation.model.collision.collision_avoidance import calculate_degrees_which_avoids_object_by_90_degrees
+from SatelliteSimulation.model.collision.collision_avoidance_handler import calculate_degrees_which_avoids_object_by_90_degrees
 
 
 # =========================================================================== #

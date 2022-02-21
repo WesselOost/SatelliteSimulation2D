@@ -73,8 +73,8 @@ def calculate_new_velocities(satellite1, satellite2):
     M: float = m1 + m2
     p1: Vector = satellite1.center()
     p2: Vector = satellite2.center()
-    v1: Vector = satellite1.velocity.value()
-    v2: Vector = satellite2.velocity.value()
+    v1: Vector = satellite1.velocity_handler.value()
+    v2: Vector = satellite2.velocity_handler.value()
 
     # Find a normal vector
     n: Vector = subtract(p1, p2)
@@ -128,17 +128,17 @@ def collision_resolution(satellite: Satellite, velocity_new: Vector):
 def set_collision_velocity(satellite, velocity_new):
     # subtract the disturbance velocity from the new velocity
     # because the disturbance velocity might increase or decrease next frame.
-    collision_velocity: Vector = subtract(velocity_new, satellite.velocity.disturbance_velocity())
-    satellite.velocity.collision_velocity().set_vector(collision_velocity)
+    collision_velocity: Vector = subtract(velocity_new, satellite.velocity_handler.disturbance_velocity())
+    satellite.velocity_handler.collision_velocity().set_vector(collision_velocity)
 
 
 def add_deceleration(satellite):
     # duration of the collision deceleration
     t_vertex: int = 20
-    satellite.velocity.collision_velocity().solve_equation_and_set_v1_v2(
-        satellite.velocity.collision_velocity().magnitude(), t_vertex)
+    satellite.velocity_handler.collision_velocity().solve_equation_and_set_v1_v2(
+        satellite.velocity_handler.collision_velocity().magnitude(), t_vertex)
     # start at the velocity tv_max/t_vertex -> only decelerate the velocity
-    satellite.velocity.collision_velocity().set_t(t_vertex)
+    satellite.velocity_handler.collision_velocity().set_t(t_vertex)
 
 
 # =========================================================================== #
