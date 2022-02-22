@@ -13,10 +13,12 @@ from model.collision.collision_handler import check_and_handle_satellite_collisi
 from model.disturbance.disturbance import *
 from model.disturbance.disturbance_type import DisturbanceType
 from model.satellite.satellite import *
+from model.arrow import ArrowType
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
+
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
 SATELLITE_TYPE_AMOUNT = 5
 
@@ -96,8 +98,17 @@ class Space:
 
 
     def get_velocity_arrows(self) -> list:
-        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites
-                                                       if satellite.velocity_handler.velocity().magnitude() != 0]))
+        arrows = list(map(satellite_to_total_velocity_arrow, [satellite for satellite in self.__satellites if
+                                                              satellite.velocity_handler.velocity().magnitude() != 0]))
+
+        arrows += list(map(satellite_to_navigation_velocity_arrow, [satellite for satellite in self.__satellites if
+                                                satellite.velocity_handler.navigation_velocity().magnitude() != 0]))
+
+        arrows += list(map(satellite_to_disturbance_velocity_arrow, [satellite for satellite in self.__satellites if
+                                        satellite.velocity_handler.disturbance_velocity().magnitude() != 0]))
+
+        return arrows
+
 
 
     def check_and_handle_collisions(self):
@@ -218,7 +229,7 @@ def append_disturbance_to_satellite(disturbance, satellite, influence_attribute)
     satellite.append_disturbance(disturbance_copy)
 
 
-def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
+def satellite_to_total_velocity_arrow(satellite: Satellite) -> Arrow:
     magnitude: float = satellite.velocity_handler.velocity().magnitude()
     unit_normal: Vector = satellite.velocity_handler.velocity().unit_normal()
     radius: float = satellite.radius()
@@ -227,7 +238,32 @@ def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
     start_vector: Vector = Vector(center.x() + radius * unit_normal.x(), center.y() + radius * unit_normal.y())
     unit_normal_direction_vector: Vector = add(start_vector, unit_normal)
 
-    return Arrow(start_vector, unit_normal_direction_vector, magnitude)
+    return Arrow(start_vector, unit_normal_direction_vector, magnitude, ArrowType.TOTAL_VELOCITY)
+
+
+def satellite_to_navigation_velocity_arrow(satellite: Satellite) -> Arrow:
+    magnitude: float = satellite.velocity_handler.navigation_velocity().magnitude()
+    unit_normal: Vector = satellite.velocity_handler.navigation_velocity().unit_normal()
+    radius: float = satellite.radius()
+    center: Vector = satellite.center()
+
+    start_vector: Vector = Vector(center.x() + radius * unit_normal.x(), center.y() + radius * unit_normal.y())
+    unit_normal_direction_vector: Vector = add(start_vector, unit_normal)
+
+    return Arrow(start_vector, unit_normal_direction_vector, magnitude, ArrowType.NAVIGATION_VELOCITY)
+
+def satellite_to_disturbance_velocity_arrow(satellite: Satellite) -> Arrow:
+    magnitude: float = satellite.velocity_handler.disturbance_velocity().magnitude()
+    unit_normal: Vector = satellite.velocity_handler.disturbance_velocity().unit_normal()
+    radius: float = satellite.radius()
+    center: Vector = satellite.center()
+
+    start_vector: Vector = Vector(center.x() + radius * unit_normal.x(), center.y() + radius * unit_normal.y())
+    unit_normal_direction_vector: Vector = add(start_vector, unit_normal)
+
+    return Arrow(start_vector, unit_normal_direction_vector, magnitude, ArrowType.DISTURBANCE_VELOCITY)
+
+
 
 
 # =========================================================================== #

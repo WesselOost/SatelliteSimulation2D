@@ -21,11 +21,12 @@ class ArrowView:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, start_of_line: tuple, end_of_line: tuple, arrow_head: list, line_thickness: int):
+    def __init__(self, start_of_line: tuple, end_of_line: tuple, arrow_head: list, line_thickness: int, color:Color):
         self.__start_of_line: tuple = start_of_line
         self.__end_of_line: tuple = end_of_line
         self.__arrow_head: list = arrow_head
         self.__line_thickness: int = line_thickness
+        self.__color: Color = color
 
 
     # ----------------------------------------------------------------------- #
@@ -54,7 +55,7 @@ class ArrowView:
 
     @property
     def color(self) -> Color:
-        return Color.RED
+        return self.__color
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Public Methods

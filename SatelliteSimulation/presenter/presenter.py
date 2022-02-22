@@ -7,17 +7,17 @@ import random
 import sys
 import pandas as pd
 
+
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
 from presenter.auto_disturbances import AutoDisturbancesHandler
-from model.arrow import Arrow
+from model.arrow import Arrow, ArrowType
 from model.basic_math.vector import multiply, Vector, add
 from model.satellite.satellite import Satellite
 from view.objects.arrow_view import ArrowView
 from view.objects.button.button_control_panel_view import ButtonControlPanelView
 from view.objects.button.button_data import ButtonData, ToggleButtonData
-from view.objects.button.pygame_button import ButtonType
 from view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from view.objects.satellite_view import SatelliteView
 from view.resources import Color
@@ -173,12 +173,20 @@ class Presenter:
 
 def arrow_to_arrow_view(arrow: Arrow, scale_factor: float, offset: float) -> ArrowView:
     arrow_offset: Vector = Vector(offset, offset)
+
+    color: Color = Color.RED
+    if arrow.arrow_type == ArrowType.NAVIGATION_VELOCITY:
+        color: Color = Color.DARK_GREEN
+    elif arrow.arrow_type == ArrowType.DISTURBANCE_VELOCITY:
+        color: Color = Color.LIGHT_BLUE
+
     return ArrowView(start_of_line=scale_and_add_offset(arrow.start_of_line(), scale_factor, arrow_offset),
                      end_of_line=scale_and_add_offset(arrow.end_of_line(), scale_factor, arrow_offset),
                      arrow_head=[scale_and_add_offset(arrow.head_left(), scale_factor, arrow_offset),
                                  scale_and_add_offset(arrow.head_right(), scale_factor, arrow_offset),
                                  scale_and_add_offset(arrow.head_tip(), scale_factor, arrow_offset)],
-                     line_thickness=max(1, int(arrow.line_thickness() * scale_factor)))
+                     line_thickness=max(1, int(arrow.line_thickness() * scale_factor)),
+                     color=color)
 
 
 def scale_and_add_offset(vector: Vector, scale_factor: float, offset: Vector) -> tuple:

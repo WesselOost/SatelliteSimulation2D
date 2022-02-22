@@ -2,6 +2,8 @@
 #  SECTION: Imports
 # =========================================================================== #
 import math
+from enum import Enum
+
 from model.basic_math.vector import *
 
 # =========================================================================== #
@@ -15,6 +17,11 @@ VELOCITY_ARROW_DEFAULT_SIZE = 24
 #  SECTION: Class definitions
 # =========================================================================== #
 
+class ArrowType(Enum):
+    NAVIGATION_VELOCITY = 0
+    TOTAL_VELOCITY = 1
+    DISTURBANCE_VELOCITY = 2
+
 
 class Arrow:
     """
@@ -24,7 +31,7 @@ class Arrow:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, start_vector: Vector, unit_normal_direction_vector: Vector, magnitude: float):
+    def __init__(self, start_vector: Vector, unit_normal_direction_vector: Vector, magnitude: float, type: ArrowType):
         '''
         5 vectors that form together an arrow
         the en_of_line is not the end of the arrow, otherwise it would stick out pas the triangular tip of the arrow.
@@ -36,6 +43,7 @@ class Arrow:
         head_right: coordinates of the right corner of the arrow head
         '''
         self.__line_thickness: float = 6
+        self.__arrow_type = type
         length: float = magnitude * VELOCITY_ARROW_DEFAULT_SIZE
         if (length > 0):
             self.__start_of_line: Vector = start_vector
@@ -62,6 +70,10 @@ class Arrow:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    @property
+    def arrow_type(self)-> ArrowType:
+        return self.__arrow_type
+
     def start_of_line(self) -> Vector:
         return self.__start_of_line
 
