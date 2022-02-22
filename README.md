@@ -1,5 +1,5 @@
 # Satellite Simulation in 2D
-![test image](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/demo/demo.gif?raw=true)
+![test image](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/demo/demo.gif?raw=true)
 
 ## Introduction
 
@@ -17,11 +17,11 @@ The simulation contains the following satellite objects with the normal and dest
 
 |name      | normal state | destroyed state
 ----------|:--------------:|:----------------:
-|SatelliteA| ![SatelliteA](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite1.png?raw=true)| ![crashed SatelliteA](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite1_crashed.png?raw=true)|
-|SatelliteB| ![SatelliteB](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite2.png?raw=true)| ![crashed SatelliteB](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite2_crashed.png?raw=true)|
-|SatelliteC| ![SatelliteC](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite3.png?raw=true)| ![crashed SatelliteC](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite3_crashed.png?raw=true)|
-|SatelliteD| ![SatelliteD](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite4.png?raw=true)| ![crashed SatelliteD](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/satellite4_crashed.png?raw=true)|
-|SpaceJunk| ![SpaceJunk](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/asteroid1.png?raw=true)| - |
+|SatelliteA| ![SatelliteA](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite1.png?raw=true)| ![crashed SatelliteA](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite1_crashed.png?raw=true)|
+|SatelliteB| ![SatelliteB](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite2.png?raw=true)| ![crashed SatelliteB](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite2_crashed.png?raw=true)|
+|SatelliteC| ![SatelliteC](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite3.png?raw=true)| ![crashed SatelliteC](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite3_crashed.png?raw=true)|
+|SatelliteD| ![SatelliteD](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite4.png?raw=true)| ![crashed SatelliteD](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/satellite4_crashed.png?raw=true)|
+|SpaceJunk| ![SpaceJunk](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/asteroid1.png?raw=true)| - |
  
  If a satellite collides it changes from the ***normal*** into the ***destroyed state***. A destroyed satellite becomes like the SpaceJunk object unable to navigate.
  
@@ -29,7 +29,7 @@ The simulation contains the following satellite objects with the normal and dest
  
  Is the **PHYSICS MODE** switched on the velocitys of each satellite are displayed like the following:
 
- ![vectorial velocity image](https://github.com/WesselOost/studienProjekt2/blob/2022-02-22_refactoring/SatelliteSimulation/Assets/demo/velocity_arrows.jpg?raw=true)
+ ![vectorial velocity image](https://github.com/WesselOost/studienProjekt2/blob/master/SatelliteSimulation/Assets/demo/velocity_arrows.jpg?raw=true)
   
 * ![#2A6E56](https://via.placeholder.com/15/2A6E56/000000?text=+) `disturbance velocity`
 * ![##799BC2](https://via.placeholder.com/15/799BC2/000000?text=+) `navigation velocity`
