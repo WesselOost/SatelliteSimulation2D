@@ -35,7 +35,7 @@ class GUI:
     # ----------------------------------------------------------------------- #
     def __init__(self, controller, border_width: float, border_height: float, border_padding: float, button_data: list):
         pygame.init()
-        pygame.display.set_caption("Satellite simulation")
+        pygame.display.set_caption("Satellite simulation 1.0.0")
         self.__ratio: float = border_height / border_width
 
         screen_width = pygame.display.Info().current_w
