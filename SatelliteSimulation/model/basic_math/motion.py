@@ -303,22 +303,3 @@ def direction_changed(points: list) -> bool:
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
-if __name__ == '__main__':
-    """tray1: Trajectory = Trajectory([(1756.5, 74.5)]*4)
-    tray2: Trajectory= Trajectory([(0,0)]*4)
-    tray2.support_vector = np.array((1644.3000000000002, 195.46))
-    tray2.velocity = np.array((0, -3.9099999999999966))
-    tray2.jerk = np.array((0, 0.020000000000010232))
-    tray2.acceleration = np.array((0, -0.05000000000001137))
-    collision = FutureCollisionDetecter(32.5, 32.5, tray2, tray1).is_collision_possible()
-    if collision:
-        new_pos_of_1 = tray1.calculate_point_one_trajectory(collision.time())
-        new_pos_of_2 = tray2.calculate_point_one_trajectory(collision.time())
-        print(collision.position(), collision.time())
-        print(calculate_distance(collision.position(), Vector(new_pos_of_2[0], new_pos_of_2[1])))
-        print(calculate_distance(collision.position(),
-              Vector(new_pos_of_1[0], new_pos_of_1[1])))
-    else:
-        print(None)"""
-    pass

@@ -185,7 +185,7 @@ class Space:
 
         for satellite in satellites:
             distance: float = calculate_distance(new_satellite.center(), satellite.center())
-            minimal_distance = satellite.radius() + satellite.observance_radius() + new_satellite.radius() + new_satellite.observance_radius()
+            minimal_distance = satellite.radius() + satellite.observance_radius + new_satellite.radius() + new_satellite.observance_radius
             if distance < minimal_distance:
                 return False
         return True
@@ -195,14 +195,14 @@ class Space:
         new_radius = 100
         if satellite_type in list(self.config_data) and np.issubdtype(self.config_data[satellite_type].dtype, np.number):
             new_radius = float(self.config_data.loc['observance-radius [0-300]', satellite_type])
-        satellite.obervance_radius = new_radius
+        satellite.observance_radius = new_radius
 
     def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
         observed_satellites = []
         for satellite in self.__satellites:
             if satellite is not observing_satellite:
                 distance = calculate_distance(satellite.center(), observing_satellite.center())
-                if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius():
+                if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius:
                     observed_satellites.append(satellite)
         return observed_satellites
 

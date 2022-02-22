@@ -62,7 +62,7 @@ class Satellite(ABC):
         return self.__observance_radius
 
     @observance_radius.setter
-    def obervance_radius(self, new_radius: float):
+    def observance_radius(self, new_radius: float):
         self.__observance_radius = min(300, max(new_radius, 0))
         
     def mass(self) -> float:
@@ -91,10 +91,6 @@ class Satellite(ABC):
 
     def radius(self) -> float:
         return self.__size / 2
-
-
-    def observance_radius(self) -> float:
-        return self.__observance_radius
 
 
     def is_crashed(self) -> bool:

@@ -207,7 +207,7 @@ def satellite_to_observance_border_view(satellite: Satellite, scale_factor: floa
 
     return SatelliteObservanceBorderView(color=color,
                                          position=position,
-                                         radius=(satellite.radius() + satellite.observance_radius()) * scale_factor,
+                                         radius=(satellite.radius() + satellite.observance_radius) * scale_factor,
                                          line_thickness=line_thickness)
 
     # =========================================================================== #

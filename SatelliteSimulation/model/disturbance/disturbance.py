@@ -106,7 +106,6 @@ class GravitationalDisturbance(Disturbance):
         # with G, m = const and r~const (because shift is to little)
         # => F_G = const * M
         # heavier objects should be more influenced by the force
-        # TODO check if r is making a big difference
         return (mass / self._max_mass) * self._strength
 
 
@@ -124,7 +123,6 @@ class MagneticDisturbance(GravitationalDisturbance):
         # assumption a satellite with more mass contains more metal
         # and more charge => is more attracted to the magnetic force
         # of the earth
-        # TODO compare the gravity/magnetic disturbance which is
         return mass / self._max_mass * self._strength
 
 
