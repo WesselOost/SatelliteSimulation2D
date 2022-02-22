@@ -295,7 +295,9 @@ def direction_changed(points: list) -> bool:
     if len(points) <= 2:
         return False
     straight_line_eq = StraightLineEquation(points[0], points[-1])
-    return straight_line_eq.calculate_t(points[-2]) is None
+    moment_of_where_point_was = straight_line_eq.calculate_t(points[-2])
+    
+    return moment_of_where_point_was is None or moment_of_where_point_was > 1
 
 
 # =========================================================================== #
