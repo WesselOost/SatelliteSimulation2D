@@ -81,7 +81,12 @@ class GUI:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
 
-    def update(self, satellites: list, arrows: list, satellite_observance_borders: list):
+
+    def update(self, satellites: list, arrows=None, satellite_observance_borders=None):
+        if satellite_observance_borders is None:
+            satellite_observance_borders = []
+        if arrows is None:
+            arrows = []
         surface = self.__surface
 
         surface.blit(self.__background_img, (0, 0))

@@ -69,6 +69,9 @@ class Presenter:
                                             on_click_handler=self.on_auto_disturbance_clicked,
                                             is_selected=False
                                             ))
+        button_data.append(ToggleButtonData(button_name="PHYSIC MODE",
+                                            on_click_handler=self.on_physic_mode_clicked,
+                                            is_selected=True))
 
         self.gui = GUI(controller=self,
                        border_width=self.__border.width(),
@@ -77,6 +80,7 @@ class Presenter:
                        button_data=button_data)
 
         self.__auto_disturbance_thread: AutoDisturbancesHandler = AutoDisturbancesHandler(self)
+        self.__is_physic_mode_selected: bool = True
 
         self.__run = True
         self.start_simulation_loop()
@@ -119,6 +123,11 @@ class Presenter:
             control_panel_view.enable(disturbance_types)
 
 
+    def on_physic_mode_clicked(self, is_selected:bool):
+        self.__is_physic_mode_selected = is_selected
+
+
+
     def steer_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         if self.__debug_mode:
             self.space.manually_steer_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
@@ -137,13 +146,16 @@ class Presenter:
         self.space.check_and_handle_collisions()
 
         offset: float = self.gui.get_satellite_border_margin() + self.gui.get_satellite_border_padding()
-        arrows: list = [arrow_to_arrow_view(arrow, scale_factor, offset) for arrow in self.space.get_velocity_arrows()]
         satellite_views: list = [satellite_to_satellite_view(satellite, scale_factor, offset) for satellite in
                                  satellites]
-        satellite_borders: list = [satellite_to_observance_border_view(satellite, scale_factor, offset)
-                                   for satellite in satellites if not satellite.is_crashed()]
+        if self.__is_physic_mode_selected:
+            arrows: list = [arrow_to_arrow_view(arrow, scale_factor, offset) for arrow in self.space.get_velocity_arrows()]
+            satellite_borders: list = [satellite_to_observance_border_view(satellite, scale_factor, offset)
+                                       for satellite in satellites if not satellite.is_crashed()]
 
-        self.gui.update(satellite_views, arrows, satellite_borders)
+            self.gui.update(satellite_views, arrows, satellite_borders)
+        else:
+            self.gui.update(satellite_views)
 
 
     def get_satellite_border(self) -> tuple:
