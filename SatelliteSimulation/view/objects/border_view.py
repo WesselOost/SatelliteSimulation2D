@@ -2,7 +2,7 @@
 #  SECTION: Imports
 # =========================================================================== #
 import pygame
-from SatelliteSimulation.view.resources import Color
+from view.resources import Color
 
 
 # =========================================================================== #

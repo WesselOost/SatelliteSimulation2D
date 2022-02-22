@@ -2,7 +2,7 @@
 #  SECTION: Imports
 # =========================================================================== #
 from enum import Enum
-from SatelliteSimulation.view.resources.Color import *
+from view.resources.Color import *
 import pygame
 
 

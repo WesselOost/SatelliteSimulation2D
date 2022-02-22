@@ -8,10 +8,10 @@
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.objects.border_view import BorderView
-from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.button.button_data import ButtonData
-from SatelliteSimulation.view.objects.earth_view import EarthView
+from view.objects.border_view import BorderView
+from view.objects.button.button_control_panel_view import ButtonControlPanelView
+from view.objects.button.button_data import ButtonData
+from view.objects.earth_view import EarthView
 
 BORDER_PERCENTAGE = 0.75
 MARGIN_PERCENTAGE = 0.01

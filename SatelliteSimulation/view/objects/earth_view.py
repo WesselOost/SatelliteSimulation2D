@@ -3,7 +3,7 @@
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.resources.images import Images
+from view.resources.images import Images
 
 # =========================================================================== #
 #  SECTION: Global definitions

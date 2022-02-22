@@ -3,14 +3,14 @@
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.navigation_handler import NavigationHandler
-from SatelliteSimulation.view.objects.arrow_view import ArrowView
-from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
-from SatelliteSimulation.view.objects.satellite_view import SatelliteView
-from SatelliteSimulation.view.objects.view_store import ViewStore
-from SatelliteSimulation.view.resources import Color
-from SatelliteSimulation.view.resources.images import Images
+from view.navigation_handler import NavigationHandler
+from view.objects.arrow_view import ArrowView
+from view.objects.button.button_control_panel_view import ButtonControlPanelView
+from view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
+from view.objects.satellite_view import SatelliteView
+from view.objects.view_store import ViewStore
+from view.resources import Color
+from view.resources.images import Images
 
 # =========================================================================== #
 #  SECTION: Global definitions

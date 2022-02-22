@@ -6,7 +6,7 @@ import random
 import threading
 import time
 from numpy.random import choice
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
+from model.disturbance.disturbance_type import DisturbanceType
 
 
 # =========================================================================== #

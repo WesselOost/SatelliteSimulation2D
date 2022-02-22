@@ -1,7 +1,7 @@
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.view.objects.button.pygame_button import ButtonType, ButtonState
+from view.objects.button.pygame_button import ButtonType, ButtonState
 
 
 # =========================================================================== #

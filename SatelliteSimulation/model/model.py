@@ -3,14 +3,16 @@
 # =========================================================================== #
 import copy
 import os
+from types import new_class
+import pandas as pd
 
-from SatelliteSimulation.model.arrow import Arrow
-from SatelliteSimulation.model.border import Border
-from SatelliteSimulation.model.collision.collision_handler import check_and_handle_satellite_collisions, \
+from model.arrow import Arrow
+from model.border import Border
+from model.collision.collision_handler import check_and_handle_satellite_collisions, \
     check_and_handle_border_collisions
-from SatelliteSimulation.model.disturbance.disturbance import *
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
-from SatelliteSimulation.model.satellite.satellite import *
+from model.disturbance.disturbance import *
+from model.disturbance.disturbance_type import DisturbanceType
+from model.satellite.satellite import *
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -31,17 +33,21 @@ class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, satellite_amount: int, border: Border):
+
+    def __init__(self, satellite_amount: int, border: Border, config_data: pd.DataFrame = None):
+        self._config_data: pd.DataFrame = config_data
         self.__border: Border = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
         self.__delta_time = 1
-
         self.update_satellite_observance()
 
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    @property
+    def config_data(self):
+        return self._config_data
 
     def get_satellites(self) -> list:
         return self.__satellites
@@ -148,6 +154,8 @@ class Space:
                 if self.__no_observance_radius_overlap(satellite, satellites) and inside_border:
                     satellites.append(satellite)
                     break
+        if self.config_data is not None:
+            _ = [self. __update_config_observance_radius(satellite) for satellite in satellites]
         return satellites
 
 
@@ -181,7 +189,13 @@ class Space:
             if distance < minimal_distance:
                 return False
         return True
-
+    
+    def __update_config_observance_radius(self, satellite: Satellite) -> None:
+        satellite_type: str = satellite.__class__.__name__
+        new_radius = 100
+        if satellite_type in list(self.config_data) and np.issubdtype(self.config_data[satellite_type].dtype, np.number):
+            new_radius = float(self.config_data[satellite_type])
+        satellite.obervance_radius = new_radius
 
     def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
         observed_satellites = []

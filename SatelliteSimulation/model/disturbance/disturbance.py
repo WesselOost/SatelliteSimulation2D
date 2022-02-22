@@ -8,8 +8,8 @@ Disturbances that can occur in space
 import random
 from abc import ABC
 
-from SatelliteSimulation.model.basic_math.vector import Vector
-from SatelliteSimulation.model.basic_math.velocity import Velocity
+from model.basic_math.vector import Vector
+from model.basic_math.velocity import Velocity
 
 
 # =========================================================================== #

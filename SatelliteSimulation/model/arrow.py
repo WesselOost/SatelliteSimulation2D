@@ -2,7 +2,7 @@
 #  SECTION: Imports
 # =========================================================================== #
 import math
-from SatelliteSimulation.model.basic_math.vector import *
+from model.basic_math.vector import *
 
 # =========================================================================== #
 #  SECTION: Global definitions

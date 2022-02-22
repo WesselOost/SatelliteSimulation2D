@@ -7,9 +7,9 @@ Handles and detects collisions between 2 circles (satellites) and border collisi
 # =========================================================================== #
 import logging
 
-from SatelliteSimulation.model.border import Border
-from SatelliteSimulation.model.satellite.satellite import Satellite
-from SatelliteSimulation.model.basic_math.vector import *
+from model.border import Border
+from model.satellite.satellite import Satellite
+from model.basic_math.vector import *
 
 
 # =========================================================================== #

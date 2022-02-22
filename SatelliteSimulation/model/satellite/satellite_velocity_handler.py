@@ -1,8 +1,8 @@
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.basic_math.vector import *
-from SatelliteSimulation.model.basic_math.velocity import Velocity
+from model.basic_math.vector import *
+from model.basic_math.velocity import Velocity
 
 
 # =========================================================================== #

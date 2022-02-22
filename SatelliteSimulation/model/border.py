@@ -1,8 +1,8 @@
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
-from SatelliteSimulation.model.basic_math.vector import Vector
+from model.basic_math.math_basic import StraightLineEquation
+from model.basic_math.vector import Vector
 
 
 # =========================================================================== #

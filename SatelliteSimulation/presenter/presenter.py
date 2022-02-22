@@ -5,25 +5,26 @@
 import os
 import random
 import sys
+import pandas as pd
 
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
-from SatelliteSimulation.presenter.auto_disturbances import AutoDisturbancesHandler
-from SatelliteSimulation.model.arrow import Arrow
-from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
-from SatelliteSimulation.model.satellite.satellite import Satellite
-from SatelliteSimulation.view.objects.arrow_view import ArrowView
-from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.button.button_data import ButtonData, ToggleButtonData
-from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
-from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
-from SatelliteSimulation.view.objects.satellite_view import SatelliteView
-from SatelliteSimulation.view.resources import Color
-from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
-from SatelliteSimulation.model.model import Space
-from SatelliteSimulation.model.border import Border
-from SatelliteSimulation.view.view import GUI
+from presenter.auto_disturbances import AutoDisturbancesHandler
+from model.arrow import Arrow
+from model.basic_math.vector import multiply, Vector, add
+from model.satellite.satellite import Satellite
+from view.objects.arrow_view import ArrowView
+from view.objects.button.button_control_panel_view import ButtonControlPanelView
+from view.objects.button.button_data import ButtonData, ToggleButtonData
+from view.objects.button.pygame_button import ButtonType
+from view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
+from view.objects.satellite_view import SatelliteView
+from view.resources import Color
+from model.disturbance.disturbance_type import DisturbanceType
+from model.model import Space
+from model.border import Border
+from view.view import GUI
 
 
 # =========================================================================== #
@@ -50,11 +51,14 @@ class Presenter:
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self, debug_mode=False):
+    def __init__(self, debug_mode=False, config_data: pd.DataFrame=None):
         self.__debug_mode: bool = debug_mode
+        self.__config_data: pd.DataFrame = config_data
         self.__border: Border = Border(x=0, y=0, width=1920, height=1080, padding=30)
 
-        self.space = Space(satellite_amount=random.randint(15, 20), border=self.__border)
+        self.space = Space(satellite_amount=random.randint(15, 20), 
+                           border=self.__border,
+                           config_data=self.__config_data)
 
         button_data: list = [ButtonData(button_name=disturbance_type.value,
                                         on_click_handler=self.on_disturbance_clicked

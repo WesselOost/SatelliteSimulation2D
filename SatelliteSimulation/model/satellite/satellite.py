@@ -8,14 +8,14 @@ Satellite and Satellite sub classes
 import random
 from abc import ABC
 
-from SatelliteSimulation.model.basic_math.math_basic import *
-from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetector, Trajectory, direction_changed
-from SatelliteSimulation.model.basic_math.vector import *
-from SatelliteSimulation.model.collision.future_collision_data import FutureCollisionData
-from SatelliteSimulation.model.collision.collision_avoidance_handler import \
+from model.basic_math.math_basic import *
+from model.basic_math.motion import FutureCollisionDetector, Trajectory, direction_changed
+from model.basic_math.vector import *
+from model.collision.future_collision_data import FutureCollisionData
+from model.collision.collision_avoidance_handler import \
     calculate_degrees_which_avoids_object_by_90_degrees
-from SatelliteSimulation.model.disturbance.disturbance import Disturbance
-from SatelliteSimulation.model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
+from model.disturbance.disturbance import Disturbance
+from model.satellite.satellite_velocity_handler import SatelliteVelocityHandler
 
 
 # =========================================================================== #
@@ -44,8 +44,8 @@ class Satellite(ABC):
         Satellite.satellite_id += 1
         self.satellite_id = Satellite.satellite_id
         self.velocity_handler: SatelliteVelocityHandler = SatelliteVelocityHandler(max_navigation_velocity_magnitude=4)
+        self.__observance_radius: float = 100
         self.__is_crashed: bool = False
-        self.__observance_radius: int = 100
         self.__mass = mass
         self.__size = size
         self.__observed_satellites: dict = observed_satellites
@@ -57,7 +57,14 @@ class Satellite(ABC):
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+    @property
+    def observance_radius(self):
+        return self.__observance_radius
 
+    @observance_radius.setter
+    def obervance_radius(self, new_radius: float):
+        self.__observance_radius = min(200, max(new_radius, 0))
+        
     def mass(self) -> float:
         return self.__mass
 

@@ -3,8 +3,8 @@
 # =========================================================================== #
 import random
 
-from SatelliteSimulation.model.basic_math.math_basic import vector_to_degree
-from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_distance, multiply
+from model.basic_math.math_basic import vector_to_degree
+from model.basic_math.vector import Vector, add, calculate_distance, multiply
 
 
 # =========================================================================== #

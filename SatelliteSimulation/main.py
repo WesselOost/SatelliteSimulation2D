@@ -11,12 +11,17 @@ Main module for the satellite simulation. Execute this to start the program.
 #  SECTION: Imports
 # =========================================================================== #
 import logging
+import os
+import pandas as pd
+from presenter.presenter import Presenter
 
-from SatelliteSimulation.presenter.presenter import Presenter
+
+
 
 # =========================================================================== #
 #  SECTION: Global definitions
 # =========================================================================== #
+ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 # =========================================================================== #
 #  SECTION: Class definitions
@@ -25,8 +30,15 @@ from SatelliteSimulation.presenter.presenter import Presenter
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
+
+
+def read_excel_file(file: str) -> pd.DataFrame:
+    return pd.read_excel(file, header=0, engine='openpyxl')
+
 def main():
-    Presenter()
+    config_file_path: str = os.path.join(ABSOLUTE_PATH, "config.xlsx")
+    config_data: pd.DataFrame = read_excel_file(file=config_file_path)
+    Presenter(config_data=config_data)
 
 
 # =========================================================================== #

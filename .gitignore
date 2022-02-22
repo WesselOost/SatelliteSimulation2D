@@ -32,3 +32,6 @@ SatelliteSimulation/view/resources/__pycache__/images.cpython-36.pyc
 SatelliteSimulation/model/colllision/__pycache__/collision_avoidance.cpython-36.pyc
 SatelliteSimulation/model/colllision/__pycache__/collision.cpython-36.pyc
 SatelliteSimulation/model/satellite/satellite.py
+SatelliteSimulation/model/__pycache__/model.cpython-310.pyc
+SatelliteSimulation/presenter/__pycache__/presenter.cpython-39.pyc
+SatelliteSimulation/presenter/__pycache__/presenter.cpython-310.pyc

@@ -7,7 +7,7 @@ Basic math definitions and calculations.
 # =========================================================================== #
 import numpy as np
 
-from SatelliteSimulation.model.basic_math.vector import *
+from model.basic_math.vector import *
 
 
 # =========================================================================== #

@@ -4,7 +4,7 @@
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.objects.button.pygame_button import Button, ToggleButton, ButtonType, ButtonState
+from view.objects.button.pygame_button import Button, ToggleButton, ButtonType, ButtonState
 
 
 # =========================================================================== #

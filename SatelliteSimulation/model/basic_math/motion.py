@@ -3,9 +3,9 @@
 # =========================================================================== #
 import numpy as np
 
-from SatelliteSimulation.model.basic_math.math_basic import StraightLineEquation
-from SatelliteSimulation.model.basic_math.vector import Vector
-from SatelliteSimulation.model.collision.future_collision_data import FutureCollisionData
+from model.basic_math.math_basic import StraightLineEquation
+from model.basic_math.vector import Vector
+from model.collision.future_collision_data import FutureCollisionData
 
 
 # =========================================================================== #
