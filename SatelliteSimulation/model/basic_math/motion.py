@@ -112,7 +112,7 @@ class Trajectory:
             self.motion_duration = rational_roots_from_zero[1]
 
 
-class FutureCollisionDetecter:
+class FutureCollisionDetector:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #

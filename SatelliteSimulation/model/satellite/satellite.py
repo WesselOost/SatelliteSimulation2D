@@ -9,7 +9,7 @@ import random
 from abc import ABC
 
 from SatelliteSimulation.model.basic_math.math_basic import *
-from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetecter, Trajectory, direction_changed
+from SatelliteSimulation.model.basic_math.motion import FutureCollisionDetector, Trajectory, direction_changed
 from SatelliteSimulation.model.basic_math.vector import *
 from SatelliteSimulation.model.collision.future_collision_data import FutureCollisionData
 from SatelliteSimulation.model.collision.collision_avoidance_handler import \
@@ -176,7 +176,7 @@ class Satellite(ABC):
                     previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions]
                     previous_positions.reverse()
                     satellite_trajectory: Trajectory = Trajectory(previous_positions)
-                collision: FutureCollisionData = FutureCollisionDetecter(
+                collision: FutureCollisionData = FutureCollisionDetector(
                     self.radius(), observed_satellite.radius(),
                     observed_trajectory, satellite_trajectory).is_collision_possible()
                 if collision:
