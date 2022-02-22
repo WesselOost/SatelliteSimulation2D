@@ -33,7 +33,7 @@ ABSOLUTE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 
 def read_excel_file(file: str) -> pd.DataFrame:
-    return pd.read_excel(file, header=0, engine='openpyxl')
+    return pd.read_excel(file, header=0, engine='openpyxl', index_col=0)
 
 def main():
     config_file_path: str = os.path.join(ABSOLUTE_PATH, "config.xlsx")

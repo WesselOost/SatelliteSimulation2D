@@ -194,7 +194,7 @@ class Space:
         satellite_type: str = satellite.__class__.__name__
         new_radius = 100
         if satellite_type in list(self.config_data) and np.issubdtype(self.config_data[satellite_type].dtype, np.number):
-            new_radius = float(self.config_data[satellite_type])
+            new_radius = float(self.config_data.loc['observance-radius [0-300]', satellite_type])
         satellite.obervance_radius = new_radius
 
     def __get_observed_satellites(self, observing_satellite: Satellite) -> list:

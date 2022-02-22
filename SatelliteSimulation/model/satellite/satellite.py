@@ -63,7 +63,7 @@ class Satellite(ABC):
 
     @observance_radius.setter
     def obervance_radius(self, new_radius: float):
-        self.__observance_radius = min(200, max(new_radius, 0))
+        self.__observance_radius = min(300, max(new_radius, 0))
         
     def mass(self) -> float:
         return self.__mass
