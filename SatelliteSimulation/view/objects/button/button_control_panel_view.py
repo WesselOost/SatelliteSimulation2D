@@ -87,14 +87,12 @@ class ButtonControlPanelView:
 
     @property
     def button_data(self) -> list:
-        # set selected state of the toggle buttons
+        # set selected state for each toggle buttons
         [toggle_button_data.set_is_selected(self.__buttons[toggle_button_data.button_name].is_selected)
          for toggle_button_data in self.__button_data if toggle_button_data.button_type == ButtonType.TOGGLE_BUTTON]
 
+        # set current button state for each Button
         [button_data.set_button_state(self.__buttons[button_data.button_name].state)
-         for button_data in self.__button_data if button_data.button_type == ButtonType.BUTTON]
-
-        [print(self.__buttons[button_data.button_name].state)
          for button_data in self.__button_data if button_data.button_type == ButtonType.BUTTON]
 
         return self.__button_data
