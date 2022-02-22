@@ -32,12 +32,14 @@ class Space:
     The model of the satellite simulation.
     The used velocities are assumed to be constant during the movement.
     """
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
     def __init__(self, satellite_amount: int, border: Border, config_data: pd.DataFrame = None):
-        self._config_data: pd.DataFrame = config_data
+        self.__config_data: pd.DataFrame = config_data
         self.__border: Border = border
         self.__satellites: list = self.__create_satellites(satellite_amount)
         self.__delta_time = 1
@@ -47,9 +49,6 @@ class Space:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
-    @property
-    def config_data(self):
-        return self._config_data
 
     def get_satellites(self) -> list:
         return self.__satellites
@@ -102,13 +101,12 @@ class Space:
                                                               satellite.velocity_handler.velocity().magnitude() != 0]))
 
         arrows += list(map(satellite_to_navigation_velocity_arrow, [satellite for satellite in self.__satellites if
-                                                satellite.velocity_handler.navigation_velocity().magnitude() != 0]))
+                                                                    satellite.velocity_handler.navigation_velocity().magnitude() != 0]))
 
         arrows += list(map(satellite_to_disturbance_velocity_arrow, [satellite for satellite in self.__satellites if
-                                        satellite.velocity_handler.disturbance_velocity().magnitude() != 0]))
+                                                                     satellite.velocity_handler.disturbance_velocity().magnitude() != 0]))
 
         return arrows
-
 
 
     def check_and_handle_collisions(self):
@@ -151,6 +149,7 @@ class Space:
         satellite = self.__satellites[0]
         satellite.manually_steer_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
     # ----------------------------------------------------------------------- #
@@ -165,8 +164,8 @@ class Space:
                 if self.__no_observance_radius_overlap(satellite, satellites) and inside_border:
                     satellites.append(satellite)
                     break
-        if self.config_data is not None:
-            _ = [self. __update_config_observance_radius(satellite) for satellite in satellites]
+        if self.__config_data is not None:
+            _ = [self.__update_config_observance_radius(satellite) for satellite in satellites]
         return satellites
 
 
@@ -200,13 +199,16 @@ class Space:
             if distance < minimal_distance:
                 return False
         return True
-    
+
+
     def __update_config_observance_radius(self, satellite: Satellite) -> None:
         satellite_type: str = satellite.__class__.__name__
         new_radius = 100
-        if satellite_type in list(self.config_data) and np.issubdtype(self.config_data[satellite_type].dtype, np.number):
-            new_radius = float(self.config_data.loc['observance-radius [0-300]', satellite_type])
+        if satellite_type in list(self.__config_data) and np.issubdtype(self.__config_data[satellite_type].dtype,
+                                                                        np.number):
+            new_radius = float(self.__config_data.loc['observance-radius [0-300]', satellite_type])
         satellite.observance_radius = new_radius
+
 
     def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
         observed_satellites = []
@@ -216,7 +218,6 @@ class Space:
                 if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius:
                     observed_satellites.append(satellite)
         return observed_satellites
-
 
         # =========================================================================== #
         #  SECTION: Function definitions
@@ -252,6 +253,7 @@ def satellite_to_navigation_velocity_arrow(satellite: Satellite) -> Arrow:
 
     return Arrow(start_vector, unit_normal_direction_vector, magnitude, ArrowType.NAVIGATION_VELOCITY)
 
+
 def satellite_to_disturbance_velocity_arrow(satellite: Satellite) -> Arrow:
     magnitude: float = satellite.velocity_handler.disturbance_velocity().magnitude()
     unit_normal: Vector = satellite.velocity_handler.disturbance_velocity().unit_normal()
@@ -263,10 +265,6 @@ def satellite_to_disturbance_velocity_arrow(satellite: Satellite) -> Arrow:
 
     return Arrow(start_vector, unit_normal_direction_vector, magnitude, ArrowType.DISTURBANCE_VELOCITY)
 
-
-
-
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
