@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Disturbance Buttons for the UI
-"""
 
 # =========================================================================== #
 #  SECTION: Imports
@@ -26,6 +17,9 @@ from SatelliteSimulation.view.objects.button.pygame_button import Button, Toggle
 
 
 class ButtonControlPanelView:
+    """
+    container for all the buttons.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -42,9 +36,12 @@ class ButtonControlPanelView:
             name: str = data.button_name
             on_clicked_handler = data.on_clicked_handler
             if data.button_type == ButtonType.TOGGLE_BUTTON:
-                self.__buttons[name] = ToggleButton(0, 0, width, font_size, name, on_clicked_handler)
+                self.__buttons[name] = ToggleButton(0, 0, width, font_size, name, on_clicked_handler, data.is_selected)
             else:
-                self.__buttons[name] = Button(0, 0, width, font_size, name, on_clicked_handler)
+                button = Button(0, 0, width, font_size, name, on_clicked_handler)
+                self.__buttons[name] = button
+                if data.button_state == ButtonState.DISABLED:
+                    button.disable()
 
         # use the first button to get the height of the button which is needed for spacing the buttons
         first_button: Button = list(self.__buttons.values())[0]
@@ -90,6 +87,16 @@ class ButtonControlPanelView:
 
     @property
     def button_data(self) -> list:
+        # set selected state of the toggle buttons
+        [toggle_button_data.set_is_selected(self.__buttons[toggle_button_data.button_name].is_selected)
+         for toggle_button_data in self.__button_data if toggle_button_data.button_type == ButtonType.TOGGLE_BUTTON]
+
+        [button_data.set_button_state(self.__buttons[button_data.button_name].state)
+         for button_data in self.__button_data if button_data.button_type == ButtonType.BUTTON]
+
+        [print(self.__buttons[button_data.button_name].state)
+         for button_data in self.__button_data if button_data.button_type == ButtonType.BUTTON]
+
         return self.__button_data
 
 
@@ -112,7 +119,7 @@ class ButtonControlPanelView:
 
     def calculate_state(self):
         for button_name in self.__buttons:
-            self.__buttons[button_name].calculate_state()
+            self.__buttons[button_name].handle_state_changed()
 
 
     def handle_new_click_events(self):
@@ -148,5 +155,3 @@ class ButtonControlPanelView:
 #  SECTION: Main Body
 # =========================================================================== #
 
-if __name__ == '__main__':
-    pass

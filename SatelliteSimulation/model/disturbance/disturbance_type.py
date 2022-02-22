@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Disturbance types that can happen to satellites in space
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -25,6 +14,9 @@ from enum import Enum
 
 
 class DisturbanceType(Enum):
+    """
+    Disturbance types that can affect satellites in space
+    """
     MALFUNCTION = "MALFUNCTION"
     MAGNETIC = "ELECTROMAGNETIC DISTURBANCE"
     SOLAR_RADIATION = "SOLAR RADIATION DISTURBANCE"
@@ -53,7 +45,3 @@ class DisturbanceType(Enum):
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

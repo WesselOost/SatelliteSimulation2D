@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -26,6 +15,10 @@ import numpy as np
 
 
 class Velocity(Vector):
+    """
+    Velocity which can accelerate and decelerate.
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -36,7 +29,6 @@ class Velocity(Vector):
         self.__v1 = 0
         self.__v2 = 0
         self.__magnitude = 0
-
 
 
     # ----------------------------------------------------------------------- #
@@ -55,6 +47,7 @@ class Velocity(Vector):
             else:
                 self.set_vector(multiply(self.unit_normal(), self.__magnitude))
 
+
     def dummy_update(self, moments_in_future: int) -> Vector:
         if self.__v1 != 0 or self.__v2 != 0:
             t = self.__t + moments_in_future
@@ -63,12 +56,13 @@ class Velocity(Vector):
                 return Vector(0, 0)
             return multiply(self.unit_normal(), future_magnitude)
 
+
     def t(self):
         return self.__t
 
+
     def set_t(self, new_t: float):
         self.__t: float = new_t
-
 
 
     def increment_t(self):
@@ -79,9 +73,9 @@ class Velocity(Vector):
         self.set_vector(multiply(Vector(self.x(), self.y()), scale_factor))
 
 
-# ----------------------------------------------------------------------- #
-#  SUBSECTION: Public Methods
-# ----------------------------------------------------------------------- #
+    # ----------------------------------------------------------------------- #
+    #  SUBSECTION: Public Methods
+    # ----------------------------------------------------------------------- #
     def solve_equation_and_set_v1_v2(self, v_max: float, t_vertex: float):
         matrix_A = np.array([[t_vertex ** 2, t_vertex], [(2 * t_vertex) ** 2, 2 * t_vertex]])
         matrix_B = np.array([v_max, 0])
@@ -89,9 +83,9 @@ class Velocity(Vector):
         self.__v1 = result[0]
         self.__v2 = result[1]
 
+
     def update_magnitude(self):
         self.__magnitude = self.__v1 * self.__t ** 2 + self.__v2 * self.__t
-
 
 # ----------------------------------------------------------------------- #
 #  SUBSECTION: Private Methods
@@ -104,7 +98,3 @@ class Velocity(Vector):
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

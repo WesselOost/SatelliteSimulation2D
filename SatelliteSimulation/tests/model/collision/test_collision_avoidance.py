@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Test class for the CollisionAvoidanceHandler.
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -28,7 +17,9 @@ from SatelliteSimulation.model.collision.collision_avoidance_handler import calc
 
 
 class TestCollisionAvoidanceHandler(TestCase):
-
+    """
+    Test class for the CollisionAvoidanceHandler.
+    """
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
@@ -371,5 +362,3 @@ class TestCollisionAvoidanceHandler(TestCase):
     # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

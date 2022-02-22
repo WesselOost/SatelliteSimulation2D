@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class Description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -25,7 +14,9 @@ from SatelliteSimulation.view.resources import Color
 
 
 class SatelliteObservanceBorderView:
-
+    """
+    A circle outline object.
+    """
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
@@ -36,7 +27,7 @@ class SatelliteObservanceBorderView:
         self.__color: Color = color
         self.__position: tuple = position
         self.__radius: float = radius
-        self.__line_thickness:int = line_thickness
+        self.__line_thickness: int = line_thickness
 
 
     # ----------------------------------------------------------------------- #
@@ -75,7 +66,3 @@ class SatelliteObservanceBorderView:
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-a 2 dimensional vector class
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -25,6 +14,10 @@ import math
 
 
 class Vector:
+    """
+    a 2 dimensional vector class
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -68,7 +61,7 @@ class Vector:
         self._y = y
 
 
-    def  clear(self):
+    def clear(self):
         self.set_x(0)
         self.set_y(0)
 
@@ -137,8 +130,7 @@ def divide(vector: Vector, scalar: float) -> Vector:
     if scalar != 0:
         return Vector(vector.x() / scalar, vector.y() / scalar)
     else:
-        # logging.debug("check vector division")
-        scalar = 10**(-100)
+        scalar = 10 ** (-100)
         return Vector(vector.x() / scalar, vector.y() / scalar)
 
 
@@ -150,11 +142,6 @@ def calculate_distance(vector1: Vector, vector2: Vector) -> float:
 def tuple_to_vector(given_tuple: tuple) -> Vector:
     return Vector(given_tuple[0], given_tuple[1])
 
-
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

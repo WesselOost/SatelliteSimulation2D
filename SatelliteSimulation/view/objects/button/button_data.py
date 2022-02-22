@@ -1,18 +1,7 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class Description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
-from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
+from SatelliteSimulation.view.objects.button.pygame_button import ButtonType, ButtonState
 
 
 # =========================================================================== #
@@ -25,14 +14,18 @@ from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
 
 
 class ButtonData:
+    """
+    Data container for button name, button type and the function that should be called when the button is clicked.
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
-    def __init__(self, button_name: str, button_type: ButtonType, on_click_handler):
+    def __init__(self, button_name: str, on_click_handler, button_state=ButtonState.RELEASED):
         self.__button_name: str = button_name
-        self.__button_type: ButtonType = button_type
         self.__on_clicked_handler = on_click_handler
+        self.__button_state = button_state
 
 
     # ----------------------------------------------------------------------- #
@@ -45,7 +38,17 @@ class ButtonData:
 
     @property
     def button_type(self) -> ButtonType:
-        return self.__button_type
+        return ButtonType.BUTTON
+
+
+    @property
+    def button_state(self) -> ButtonState:
+        return self.__button_state
+
+
+
+    def set_button_state(self, button_state: ButtonState):
+        self.__button_state = button_state
 
 
     @property
@@ -63,10 +66,26 @@ class ButtonData:
     #  SECTION: Function definitions
     # =========================================================================== #
 
-    # =========================================================================== #
-    #  SECTION: Main Body
-    # =========================================================================== #
+
+class ToggleButtonData(ButtonData):
+
+    def __init__(self, button_name: str, on_click_handler, is_selected):
+        super().__init__(button_name, on_click_handler)
+        self.__is_selected = is_selected
 
 
-if __name__ == '__main__':
-    pass
+    @property
+    def is_selected(self):
+        return self.__is_selected
+
+
+    @property
+    def button_type(self) -> ButtonType:
+        return ButtonType.TOGGLE_BUTTON
+
+    def set_is_selected(self, is_selected):
+        self.__is_selected = is_selected
+
+# =========================================================================== #
+#  SECTION: Main Body
+# =========================================================================== #

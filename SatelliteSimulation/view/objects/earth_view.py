@@ -1,13 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-An earth Icon that rotates with a dotted outline around it
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -24,6 +14,9 @@ from SatelliteSimulation.view.resources.images import Images
 #  SECTION: Class definitions
 # =========================================================================== #
 class EarthView:
+    """
+    An earth Icon that rotates with a dotted outline around it
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -104,5 +97,3 @@ class EarthView:
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-if __name__ == '__main__':
-    pass

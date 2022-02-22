@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : Tom Brandherm & Wessel Oostrum
 # @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
+# @Version : 1.0.0
 """
 Main module for the satellite simulation. Execute this to start the program.
 """

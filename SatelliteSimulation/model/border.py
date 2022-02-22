@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Border view for the satellites
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -26,6 +15,9 @@ from SatelliteSimulation.model.basic_math.vector import Vector
 
 
 class Border:
+    """
+    A rectangular shape
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -122,5 +114,3 @@ class Border:
 # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

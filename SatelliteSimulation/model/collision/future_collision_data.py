@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-11-16 13:16:31
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Collision object consisting out of the point and the time of collision
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -25,6 +14,11 @@ from SatelliteSimulation.model.basic_math.vector import *
 
 
 class FutureCollisionData:
+    """
+    Collision object consisting out of the point and the time of collision
+    """
+
+
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
@@ -38,12 +32,14 @@ class FutureCollisionData:
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Getter/Setter
     # ----------------------------------------------------------------------- #
+
     def position(self) -> Vector:
         return Vector(self.__x, self.__y)
 
 
     def time(self) -> float:
         return self.__moment_of_crash
+
 
     @property
     def trajectory(self):
@@ -66,7 +62,3 @@ class FutureCollisionData:
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

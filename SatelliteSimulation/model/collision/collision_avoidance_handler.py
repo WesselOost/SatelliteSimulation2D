@@ -1,17 +1,8 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
+import random
+
 from SatelliteSimulation.model.basic_math.math_basic import vector_to_degree
 from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_distance, multiply
 
@@ -45,6 +36,9 @@ from SatelliteSimulation.model.basic_math.vector import Vector, add, calculate_d
 # =========================================================================== #
 #  SECTION: Function definitions
 # =========================================================================== #
+def calculate_random_degrees():
+    return random.randint(0, 360)
+
 def calculate_degrees_which_avoids_object_by_90_degrees(observed_object_direction: Vector,
                                                         observed_object_center: Vector,
                                                         satellite_direction: Vector,
@@ -71,5 +65,3 @@ def calculate_degrees_which_avoids_object_by_90_degrees(observed_object_directio
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-if __name__ == '__main__':
-    pass

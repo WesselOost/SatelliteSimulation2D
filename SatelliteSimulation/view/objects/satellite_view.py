@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class Description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -24,6 +13,10 @@ Class Description
 
 
 class SatelliteView:
+    """
+    The data required to represent a satellite on the UI
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -78,7 +71,3 @@ class SatelliteView:
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

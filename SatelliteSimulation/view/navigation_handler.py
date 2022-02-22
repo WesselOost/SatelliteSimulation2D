@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Disturbance types that can happen to satellites in space
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -25,6 +14,9 @@ import pygame
 
 
 class NavigationHandler:
+    """
+    Handles new keyboard arrow click events
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -78,5 +70,3 @@ class NavigationHandler:
     # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

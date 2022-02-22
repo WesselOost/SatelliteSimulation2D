@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-a Border with black background and light grey outline
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -26,6 +16,9 @@ from SatelliteSimulation.view.resources import Color
 
 
 class BorderView:
+    """
+    A Border with black background and light grey outline
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -92,5 +85,3 @@ class BorderView:
 #  SECTION: Main Body
 # =========================================================================== #
 
-if __name__ == '__main__':
-    pass

@@ -1,10 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
 """
 Disturbances that can occur in space
 """
@@ -13,6 +6,8 @@ Disturbances that can occur in space
 #  SECTION: Imports
 # =========================================================================== #
 import random
+from abc import ABC
+
 from SatelliteSimulation.model.basic_math.vector import Vector
 from SatelliteSimulation.model.basic_math.velocity import Velocity
 
@@ -26,7 +21,8 @@ from SatelliteSimulation.model.basic_math.velocity import Velocity
 # =========================================================================== #
 
 
-class Disturbance:
+class Disturbance(ABC):
+    """Abstract Disturbance class"""
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -86,10 +82,6 @@ class SolarRadiationDisturbance(Disturbance):
 
 
     def update_trajectory(self, surface: float):
-        # TODO use vector multiply
-        # velocity_x: float = self._velocity.x() * self.__add_radiation_pressure(surface)
-        # velocity_y: float = self._velocity.y() * self.__add_radiation_pressure(surface)
-        # self._velocity.set_xy(velocity_x, velocity_y)
         self._set_velocity_trajectory(self.__radiation_pressure(surface))
 
 
@@ -145,5 +137,3 @@ class MagneticDisturbance(GravitationalDisturbance):
 # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

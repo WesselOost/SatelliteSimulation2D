@@ -1,15 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class Description
-"""
-
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -30,7 +18,11 @@ from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceTy
 # =========================================================================== #
 
 
-class AutoDisturbances:
+class AutoDisturbancesHandler:
+    """
+    A Thread class which creates at random intervals a random Disturbance type.
+    The DisturbanceTypes are weighted.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -49,7 +41,6 @@ class AutoDisturbances:
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def start(self):
-        logging.info('start thread')
         if not self.__thread.is_alive():
             self.__stop_thread = False
             self.__thread = threading.Thread(target=self.__run, args=(lambda: self.__stop_thread,))
@@ -60,7 +51,6 @@ class AutoDisturbances:
     def stop(self):
         if self.__thread.is_alive():
             self.__stop_thread = True
-            logging.info('thread stopped')
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
@@ -78,12 +68,11 @@ class AutoDisturbances:
     #  SECTION: Function definitions
     # =========================================================================== #
     def __get_random_disturbance(self) -> DisturbanceType:
-        return choice(self.__disturbanceTypes, 1, p=[0.70, 0.10, 0.10, 0.10])[0]
+        weights_of_the_disturbance_type = [0.70, 0.10, 0.10, 0.10]
+        return choice(self.__disturbanceTypes, 1, p=weights_of_the_disturbance_type)[0]
 
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

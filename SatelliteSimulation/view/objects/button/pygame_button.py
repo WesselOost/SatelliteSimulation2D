@@ -1,13 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Button module for the satellite simulation written in pygame.
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -37,6 +27,9 @@ class ButtonType(Enum):
 
 
 class Button:
+    """
+    Button module for pygame.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -107,7 +100,7 @@ class Button:
         self._body_color = BLUE
 
 
-    def calculate_state(self):
+    def handle_state_changed(self):
         if self.__state is not ButtonState.DISABLED:
             mouse_position = pygame.mouse.get_pos()
             self._new_click_event = False
@@ -211,10 +204,19 @@ class Button:
 #  SECTION: Main Body
 # =========================================================================== #
 class ToggleButton(Button):
+    """
+    button that can be on or off.
+    """
 
-    def __init__(self, x: float, y: float, width: float, font_size: float, button_text: str, on_clicked_handler):
+    def __init__(self, x: float, y: float, width: float, font_size: float, button_text: str, on_clicked_handler, is_selected: bool):
         super().__init__(x, y, width, font_size, button_text, on_clicked_handler)
-        self.__is_selected = False
+        self.__is_selected: bool = is_selected
+        self.__selected_on_changed()
+
+
+    @property
+    def is_selected(self):
+        return self.__is_selected
 
 
     def activate_click_handler(self):
@@ -237,5 +239,3 @@ class ToggleButton(Button):
         self._released_color: tuple = bottom_border_color
 
 
-if __name__ == '__main__':
-    pass

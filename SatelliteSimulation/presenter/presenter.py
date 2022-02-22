@@ -1,30 +1,21 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Controller of the satellite simulation.
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
 
 import os
+import random
 import sys
 
 sys.dont_write_bytecode = True
 sys.path.append(os.getcwd())
 
-from SatelliteSimulation.presenter.auto_disturbances import AutoDisturbances
+from SatelliteSimulation.presenter.auto_disturbances import AutoDisturbancesHandler
 from SatelliteSimulation.model.arrow import Arrow
 from SatelliteSimulation.model.basic_math.vector import multiply, Vector, add
 from SatelliteSimulation.model.satellite.satellite import Satellite
 from SatelliteSimulation.view.objects.arrow_view import ArrowView
 from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.button.button_data import ButtonData
+from SatelliteSimulation.view.objects.button.button_data import ButtonData, ToggleButtonData
 from SatelliteSimulation.view.objects.button.pygame_button import ButtonType
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from SatelliteSimulation.view.objects.satellite_view import SatelliteView
@@ -45,36 +36,35 @@ from SatelliteSimulation.view.view import GUI
 
 
 class Presenter:
+    """
+    This class connects the model (Space) and the view layer (GUI). It initiates their data.
+    It requests the model layer to update,
+    retrieves data from the model,
+    converts them to ui objects,
+    requests the view layer to update the UI
+    and receive user events from the view layer.
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
 
-    def __init__(self):
+    def __init__(self, debug_mode=False):
+        self.__debug_mode: bool = debug_mode
         self.__border: Border = Border(x=0, y=0, width=1920, height=1080, padding=30)
 
-        self.space = Space(satellite_amount=15, border=self.__border)
+        self.space = Space(satellite_amount=random.randint(15, 20), border=self.__border)
 
-        button_data: list = [ButtonData(button_name=DisturbanceType.MALFUNCTION.value,
-                                        button_type=ButtonType.BUTTON,
+        button_data: list = [ButtonData(button_name=disturbance_type.value,
                                         on_click_handler=self.on_disturbance_clicked
-                                        ),
-                             ButtonData(button_name=DisturbanceType.SOLAR_RADIATION.value,
-                                        button_type=ButtonType.BUTTON,
-                                        on_click_handler=self.on_disturbance_clicked
-                                        ),
-                             ButtonData(button_name=DisturbanceType.GRAVITATIONAL.value,
-                                        button_type=ButtonType.BUTTON,
-                                        on_click_handler=self.on_disturbance_clicked
-                                        ),
-                             ButtonData(button_name=DisturbanceType.MAGNETIC.value,
-                                        button_type=ButtonType.BUTTON,
-                                        on_click_handler=self.on_disturbance_clicked
-                                        ),
-                             ButtonData(button_name="AUTOMATIC RANDOM DISTURBANCES",
-                                        button_type=ButtonType.TOGGLE_BUTTON,
-                                        on_click_handler=self.on_auto_disturbance_clicked
-                                        )]
+                                        ) for disturbance_type in DisturbanceType]
+
+        # add auto disturbance toggle button
+        button_data.append(ToggleButtonData(button_name="AUTOMATIC RANDOM DISTURBANCES",
+                                            on_click_handler=self.on_auto_disturbance_clicked,
+                                            is_selected=False
+                                            ))
 
         self.gui = GUI(controller=self,
                        border_width=self.__border.width(),
@@ -82,19 +72,18 @@ class Presenter:
                        border_padding=self.__border.padding(),
                        button_data=button_data)
 
-        self.__auto_disturbance_thread: AutoDisturbances = AutoDisturbances(self)
+        self.__auto_disturbance_thread: AutoDisturbancesHandler = AutoDisturbancesHandler(self)
 
         self.__run = True
         self.start_simulation_loop()
 
+        # ----------------------------------------------------------------------- #
+        #  SUBSECTION: Getter/Setter
+        # ----------------------------------------------------------------------- #
 
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Getter/Setter
-    # ----------------------------------------------------------------------- #
-
-    # ----------------------------------------------------------------------- #
-    #  SUBSECTION: Public Methods
-    # ----------------------------------------------------------------------- #
+        # ----------------------------------------------------------------------- #
+        #  SUBSECTION: Public Methods
+        # ----------------------------------------------------------------------- #
 
 
     def start_simulation_loop(self):
@@ -117,22 +106,18 @@ class Presenter:
 
     def on_auto_disturbance_clicked(self, is_selected: bool):
         control_panel_view: ButtonControlPanelView = self.gui.button_control_panel_view
+        disturbance_types = [disturbance_type.value for disturbance_type in DisturbanceType]
         if is_selected:
             self.__auto_disturbance_thread.start()
-            control_panel_view.disable([DisturbanceType.MALFUNCTION.value,
-                                        DisturbanceType.SOLAR_RADIATION.value,
-                                        DisturbanceType.GRAVITATIONAL.value,
-                                        DisturbanceType.MAGNETIC.value])
+            control_panel_view.disable(disturbance_types)
         else:
             self.__auto_disturbance_thread.stop()
-            control_panel_view.enable([DisturbanceType.MALFUNCTION.value,
-                                       DisturbanceType.SOLAR_RADIATION.value,
-                                       DisturbanceType.GRAVITATIONAL.value,
-                                       DisturbanceType.MAGNETIC.value])
+            control_panel_view.enable(disturbance_types)
 
 
-    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        self.space.navigate_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
+    def steer_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
+        if self.__debug_mode:
+            self.space.manually_steer_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
 
     def set_delta_time(self, delta_time: float):
@@ -172,12 +157,16 @@ class Presenter:
 
 def arrow_to_arrow_view(arrow: Arrow, scale_factor: float, offset: float) -> ArrowView:
     arrow_offset: Vector = Vector(offset, offset)
-    return ArrowView(start_of_line=add(multiply(arrow.start_of_line(), scale_factor), arrow_offset).get_as_tuple(),
-                     end_of_line=add(multiply(arrow.end_of_line(), scale_factor), arrow_offset).get_as_tuple(),
-                     arrow_head=[add(multiply(arrow.head_left(), scale_factor), arrow_offset).get_as_tuple(),
-                                 add(multiply(arrow.head_right(), scale_factor), arrow_offset).get_as_tuple(),
-                                 add(multiply(arrow.head_tip(), scale_factor), arrow_offset).get_as_tuple()],
+    return ArrowView(start_of_line=scale_and_add_offset(arrow.start_of_line(), scale_factor, arrow_offset),
+                     end_of_line=scale_and_add_offset(arrow.end_of_line(), scale_factor, arrow_offset),
+                     arrow_head=[scale_and_add_offset(arrow.head_left(), scale_factor, arrow_offset),
+                                 scale_and_add_offset(arrow.head_right(), scale_factor, arrow_offset),
+                                 scale_and_add_offset(arrow.head_tip(), scale_factor, arrow_offset)],
                      line_thickness=max(1, int(arrow.line_thickness() * scale_factor)))
+
+
+def scale_and_add_offset(vector: Vector, scale_factor: float, offset: Vector) -> tuple:
+    return add(vector1=multiply(vector, scale_factor), vector2=offset).get_as_tuple()
 
 
 def satellite_to_satellite_view(satellite: Satellite, scale_factor: float, offset: float) -> SatelliteView:
@@ -208,7 +197,3 @@ def satellite_to_observance_border_view(satellite: Satellite, scale_factor: floa
     # =========================================================================== #
     #  SECTION: Main Body
     # =========================================================================== #
-
-
-if __name__ == '__main__':
-    pass

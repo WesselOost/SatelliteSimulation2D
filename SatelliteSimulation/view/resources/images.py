@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class Description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -51,6 +40,9 @@ class ImageSingletonMeta(type):
 
 
 class Images(metaclass=ImageSingletonMeta):
+    """
+    A singleton to access the image assets, so that they only have to be loaded once.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -119,5 +111,3 @@ class Images(metaclass=ImageSingletonMeta):
 # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

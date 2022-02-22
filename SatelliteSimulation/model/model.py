@@ -1,25 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : https://de.wikipedia.org/wiki/Bahnst%C3%B6rung#Schwerefeldvariationen
-# @Version : 0.0.1
-"""
-The model of the satellite simulation. All the data is stored in that class.
-The used velocities are assumed to be constant during the movement.
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
 import copy
-import logging
 import os
 
 from SatelliteSimulation.model.arrow import Arrow
-from SatelliteSimulation.model.collision.collision_handler import check_and_handle_satellite_collisions, \
-    satellites_overlap
 from SatelliteSimulation.model.border import Border
+from SatelliteSimulation.model.collision.collision_handler import check_and_handle_satellite_collisions, \
+    check_and_handle_border_collisions
 from SatelliteSimulation.model.disturbance.disturbance import *
 from SatelliteSimulation.model.disturbance.disturbance_type import DisturbanceType
 from SatelliteSimulation.model.satellite.satellite import *
@@ -28,13 +16,18 @@ from SatelliteSimulation.model.satellite.satellite import *
 #  SECTION: Global definitions
 # =========================================================================== #
 ABSOLUTE_PATH = os.path.abspath(os.path.dirname(__file__))
-SATELLITE_TYPE_AMOUNT = 4
+SATELLITE_TYPE_AMOUNT = 5
 
 
 # =========================================================================== #
 #  SECTION: Class definitions
 # =========================================================================== #
+
 class Space:
+    """
+    The model of the satellite simulation.
+    The used velocities are assumed to be constant during the movement.
+    """
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
     # ----------------------------------------------------------------------- #
@@ -76,31 +69,19 @@ class Space:
             if not_crashed_satellites:
                 satellite = random.choice(not_crashed_satellites)
                 satellite.append_disturbance(Malfunction())
-                logging.info('malfunction')
         elif disturbance_type == DisturbanceType.SOLAR_RADIATION:
-            # TODO check max surface
             max_surface: float = (self.__border.height() // 10 * 1.2) ** 2
             disturbance = SolarRadiationDisturbance(max_surface)
             for satellite in self.__satellites:
-                self.append_disturbance_to_satellite(disturbance, satellite, satellite.surface())
-            logging.info('sun burn')
+                append_disturbance_to_satellite(disturbance, satellite, satellite.surface())
         elif disturbance_type == DisturbanceType.GRAVITATIONAL:
             disturbance = GravitationalDisturbance(max_mass=120)
             for satellite in self.__satellites:
-                self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
-            logging.info('damn gravity')
-
+                append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
         elif disturbance_type == DisturbanceType.MAGNETIC:
             disturbance = MagneticDisturbance(max_mass=120)
             for satellite in self.__satellites:
-                self.append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
-            logging.info('pls help Iron Man')
-
-
-    def append_disturbance_to_satellite(self, disturbance, satellite, influence_attribute):
-        disturbance_copy = copy.deepcopy(disturbance)
-        disturbance_copy.update_trajectory(influence_attribute)
-        satellite.append_disturbance(disturbance_copy)
+                append_disturbance_to_satellite(disturbance, satellite, satellite.mass())
 
 
     def move_satellites(self):
@@ -109,88 +90,36 @@ class Space:
 
 
     def get_velocity_arrows(self) -> list:
-        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites if satellite.velocity_handler.value().magnitude() != 0]))
+        return list(map(satellite_to_magnitude_arrow, [satellite for satellite in self.__satellites
+                                                       if satellite.velocity_handler.velocity().magnitude() != 0]))
 
 
     def check_and_handle_collisions(self):
         for index, satellite in enumerate(self.__satellites):
             # [index + 1] prevents checking previously compared satellites
             check_and_handle_satellite_collisions(satellite, self.__satellites[index + 1:])
-        a_satellite_out_of_border = True
-        satellite_overlap = True
-        max_iterations: int = 20
 
-        while a_satellite_out_of_border and satellite_overlap and max_iterations != 0:
-            satellite_overlap = False
-            a_satellite_out_of_border = False
+        check_and_handle_border_collisions(self.__border, self.__satellites)
 
-            for satellite in self.__satellites:
-                if not self.__border.is_object_inside_border(center=satellite.center(), radius=satellite.radius()):
-                    a_satellite_out_of_border = True
-                    x_shift, y_shift = self.__handle_border_overlap(satellite)
-                    satellite_overlap = satellites_overlap or self.handle_satellite_overlap_shifts(x_shift, y_shift)
-            max_iterations -= 1
-
-
-    def handle_satellite_overlap_shifts(self, x_shift, y_shift) -> bool:
-        overlap_occurred: bool = False
-        for i, sat1 in enumerate(self.__satellites):
-            for sat2 in self.__satellites[i + 1:]:
-
-                if satellites_overlap(sat1, sat2):
-                    overlap_occurred = True
-                    self.shift_x(sat1, sat2, x_shift)
-                    self.shift_y(sat1, sat2, y_shift)
-
-        return overlap_occurred
-
-
-    def shift_x(self, sat1: Satellite, sat2: Satellite, x_shift: float):
-        x1 = sat1.position.x()
-        x2 = sat2.position.x()
-        if self.no_shift_or_positions_equal(x1, x2, x_shift):
-            pass
-        elif self.p1_further_from_border_than_p2(x1, x2, x_shift):
-            sat1.position.add_to_x(x_shift)
-        else:
-            sat2.position.add_to_x(x_shift)
-
-
-    def shift_y(self, sat1: Satellite, sat2: Satellite, y_shift: float):
-        y1 = sat1.position.y()
-        y2 = sat2.position.y()
-        if self.no_shift_or_positions_equal(y1, y2, y_shift):
-            pass
-        elif self.p1_further_from_border_than_p2(y1, y2, y_shift):
-            sat1.position.add_to_y(y_shift)
-        else:
-            sat2.position.add_to_y(y_shift)
-
-
-    def no_shift_or_positions_equal(self, p1, p2, shift):
-        return shift == 0 or p1 == p2
-
-
-    def p1_further_from_border_than_p2(self, p1: float, p2: float, shift: float) -> bool:
-        return (shift > 0 and p1 > p2) or (shift < 0 and p1 < p2)
 
     def update_satellite_observance(self):
         for satellite in self.__satellites:
             observed_satellites = self.__get_observed_satellites(satellite)
             previous_observed_satellites = satellite.observed_satellites()
             # clean old observance
-            obervance_dict = {
+            observance_dict = {
                 k: previous_observed_satellites[k] for k in observed_satellites if k in previous_observed_satellites}
             # update and adding new
             for observed_satellite in observed_satellites:
-                if observed_satellite in obervance_dict:
-                    obervance_dict[observed_satellite].insert(0, observed_satellite.center().get_as_tuple())
-                    limit = min(len(obervance_dict[observed_satellite]), 4)
-                    obervance_dict[observed_satellite] = obervance_dict[observed_satellite][:limit]
+                if observed_satellite in observance_dict:
+                    observance_dict[observed_satellite].insert(0, observed_satellite.center().get_as_tuple())
+                    limit = min(len(observance_dict[observed_satellite]), 4)
+                    observance_dict[observed_satellite] = observance_dict[observed_satellite][:limit]
                 else:
-                    obervance_dict[observed_satellite] = [
+                    observance_dict[observed_satellite] = [
                         observed_satellite.center().get_as_tuple()]
-            satellite.update_observed_satellites(obervance_dict)
+            satellite.update_observed_satellites(observance_dict)
+
 
     def avoid_possible_future_collisions(self):
         for satellite in self.__satellites:
@@ -198,10 +127,12 @@ class Space:
                 satellite.update_possible_collisions()
 
                 if satellite.possible_collisions():
-                    for possible_collision in satellite.possible_collisions():
-                        # logging.debug(possible_collision)
-                        satellite.avoid_possible_collisions()
+                    satellite.avoid_possible_collisions()
 
+
+    def manually_steer_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
+        satellite = self.__satellites[0]
+        satellite.manually_steer_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Private Methods
@@ -222,7 +153,7 @@ class Space:
 
     def __create_random_satellite(self) -> Satellite:
         border: Border = self.__border
-        default_size: float = border.height() // 10
+        default_size: float = border.height() // 14
         satellite_type: int = random.randint(1, SATELLITE_TYPE_AMOUNT)
         x = random.randrange(int(border.left()), int(border.right()), 1)
         y = random.randrange(int(border.top()), int(border.bottom()), 1)
@@ -240,16 +171,6 @@ class Space:
             return SpaceJunk(position, math.ceil(default_size * 0.2))
 
 
-    def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
-        observed_satellites = []
-        for satellite in self.__satellites:
-            if satellite is not observing_satellite:
-                distance = calculate_distance(satellite.center(), observing_satellite.center())
-                if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius():
-                    observed_satellites.append(satellite)
-        return observed_satellites
-
-
     def __no_observance_radius_overlap(self, new_satellite: Satellite, satellites: list) -> bool:
         if not satellites:
             return True
@@ -262,52 +183,30 @@ class Space:
         return True
 
 
-    def __handle_border_overlap(self, satellite: Satellite) -> tuple:
-        border: Border = self.__border
-        satellite_x = satellite.position.x()
-        satellite_size = satellite.size()
-        satellite_right_edge = satellite_x + satellite_size
+    def __get_observed_satellites(self, observing_satellite: Satellite) -> list:
+        observed_satellites = []
+        for satellite in self.__satellites:
+            if satellite is not observing_satellite:
+                distance = calculate_distance(satellite.center(), observing_satellite.center())
+                if distance - satellite.radius() <= observing_satellite.radius() + observing_satellite.observance_radius():
+                    observed_satellites.append(satellite)
+        return observed_satellites
 
-        new_x: float = satellite_x
-
-        if satellite_right_edge > border.right():
-            new_x = border.right() - satellite_size
-
-        if satellite_x < border.left():
-            new_x = border.left()
-
-        satellite.position.set_x(new_x)
-
-        satellite_y = satellite.position.y()
-        satellite_bottom_edge = satellite_y + satellite_size
-        new_y: float = satellite_y
-
-        if satellite_y < border.top():
-            new_y = border.top()
-
-        if satellite_bottom_edge > border.bottom():
-            new_y = border.bottom() - satellite_size
-
-        satellite.position.set_y(new_y)
-        satellite.velocity_handler.navigation_velocity().clear()
-        satellite.velocity_handler.disturbance_velocity().clear()
-        satellite.velocity_handler.collision_velocity().clear()
-
-        return new_x - satellite_x, new_y - satellite_y
-
-
-    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        satellite = self.__satellites[0]
-        satellite.navigate_satellite(pressed_left, pressed_up, pressed_right, pressed_down)
 
         # =========================================================================== #
         #  SECTION: Function definitions
         # =========================================================================== #
 
 
+def append_disturbance_to_satellite(disturbance, satellite, influence_attribute):
+    disturbance_copy = copy.deepcopy(disturbance)
+    disturbance_copy.update_trajectory(influence_attribute)
+    satellite.append_disturbance(disturbance_copy)
+
+
 def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
-    magnitude: float = satellite.velocity_handler.value().magnitude()
-    unit_normal: Vector = satellite.velocity_handler.value().unit_normal()
+    magnitude: float = satellite.velocity_handler.velocity().magnitude()
+    unit_normal: Vector = satellite.velocity_handler.velocity().unit_normal()
     radius: float = satellite.radius()
     center: Vector = satellite.center()
 
@@ -321,5 +220,3 @@ def satellite_to_magnitude_arrow(satellite: Satellite) -> Arrow:
 #  SECTION: Main Body
 # =========================================================================== #
 
-if __name__ == '__main__':
-    pass

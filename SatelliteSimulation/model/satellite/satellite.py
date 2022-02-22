@@ -1,12 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-27 12:54:01
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
 """
-a bunch of possible satellites and their abilities
+Satellite and Satellite sub classes
 """
 
 # =========================================================================== #
@@ -113,7 +106,7 @@ class Satellite(ABC):
     #  SUBSECTION: Public Methods
     # ----------------------------------------------------------------------- #
     def __str__(self):
-        return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity_handler.value()}, radius={self.radius()}'
+        return f'{self.__class__.__name__} id={self.satellite_id} center={self.center()}, velocity={self.velocity_handler.velocity()}, radius={self.radius()}'
 
 
     def update_crashed_status(self):
@@ -130,8 +123,8 @@ class Satellite(ABC):
         self.velocity_handler.update_velocities(self.__disturbances)
         self.__disturbances = [disturbance for disturbance in self.__disturbances if disturbance.velocity().t() > 0]
 
-        self.position.add_to_x(self.velocity_handler.value().x())
-        self.position.add_to_y(self.velocity_handler.value().y())
+        self.position.add_to_x(self.velocity_handler.velocity().x())
+        self.position.add_to_y(self.velocity_handler.velocity().y())
         self.__update_previous_four_position()
 
 
@@ -152,8 +145,7 @@ class Satellite(ABC):
         self.velocity_handler.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity_handler.max_navigation_velocity(), 20)
 
 
-    def navigate_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
-        # todo fix navigation duration
+    def manually_steer_satellite(self, pressed_left: bool, pressed_up: bool, pressed_right: bool, pressed_down: bool):
         self.velocity_handler.navigation_velocity().solve_equation_and_set_v1_v2(self.velocity_handler.max_navigation_velocity(), 20)
         nav_x: float = self.velocity_handler.navigation_velocity().x()
         nav_y: float = self.velocity_handler.navigation_velocity().y()
@@ -180,7 +172,7 @@ class Satellite(ABC):
                 observed_trajectory: Trajectory = Trajectory(recorded_positions)
                 satellite_trajectory: Trajectory = Trajectory(
                     [self.center().get_as_tuple()] * 4)
-                if self.velocity_handler.value().magnitude() != 0:
+                if self.velocity_handler.velocity().magnitude() != 0:
                     previous_positions = [p.get_as_tuple() for p in self.__previous_four_positions]
                     previous_positions.reverse()
                     satellite_trajectory: Trajectory = Trajectory(previous_positions)
@@ -196,10 +188,12 @@ class Satellite(ABC):
     def avoid_possible_collisions(self):
         observed_satellite = list(self.__possible_collisions)[0]
         observed_trajectory: Trajectory = self.__possible_collisions[observed_satellite].trajectory
-        self.__avoid_observed_satellite_direction_by_90_degrees(
-            observed_satellite_direction=observed_trajectory.get_direction_vector(),
-            observed_satellite_center=observed_trajectory.get_current_position())
-        # self.__avoid_collision_by_random_position()
+        self.navigate_to_in_degree(
+            calculate_degrees_which_avoids_object_by_90_degrees(observed_trajectory.get_direction_vector(),
+                                                                observed_trajectory.get_current_position(),
+                                                                self.velocity_handler.velocity(),
+                                                                self.center()))
+
 
 
     # ----------------------------------------------------------------------- #
@@ -210,28 +204,13 @@ class Satellite(ABC):
         self.__previous_four_positions = self.__previous_four_positions[:4]
 
 
-    def __avoid_collision_by_random_position(self):
-        self.navigate_to_in_degree(random.randint(0, 360))
-        # todo create own class for avoiding methods
-        pass
-
-
     def __list_length_valid_and_at_least_one_sat_moving(self, positions: list, min_list_length=4) -> bool:
         list_length_is_valid: bool = len(positions) >= max(2, min_list_length)
         if not list_length_is_valid:
             return False
         # if none are moving
-        return not (positions[-1] == positions[-2] and not self.velocity_handler.value().magnitude())
+        return not (positions[-1] == positions[-2] and not self.velocity_handler.velocity().magnitude())
 
-
-    def __avoid_observed_satellite_direction_by_90_degrees(self,
-                                                           observed_satellite_direction: Vector,
-                                                           observed_satellite_center: Vector):
-
-        self.navigate_to_in_degree(calculate_degrees_which_avoids_object_by_90_degrees(observed_satellite_center,
-                                                                                       observed_satellite_direction,
-                                                                                       self.center(),
-                                                                                       self.velocity_handler.value()))
 
 
     def get_type(self) -> int:
@@ -300,5 +279,3 @@ class SpaceJunk(Satellite):
 # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

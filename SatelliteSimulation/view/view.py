@@ -1,29 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-View of the satellite simulation. Everything that is part of the visible GUI
-is implemented here. The GUI is based on the python library "pygame".
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
 import pygame
 
-from SatelliteSimulation.view.objects.border_view import BorderView
-from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
-from SatelliteSimulation.view.objects.earth_view import EarthView
-from SatelliteSimulation.view.resources import Color
-from SatelliteSimulation.view.objects.arrow_view import ArrowView
-from SatelliteSimulation.view.resources.images import Images
 from SatelliteSimulation.view.navigation_handler import NavigationHandler
-from SatelliteSimulation.view.objects.view_store import ViewStore
+from SatelliteSimulation.view.objects.arrow_view import ArrowView
+from SatelliteSimulation.view.objects.button.button_control_panel_view import ButtonControlPanelView
 from SatelliteSimulation.view.objects.satellite_observance_border_view import SatelliteObservanceBorderView
 from SatelliteSimulation.view.objects.satellite_view import SatelliteView
+from SatelliteSimulation.view.objects.view_store import ViewStore
+from SatelliteSimulation.view.resources import Color
+from SatelliteSimulation.view.resources.images import Images
 
 # =========================================================================== #
 #  SECTION: Global definitions
@@ -37,6 +24,11 @@ EXPECTED_FRAME_RATE = 60
 #  SECTION: Class definitions
 # =========================================================================== #
 class GUI:
+    """
+    View of the satellite simulation. Everything that is part of the visible GUI
+    is implemented here. The GUI is based on the python library "pygame".
+    """
+
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -67,14 +59,9 @@ class GUI:
         self.__navigation_handler: NavigationHandler = NavigationHandler()
 
         self.__view_store: ViewStore = ViewStore(border_width, border_height, border_padding, button_data)
-        self.__satellite_border: BorderView = self.__view_store.border_view(self.__scale_factor)
-        self.__disturbance_buttons_control_panel_view: ButtonControlPanelView = self.__view_store.button_control_panel(
-            self.__scale_factor)
-        self.__earth: EarthView = self.__view_store.earth(self.__scale_factor)
-        self.__satellite_mini_border: BorderView = self.__view_store.mini_border_view(self.__scale_factor)
+        self.__view_store.scale_views(self.__scale_factor)
 
         self.__clock = pygame.time.Clock()
-
 
 
     # ----------------------------------------------------------------------- #
@@ -87,7 +74,7 @@ class GUI:
 
     @property
     def button_control_panel_view(self) -> ButtonControlPanelView:
-        return self.__disturbance_buttons_control_panel_view
+        return self.__view_store.button_control_panel
 
 
     # ----------------------------------------------------------------------- #
@@ -98,12 +85,12 @@ class GUI:
         surface = self.__surface
 
         surface.blit(self.__background_img, (0, 0))
-        self.__earth.draw(self.__surface)
+        self.__view_store.earth.draw(self.__surface)
         self.__draw_border_connection_lines(surface)
-        self.__satellite_border.draw(surface)
-        self.__satellite_mini_border.draw(surface)
+        self.__view_store.border.draw(surface)
+        self.__view_store.mini_border.draw(surface)
 
-        self.__disturbance_buttons_control_panel_view.draw(surface)
+        self.__view_store.button_control_panel.draw(surface)
 
         if satellite_observance_borders:
             for observance_border in satellite_observance_borders:
@@ -136,11 +123,12 @@ class GUI:
 
 
     def __draw_border_connection_lines(self, surface):
-        satellite_border = self.__satellite_border.get_border_rectangle()
-        satellite_mini_border = self.__satellite_mini_border.get_border_rectangle()
+        satellite_border = self.__view_store.border.get_border_rectangle()
+        satellite_mini_border = self.__view_store.mini_border.get_border_rectangle()
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topleft, satellite_mini_border.topleft, 3)
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomleft, satellite_mini_border.bottomleft, 3)
-        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright, 3)
+        pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.bottomright, satellite_mini_border.bottomright,
+                           3)
         pygame.draw.aaline(surface, Color.LIGHT_GREY, satellite_border.topright, satellite_mini_border.topright, 3)
 
 
@@ -164,10 +152,9 @@ class GUI:
 
 
     def __scale_on_changed(self, scale_factor: float):
-        self.__satellite_border = self.__view_store.border_view(self.__scale_factor)
-        self.__disturbance_buttons_control_panel_view = self.__view_store.button_control_panel(self.__scale_factor)
-        self.__earth = self.__view_store.earth(self.__scale_factor)
-        self.__satellite_mini_border = self.__view_store.mini_border_view(self.__scale_factor)
+        self.__view_store.scale_views(scale_factor)
+        self.__background_img = self.__images.get_background()
+        self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
 
 
     def __draw_satellite(self, satellite: SatelliteView):
@@ -196,22 +183,20 @@ class GUI:
 
                 self.__scale_factor = self.__surface.get_height() / self.__initial_height
                 self.__scale_on_changed(self.__scale_factor)
-                self.__background_img = self.__images.get_background()
-                self.__background_img = pygame.transform.scale(self.__background_img, self.__surface.get_size())
 
 
     def calculate_button_states_and_handle_click_events(self):
-        self.__disturbance_buttons_control_panel_view.calculate_state()
-        self.__disturbance_buttons_control_panel_view.handle_new_click_events()
+        self.__view_store.button_control_panel.calculate_state()
+        self.__view_store.button_control_panel.handle_new_click_events()
 
 
     def handle_user_navigation(self):
         if self.__navigation_handler.should_navigate():
             pressed_left, pressed_up, pressed_right, pressed_down = self.__navigation_handler.get_button_states()
-            self.__controller.navigate_satellite(pressed_left,
-                                                 pressed_up,
-                                                 pressed_right,
-                                                 pressed_down)
+            self.__controller.steer_satellite(pressed_left,
+                                              pressed_up,
+                                              pressed_right,
+                                              pressed_down)
 
 
     def quit(self):
@@ -219,12 +204,11 @@ class GUI:
 
 
     def get_satellite_border_margin(self):
-        return self.__satellite_border.margin
+        return self.__view_store.border.margin
 
 
     def get_satellite_border_padding(self):
-        return self.__satellite_border.padding
-
+        return self.__view_store.border.padding
 
 # =========================================================================== #
 #  SECTION: Function definitions
@@ -233,5 +217,3 @@ class GUI:
 # =========================================================================== #
 #  SECTION: Main Body
 # =========================================================================== #
-if __name__ == '__main__':
-    pass

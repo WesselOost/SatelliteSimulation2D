@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-Class description
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -27,6 +16,10 @@ from SatelliteSimulation.model.basic_math.velocity import Velocity
 
 
 class SatelliteVelocityHandler:
+    """
+    Handles the 3 different velocity types disturbance velocity, collision velocity and navigation velocity.
+    The three different velocities combined form the actual velocity.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -61,8 +54,13 @@ class SatelliteVelocityHandler:
         return self.__collision_velocity
 
 
-    def value(self) -> Vector:
+    def velocity(self) -> Vector:
         return add(self.__navigation_velocity, add(self.__disturbance_velocity, self.__collision_velocity))
+
+    def clear(self):
+        self.__navigation_velocity.clear()
+        self.__disturbance_velocity.clear()
+        self.__collision_velocity.clear()
 
 
     # ----------------------------------------------------------------------- #
@@ -91,5 +89,3 @@ class SatelliteVelocityHandler:
 # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass

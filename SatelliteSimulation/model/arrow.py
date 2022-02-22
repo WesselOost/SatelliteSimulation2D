@@ -1,14 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Date    : 2021-10-28 13:51:47
-# @Author  : Tom Brandherm & Wessel Oostrum
-# @Python  : 3.6.8
-# @Link    : link
-# @Version : 0.0.1
-"""
-An arrow shape
-"""
-
 # =========================================================================== #
 #  SECTION: Imports
 # =========================================================================== #
@@ -28,6 +17,9 @@ VELOCITY_ARROW_DEFAULT_SIZE = 24
 
 
 class Arrow:
+    """
+    An arrow shape made up by 5 points in space.
+    """
 
     # ----------------------------------------------------------------------- #
     #  SUBSECTION: Constructor
@@ -136,5 +128,3 @@ class Arrow:
     # =========================================================================== #
 
 
-if __name__ == '__main__':
-    pass
